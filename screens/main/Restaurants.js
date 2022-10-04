@@ -3,7 +3,7 @@ import React from "react";
 
 const Restaurants = () => {
 	return (
-		<View>
+		<View style={styles.container}>
 			<Text>Restaurants</Text>
 		</View>
 	);
@@ -11,4 +11,10 @@ const Restaurants = () => {
 
 export default Restaurants;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+});

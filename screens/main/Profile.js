@@ -1,14 +1,33 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { Button, StyleSheet, Text, View } from "react-native";
+
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../../redux/slices/user";
+
+import { getAuth, signOut } from "firebase/auth";
+import { auth, storage } from "../../firebase";
 
 const Profile = () => {
+	const dispatch = useDispatch();
+
+	function logoutHandler() {
+		dispatch(logoutUser);
+		signOut(auth);
+	}
+
 	return (
-		<View>
+		<View style={styles.container}>
 			<Text>Profile</Text>
+			<Button title="Logout" onPress={logoutHandler} />
 		</View>
 	);
 };
 
 export default Profile;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+});

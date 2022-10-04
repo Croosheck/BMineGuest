@@ -3,7 +3,7 @@ import React from "react";
 
 const Reservations = () => {
 	return (
-		<View>
+		<View style={styles.container}>
 			<Text>Reservations</Text>
 		</View>
 	);
@@ -11,4 +11,10 @@ const Reservations = () => {
 
 export default Reservations;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+});
