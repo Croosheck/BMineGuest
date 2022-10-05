@@ -9,7 +9,6 @@ const Login = () => {
 	const [credentials, setCredentials] = useState({
 		email: "test@test.com",
 		password: "123123",
-		name: "",
 	});
 
 	function inputHandler(type, text) {

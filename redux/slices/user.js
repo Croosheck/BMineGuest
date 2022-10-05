@@ -18,17 +18,14 @@ export const userSlice = createSlice({
 	name: "user",
 	initialState: {
 		currentUser: null,
-		placesList: [],
+		reservationDate: null,
 	},
 	reducers: {
 		logoutUser: (state) => {
 			state.currentUser = null;
 		},
-		loadPlaces: (state, { payload }) => {
-			state.placesList = [...state.placesList, payload];
-		},
-		clearPlaces: (state) => {
-			state.placesList = [];
+		pickDate: (state, { payload }) => {
+			state.reservationDate = payload;
 		},
 	},
 	extraReducers: {
@@ -38,6 +35,6 @@ export const userSlice = createSlice({
 	},
 });
 
-export const { logoutUser, loadPlaces, clearPlaces } = userSlice.actions;
+export const { logoutUser, pickDate } = userSlice.actions;
 
 export default userSlice.reducer;
