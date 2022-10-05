@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { Button, View } from "react-native";
+import { Alert, Button, View } from "react-native";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { useDispatch } from "react-redux";
 import { pickDate } from "../redux/slices/user";
-import { calendar } from "../util/permissions";
+import { calendar, reminder } from "../util/permissions";
 
 const Calendar = () => {
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 	const dispatch = useDispatch();
 
+	let permissionCalendarStatus;
+
 	// Request permissios to use system calendar (read and write)
 	useEffect(() => {
-		calendar();
+		async function permissionsStatus() {
+			permissionCalendarStatus = await calendar();
+		}
+		permissionsStatus();
 	}, []);
 
 	const showDatePicker = () => {
+		if (permissionCalendarStatus !== "granted") {
+			Alert.alert("Access denied!", "No permission to use Your calendar.");
+			return;
+		}
 		setDatePickerVisibility(true);
 	};
 

@@ -1,13 +1,25 @@
-import { StyleSheet, View, Button, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Button, Alert, Platform } from "react-native";
 
 import { useDispatch } from "react-redux";
 import { clearDate } from "../redux/slices/user";
 
 import * as SystemCalendar from "expo-calendar";
+import { useEffect } from "react";
 
 const AddEvent = ({ eventDate }) => {
 	const dispatch = useDispatch();
+
+	let permissionReminderStatus;
+
+	useEffect(() => {
+		async function permissionsStatus() {
+			//only ios
+			permissionReminderStatus = await reminder();
+		}
+		if (Platform.OS === "ios") {
+			permissionsStatus();
+		}
+	});
 
 	async function getDefaultCalendarSource() {
 		const defaultCalendar = await SystemCalendar.getDefaultCalendarAsync();
@@ -15,12 +27,17 @@ const AddEvent = ({ eventDate }) => {
 	}
 
 	async function createCalendar() {
+		// if (permissionReminderStatus !== "granted") {
+		// 	Alert.alert("Access denied!", "No permission to use Your calendar.");
+		// 	return;
+		// }
+
 		const defaultCalendarSource =
 			Platform.OS === "ios"
 				? await getDefaultCalendarSource()
-				: { isLocalAccount: true, name: "Expo Calendar" };
+				: { isLocalAccount: true, name: "Restaurant Reservation" };
 		const newCalendarID = await SystemCalendar.createCalendarAsync({
-			title: "Expo Calendar",
+			title: "Reservations Calendar",
 			color: "blue",
 			entityType: SystemCalendar.EntityTypes.EVENT,
 			sourceId: defaultCalendarSource.id,
@@ -29,7 +46,6 @@ const AddEvent = ({ eventDate }) => {
 			ownerAccount: "personal",
 			accessLevel: SystemCalendar.CalendarAccessLevel.OWNER,
 		});
-		console.log(`Your new calendar ID is: ${newCalendarID}`);
 		return newCalendarID;
 	}
 
@@ -40,9 +56,19 @@ const AddEvent = ({ eventDate }) => {
 			const res = await SystemCalendar.createEventAsync(calendarId, {
 				endDate: new Date(eventDate),
 				startDate: new Date(eventDate),
-				title: `Test event: ${eventDate}`,
+				title: `Restaurant Reservation`,
+				alarms: [
+					{
+						// Reminder offset (in minutes)
+						relativeOffset: -120,
+						method: SystemCalendar.AlarmMethod.ALERT,
+					},
+				],
 			});
-			Alert.alert("Success!", "Event Created.");
+			Alert.alert(
+				"Success!",
+				"Your reservation has been added to Your calendar."
+			);
 			dispatch(clearDate());
 		} catch (e) {
 			console.log(e);
@@ -58,4 +84,8 @@ const AddEvent = ({ eventDate }) => {
 
 export default AddEvent;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+	container: {
+		marginVertical: 10,
+	},
+});
