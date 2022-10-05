@@ -27,6 +27,9 @@ export const userSlice = createSlice({
 		pickDate: (state, { payload }) => {
 			state.reservationDate = payload;
 		},
+		clearDate: (state) => {
+			state.reservationDate = null;
+		},
 	},
 	extraReducers: {
 		[getUser.fulfilled]: (state, { payload }) => {
@@ -35,6 +38,6 @@ export const userSlice = createSlice({
 	},
 });
 
-export const { logoutUser, pickDate } = userSlice.actions;
+export const { logoutUser, pickDate, clearDate } = userSlice.actions;
 
 export default userSlice.reducer;

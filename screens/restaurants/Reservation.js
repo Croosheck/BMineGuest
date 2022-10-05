@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Button, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
 
 import Calendar from "../../components/Calendar";
 import { formatDate } from "../../util/dateFormat";
+import AddEvent from "../../components/AddEvent";
 
 const Reservation = () => {
 	const [displayTime, setDisplayTime] = useState();
@@ -19,6 +20,7 @@ const Reservation = () => {
 	return (
 		<View style={styles.container}>
 			<Calendar />
+			{reservationDate && <AddEvent eventDate={reservationDate} />}
 			<Text>{displayTime}</Text>
 		</View>
 	);

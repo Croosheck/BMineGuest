@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, View } from "react-native";
+
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { useDispatch } from "react-redux";
 import { pickDate } from "../redux/slices/user";
+import { calendar } from "../util/permissions";
 
 const Calendar = () => {
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 	const dispatch = useDispatch();
+
+	// Request permissios to use system calendar (read and write)
+	useEffect(() => {
+		calendar();
+	}, []);
 
 	const showDatePicker = () => {
 		setDatePickerVisibility(true);
