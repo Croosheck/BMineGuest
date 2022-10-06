@@ -27,10 +27,10 @@ const AddEvent = ({ eventDate }) => {
 	}
 
 	async function createCalendar() {
-		// if (permissionReminderStatus !== "granted") {
-		// 	Alert.alert("Access denied!", "No permission to use Your calendar.");
-		// 	return;
-		// }
+		if (Platform.OS === "ios" && permissionReminderStatus !== "granted") {
+			Alert.alert("Access denied!", "No permission to use Your calendar.");
+			return;
+		}
 
 		const defaultCalendarSource =
 			Platform.OS === "ios"

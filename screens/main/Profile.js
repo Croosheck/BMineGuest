@@ -16,7 +16,6 @@ const Profile = () => {
 
 	return (
 		<View style={styles.container}>
-			<Text>Profile</Text>
 			<Button title="Logout" onPress={logoutHandler} />
 		</View>
 	);
@@ -29,5 +28,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+		backgroundColor: "#311A1A",
 	},
 });

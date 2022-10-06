@@ -19,7 +19,7 @@ const Calendar = () => {
 			permissionCalendarStatus = await calendar();
 		}
 		permissionsStatus();
-	}, []);
+	});
 
 	const showDatePicker = () => {
 		if (permissionCalendarStatus !== "granted") {

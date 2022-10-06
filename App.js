@@ -15,6 +15,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import { getAuth } from "firebase/auth";
+import RestaurantProfile from "./screens/restaurants/RestaurantProfile";
 
 function AppContainer() {
 	const Stack = createStackNavigator();
@@ -84,8 +85,24 @@ function AppContainer() {
 						headerShown: false,
 					}}
 				/>
+				<Stack.Screen
+					name="RestaurantProfile"
+					component={RestaurantProfile}
+					options={{
+						headerShown: false,
+					}}
+				/>
 			</Stack.Navigator>
 		</NavigationContainer>
+	);
+}
+
+export default function App() {
+	return (
+		<Provider store={store}>
+			<StatusBar translucent={false} style="light" />
+			<AppContainer />
+		</Provider>
 	);
 }
 
@@ -96,12 +113,3 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 });
-
-export default function App() {
-	return (
-		<Provider store={store}>
-			<StatusBar translucent={false} style="light" />
-			<AppContainer />
-		</Provider>
-	);
-}

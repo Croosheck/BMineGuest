@@ -4,7 +4,7 @@ import React from "react";
 const Reservations = () => {
 	return (
 		<View style={styles.container}>
-			<Text>Reservations</Text>
+			<Text style={styles.text}>Reservations</Text>
 		</View>
 	);
 };
@@ -16,5 +16,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+		backgroundColor: "#311A1A",
+	},
+	text: {
+		color: "#ffffff",
 	},
 });
