@@ -17,18 +17,25 @@ export const getUser = createAsyncThunk("user/getUser", async () => {
 export const userSlice = createSlice({
 	name: "user",
 	initialState: {
-		currentUser: null,
-		reservationDate: null,
+		currentUser: "",
+		reservationData: {},
+		reservationDate: "",
 	},
 	reducers: {
-		logoutUser: (state) => {
-			state.currentUser = null;
+		addReservationItem: (state, { payload }) => {
+			state.reservationData = { ...state.reservationData, ...payload };
+		},
+		removeReservationItem: (state, { payload }) => {
+			state.reservationData = { ...state.reservationData, ...payload };
 		},
 		pickDate: (state, { payload }) => {
 			state.reservationDate = payload;
 		},
 		clearDate: (state) => {
-			state.reservationDate = null;
+			state.reservationDate = "";
+		},
+		logoutUser: (state) => {
+			state.currentUser = "";
 		},
 	},
 	extraReducers: {
@@ -38,6 +45,12 @@ export const userSlice = createSlice({
 	},
 });
 
-export const { logoutUser, pickDate, clearDate } = userSlice.actions;
+export const {
+	addReservationItem,
+	removeReservationItem,
+	pickDate,
+	clearDate,
+	logoutUser,
+} = userSlice.actions;
 
 export default userSlice.reducer;

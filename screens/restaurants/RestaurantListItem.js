@@ -11,9 +11,10 @@ import React from "react";
 const RestaurantListItem = ({
 	name,
 	imageUri,
-	description,
+	category,
 	reservationsStatus,
 	onPress,
+	id,
 }) => {
 	return (
 		<View style={styles.outerContainer}>
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
 		borderRadius: 20,
 	},
 	nameContainer: {
-		backgroundColor: "#CCCCCC8A",
+		backgroundColor: "#CCCCCC6E",
 		width: "100%",
 		justifyContent: "center",
 		alignItems: "center",
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 	},
 	name: {
-		fontSize: 20,
+		fontSize: 24,
 		fontWeight: "bold",
 		color: "#000000",
 	},

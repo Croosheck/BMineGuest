@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -12,7 +11,6 @@ import Profile from "./main/Profile";
 
 const Main = () => {
 	const Tab = createMaterialBottomTabNavigator();
-	const Stack = createNativeStackNavigator();
 
 	return (
 		<>

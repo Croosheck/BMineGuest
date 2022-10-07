@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
 	Button,
 	Dimensions,
@@ -6,10 +7,38 @@ import {
 	Text,
 	View,
 } from "react-native";
-import React from "react";
 
-const RestaurantProfile = ({ route }) => {
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "../../redux/slices/user";
+
+const RestaurantProfile = ({ navigation, route }) => {
 	const { name, imageUri, description } = route.params;
+
+	const dispatch = useDispatch();
+	const { name: username, email } = useSelector(
+		(state) => state.userReducer.currentUser
+	);
+
+	useEffect(() => {
+		dispatch(getUser());
+	}, []);
+
+	function onReserveHandler() {
+		navigation.navigate("ReserveMain");
+	}
+
+	const emailShown = email ? (
+		<Text style={styles.description}>{email}</Text>
+	) : (
+		<Text style={[styles.description, { opacity: 0 }]}>.</Text>
+	);
+
+	const usernameShown = username ? (
+		<Text style={styles.description}>{username}</Text>
+	) : (
+		<Text style={[styles.description, { opacity: 0 }]}>.</Text>
+	);
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.imageContainer}>
@@ -19,14 +48,20 @@ const RestaurantProfile = ({ route }) => {
 			<View style={styles.menuContainer}>
 				<View style={styles.detailsContainer}>
 					<Text style={styles.description}>{description}</Text>
+					<Text style={styles.description}>{description}</Text>
+					{emailShown}
+					{usernameShown}
 				</View>
 				<View style={styles.buttonsContainer}>
+					{/* <View style={styles.button}>
+						<Button title="Social" />
+					</View> */}
 					<View style={styles.button}>
-						<Button title="Button" />
+						<Button title="Reserve" onPress={onReserveHandler} />
 					</View>
-					<View style={styles.button}>
-						<Button title="Button" />
-					</View>
+					{/* <View style={styles.button}>
+						<Button title="Navigate" />
+					</View> */}
 				</View>
 			</View>
 		</View>
@@ -44,12 +79,12 @@ const styles = StyleSheet.create({
 		padding: 8,
 	},
 	imageContainer: {
-		flex: 0.5,
+		flex: 0.55,
 		// borderWidth: 2,
 		// borderColor: "#ffffff",
 	},
 	image: {
-		height: Dimensions.get("window").width * 0.6,
+		height: Dimensions.get("window").height * 0.35,
 		width: Dimensions.get("window").width * 0.95,
 		borderWidth: 2,
 		borderColor: "#ffffff",
@@ -59,7 +94,7 @@ const styles = StyleSheet.create({
 		color: "#ffffff",
 		fontSize: 20,
 		textAlign: "center",
-		marginVertical: 16,
+		marginVertical: Dimensions.get("window").height * 0.02,
 	},
 	menuContainer: {
 		flex: 0.6,
@@ -69,20 +104,25 @@ const styles = StyleSheet.create({
 		// borderColor: "#ffffff",
 	},
 	detailsContainer: {
-		flexDirection: "column",
-		justifyContent: "flex-start",
+		flex: 0.9,
+		justifyContent: "center",
+		// borderWidth: 2,
+		// borderColor: "#ffffff",
 	},
 	description: {
 		textAlign: "center",
 		color: "#ffffff",
-		marginVertical: 24,
+		marginVertical: Dimensions.get("window").height * 0.01,
 	},
 	buttonsContainer: {
 		flexDirection: "row",
 		justifyContent: "center",
+		marginBottom: Dimensions.get("window").height * 0.02,
+		// borderWidth: 2,
+		// borderColor: "#ffffff",
 	},
 	button: {
-		width: Dimensions.get("window").width * 0.4,
-		marginHorizontal: 24,
+		minWidth: Dimensions.get("window").width * 0.25,
+		marginHorizontal: 12,
 	},
 });

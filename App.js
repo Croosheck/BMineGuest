@@ -16,6 +16,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import { getAuth } from "firebase/auth";
 import RestaurantProfile from "./screens/restaurants/RestaurantProfile";
+import ReserveMain from "./screens/reservationProcess/ReserveMain";
+import Summary from "./screens/reservationProcess/Summary";
 
 function AppContainer() {
 	const Stack = createStackNavigator();
@@ -90,6 +92,33 @@ function AppContainer() {
 					component={RestaurantProfile}
 					options={{
 						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="ReserveMain"
+					component={ReserveMain}
+					options={{
+						// headerShown: false,
+						headerTitle: "Reservation Options",
+						headerStyle: {
+							backgroundColor: "#330A0A",
+							// borderColor: "#ffffff",
+							// borderBottomWidth: 2,
+						},
+						headerTintColor: "#ffffff",
+					}}
+				/>
+				<Stack.Screen
+					name="Summary"
+					component={Summary}
+					options={{
+						// headerShown: false,
+						headerStyle: {
+							backgroundColor: "#330A0A",
+							// borderColor: "#ffffff",
+							// borderBottomWidth: 2,
+						},
+						headerTintColor: "#ffffff",
 					}}
 				/>
 			</Stack.Navigator>
