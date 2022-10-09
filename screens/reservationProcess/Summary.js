@@ -1,12 +1,32 @@
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+	Button,
+	Dimensions,
+	Pressable,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { useSelector } from "react-redux";
 import { formatDate } from "../../util/dateFormat";
+import uploadData from "../../util/storage";
 
 const Summary = ({ navigation }) => {
 	const [displayTime, setDisplayTime] = useState();
 
+	const { table, extras } = useSelector(
+		(state) => state.userReducer.reservationData
+	);
+	const { reservationDate } = useSelector((state) => state.userReducer);
+
 	useLayoutEffect(() => {
+		const data = {
+			rsrvDate: formatDate(reservationDate),
+			rsrvTimestamp: reservationDate,
+			table: table,
+			extras: extras,
+		};
+
 		navigation.setOptions({
 			headerRight: () => (
 				<Pressable
@@ -25,6 +45,8 @@ const Summary = ({ navigation }) => {
 					onPress={() => {
 						console.log("Pressed");
 						// navigation.navigate();
+
+						uploadData(null, null, data);
 					}}
 				>
 					<Text style={{ color: "#ffffff" }}>All Done!</Text>
@@ -32,11 +54,6 @@ const Summary = ({ navigation }) => {
 			),
 		});
 	});
-
-	const { table, extras } = useSelector(
-		(state) => state.userReducer.reservationData
-	);
-	const { reservationDate } = useSelector((state) => state.userReducer);
 
 	useEffect(() => {
 		if (!reservationDate) return;
@@ -46,7 +63,8 @@ const Summary = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.text}>{displayTime}</Text>
-			{table && <Text style={styles.text}>{table}</Text>}
+			{table && <Text style={styles.text}>Shape: {table.tShape}</Text>}
+			{table && <Text style={styles.text}>Seats: {table.tSeats}</Text>}
 			{extras && <Text style={styles.text}>{extras}</Text>}
 		</View>
 	);

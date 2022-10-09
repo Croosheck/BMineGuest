@@ -1,5 +1,4 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import React from "react";
 import RestaurantListItem from "../restaurants/RestaurantListItem";
 
 import { RESTAURANTS } from "../../util/restaurants";

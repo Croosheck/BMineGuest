@@ -2,7 +2,7 @@ import { Dimensions, Pressable, StyleSheet, Text } from "react-native";
 import LoadingScreen from "../../components/LoadingScreen";
 
 import Date from "./Date";
-import Table from "./Table";
+import Tables from "./Tables";
 import Extras from "./Extras";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -59,7 +59,7 @@ const ReserveMain = ({ navigation }) => {
 			}}
 		>
 			<TopTab.Screen name="Date" component={Date} />
-			<TopTab.Screen name="Table" component={Table} />
+			<TopTab.Screen name="Tables" component={Tables} />
 			<TopTab.Screen name="Extras" component={Extras} />
 		</TopTab.Navigator>
 	);

@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getDoc, doc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 
+import { RESTAURANTS } from "../../util/restaurants";
+
 export const getUser = createAsyncThunk("user/getUser", async () => {
 	const docRef = doc(db, "users", auth.currentUser.uid);
 	const docSnap = await getDoc(docRef);
@@ -14,12 +16,15 @@ export const getUser = createAsyncThunk("user/getUser", async () => {
 	}
 });
 
+const restaurants = RESTAURANTS;
+
 export const userSlice = createSlice({
 	name: "user",
 	initialState: {
 		currentUser: "",
 		reservationData: {},
 		reservationDate: "",
+		availableRestaurants: restaurants,
 	},
 	reducers: {
 		addReservationItem: (state, { payload }) => {
@@ -37,6 +42,22 @@ export const userSlice = createSlice({
 		logoutUser: (state) => {
 			state.currentUser = "";
 		},
+		tablePicked: (state, { payload }) => {
+			const pickedRestaurantIndex = state.availableRestaurants.findIndex(
+				(restaurant) => restaurant.key === payload.key
+			);
+
+			state.availableRestaurants[pickedRestaurantIndex].tables.map(
+				(table) => (table.tPicked = false)
+			);
+
+			state.availableRestaurants[pickedRestaurantIndex].tables[
+				payload.tableIndex
+			].tPicked =
+				!state.availableRestaurants[pickedRestaurantIndex].tables[
+					payload.tableIndex
+				].tPicked;
+		},
 	},
 	extraReducers: {
 		[getUser.fulfilled]: (state, { payload }) => {
@@ -51,6 +72,7 @@ export const {
 	pickDate,
 	clearDate,
 	logoutUser,
+	tablePicked,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -13,7 +13,7 @@ import { auth, db } from "../../firebase";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 
-import uploadFile from "../../util/storage";
+import uploadData from "../../util/storage";
 
 import * as ImagePicker from "expo-image-picker";
 
@@ -108,7 +108,7 @@ const Register = () => {
 
 		getAuth().onAuthStateChanged((user) => {
 			if (user) {
-				uploadFile(image, "profilePic");
+				uploadData(image, "userProfile");
 			}
 		});
 	}

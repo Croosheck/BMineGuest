@@ -23,7 +23,8 @@
 				"foregroundImage": "./assets/adaptive-icon.png",
 				"backgroundColor": "#FFFFFF"
 			},
-			"permissions": ["READ_CALENDAR", "WRITE_CALENDAR"]
+			"permissions": ["READ_CALENDAR", "WRITE_CALENDAR"],
+			"package": "com.croosheck.bmineguest"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
