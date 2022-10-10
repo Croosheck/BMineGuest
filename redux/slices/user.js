@@ -22,16 +22,32 @@ export const userSlice = createSlice({
 	name: "user",
 	initialState: {
 		currentUser: "",
-		reservationData: {},
+		reservationData: {
+			extras: [],
+			table: [],
+		},
 		reservationDate: "",
 		availableRestaurants: restaurants,
 	},
 	reducers: {
-		addReservationItem: (state, { payload }) => {
+		addTable: (state, { payload }) => {
 			state.reservationData = { ...state.reservationData, ...payload };
 		},
-		removeReservationItem: (state, { payload }) => {
-			state.reservationData = { ...state.reservationData, ...payload };
+		addExtra: (state, { payload }) => {
+			state.reservationData = {
+				...state.reservationData,
+				extras: [...state.reservationData.extras, { ...payload }],
+			};
+		},
+		removeExtra: (state, { payload }) => {
+			const filteredExtras = state.reservationData.extras.filter(
+				(item) => item.xName !== payload
+			);
+
+			state.reservationData = {
+				...state.reservationData,
+				extras: filteredExtras,
+			};
 		},
 		pickDate: (state, { payload }) => {
 			state.reservationDate = payload;
@@ -58,6 +74,22 @@ export const userSlice = createSlice({
 					payload.tableIndex
 				].tPicked;
 		},
+		extraPicked: (state, { payload }) => {
+			const pickedRestaurantIndex = state.availableRestaurants.findIndex(
+				(restaurant) => restaurant.key === payload.key
+			);
+
+			// state.availableRestaurants[pickedRestaurantIndex].extras.map(
+			// 	(extra) => (extra.xPicked = false)
+			// );
+
+			state.availableRestaurants[pickedRestaurantIndex].extras[
+				payload.extraIndex
+			].xPicked =
+				!state.availableRestaurants[pickedRestaurantIndex].extras[
+					payload.extraIndex
+				].xPicked;
+		},
 	},
 	extraReducers: {
 		[getUser.fulfilled]: (state, { payload }) => {
@@ -67,12 +99,14 @@ export const userSlice = createSlice({
 });
 
 export const {
-	addReservationItem,
-	removeReservationItem,
+	addTable,
+	addExtra,
+	removeExtra,
 	pickDate,
 	clearDate,
 	logoutUser,
 	tablePicked,
+	extraPicked,
 } = userSlice.actions;
 
 export default userSlice.reducer;

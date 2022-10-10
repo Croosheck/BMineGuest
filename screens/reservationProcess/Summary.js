@@ -3,6 +3,7 @@ import {
 	Button,
 	Dimensions,
 	Pressable,
+	ScrollView,
 	StyleSheet,
 	Text,
 	View,
@@ -43,9 +44,6 @@ const Summary = ({ navigation }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
-						console.log("Pressed");
-						// navigation.navigate();
-
 						uploadData(null, null, data);
 					}}
 				>
@@ -65,7 +63,22 @@ const Summary = ({ navigation }) => {
 			<Text style={styles.text}>{displayTime}</Text>
 			{table && <Text style={styles.text}>Shape: {table.tShape}</Text>}
 			{table && <Text style={styles.text}>Seats: {table.tSeats}</Text>}
-			{extras && <Text style={styles.text}>{extras}</Text>}
+			{extras && (
+				<ScrollView>
+					<View style={{ flexDirection: "column" }}>
+						{extras.map((item) => {
+							return (
+								<Text
+									key={Math.random() * 1000000}
+									style={{ color: "#ffffff" }}
+								>
+									{item.xName}
+								</Text>
+							);
+						})}
+					</View>
+				</ScrollView>
+			)}
 		</View>
 	);
 };

@@ -2,18 +2,16 @@ import { Dimensions, FlatList, StyleSheet, View } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
-	addReservationItem,
+	addTable,
 	removeReservationItem,
 	tablePicked,
 } from "../../redux/slices/user";
 
-import TableTile from "../../components/TableTile";
-import { RESTAURANTS } from "../../util/restaurants";
+import ItemTile from "../../components/ItemTile";
 import { useEffect, useState } from "react";
 
 const Tables = () => {
 	const [tables, setTables] = useState();
-	const [tabPicked, setTabPicked] = useState(false);
 
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
 
@@ -31,7 +29,7 @@ const Tables = () => {
 
 	function addDataHandler(itemData) {
 		dispatch(
-			addReservationItem({
+			addTable({
 				table: {
 					tShape: itemData.item.tShape,
 					tSeats: itemData.item.tSeats,
@@ -44,8 +42,6 @@ const Tables = () => {
 				tableIndex: itemData.index,
 			})
 		);
-
-		console.log(itemData.item.tPicked);
 	}
 
 	function removeDataHandler() {
@@ -60,11 +56,14 @@ const Tables = () => {
 					numColumns={2}
 					renderItem={(itemData) => {
 						return (
-							<TableTile
-								shape={itemData.item.tShape}
-								seats={itemData.item.tSeats}
+							<ItemTile
+								title={`${itemData.item.tShape}`}
+								textBelow={`${itemData.item.tSeats}`}
 								onPress={() => addDataHandler(itemData)}
 								picked={itemData.item.tPicked}
+								iconName="human-male-female"
+								iconSize={20}
+								iconColor="#ffffff"
 							/>
 						);
 					}}
