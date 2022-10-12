@@ -2,21 +2,18 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getDoc, doc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 
-import { RESTAURANTS } from "../../util/restaurants";
+import { RESTAURANTS as restaurants } from "../../util/restaurants";
 
 export const getUser = createAsyncThunk("user/getUser", async () => {
 	const docRef = doc(db, "users", auth.currentUser.uid);
 	const docSnap = await getDoc(docRef);
 
 	if (docSnap.exists()) {
-		const { email, name, registrationTimestamp, lastTimeLoggedIn } =
-			docSnap.data();
+		const { email, name } = docSnap.data();
 
 		return { email, name };
 	}
 });
-
-const restaurants = RESTAURANTS;
 
 export const userSlice = createSlice({
 	name: "user",
@@ -24,7 +21,7 @@ export const userSlice = createSlice({
 		currentUser: "",
 		reservationData: {
 			extras: [],
-			table: [],
+			table: {},
 		},
 		reservationDate: "",
 		availableRestaurants: restaurants,
@@ -48,6 +45,24 @@ export const userSlice = createSlice({
 				...state.reservationData,
 				extras: filteredExtras,
 			};
+		},
+		clearReservationData: (state, { payload }) => {
+			state.reservationData = {
+				extras: [],
+				table: {},
+			};
+
+			const currentRestaurantIndex = state.availableRestaurants.findIndex(
+				(restaurant) => restaurant.key === payload
+			);
+
+			state.availableRestaurants[currentRestaurantIndex].tables.map(
+				(table) => (table.tPicked = false)
+			);
+
+			state.availableRestaurants[currentRestaurantIndex].extras.map(
+				(extra) => (extra.xPicked = false)
+			);
 		},
 		pickDate: (state, { payload }) => {
 			state.reservationDate = payload;
@@ -79,10 +94,6 @@ export const userSlice = createSlice({
 				(restaurant) => restaurant.key === payload.key
 			);
 
-			// state.availableRestaurants[pickedRestaurantIndex].extras.map(
-			// 	(extra) => (extra.xPicked = false)
-			// );
-
 			state.availableRestaurants[pickedRestaurantIndex].extras[
 				payload.extraIndex
 			].xPicked =
@@ -102,6 +113,7 @@ export const {
 	addTable,
 	addExtra,
 	removeExtra,
+	clearReservationData,
 	pickDate,
 	clearDate,
 	logoutUser,

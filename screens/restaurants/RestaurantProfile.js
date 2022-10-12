@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/slices/user";
 
 const RestaurantProfile = ({ navigation, route }) => {
-	const { name, imageUri, description } = route.params;
+	const { name, imageUri, description, restaurantKey } = route.params;
 
 	const dispatch = useDispatch();
 	const { name: username, email } = useSelector(
@@ -24,7 +24,9 @@ const RestaurantProfile = ({ navigation, route }) => {
 	}, []);
 
 	function onReserveHandler() {
-		navigation.navigate("ReserveMain");
+		navigation.navigate("ReserveMain", {
+			restaurantKey: restaurantKey,
+		});
 	}
 
 	const emailShown = email ? (
@@ -48,7 +50,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 			<View style={styles.menuContainer}>
 				<View style={styles.detailsContainer}>
 					<Text style={styles.description}>{description}</Text>
-					<Text style={styles.description}>{description}</Text>
+					<Text style={styles.description}>{restaurantKey}</Text>
 					{emailShown}
 					{usernameShown}
 				</View>

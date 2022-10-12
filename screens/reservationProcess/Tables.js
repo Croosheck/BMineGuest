@@ -10,15 +10,16 @@ import {
 import ItemTile from "../../components/ItemTile";
 import { useEffect, useState } from "react";
 
-const Tables = () => {
+const Tables = ({ route }) => {
 	const [tables, setTables] = useState();
 
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
 
 	const dispatch = useDispatch();
 
+	const { restaurantKey } = route.params;
+
 	let pickedRestaurant;
-	let restaurantKey = 2;
 
 	useEffect(() => {
 		pickedRestaurant = availableRestaurants.filter(

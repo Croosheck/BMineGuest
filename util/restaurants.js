@@ -58,7 +58,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 1.99,
 				xAvailability: true,
 				xPicked: false,
 			},
@@ -144,7 +144,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 2.99,
 				xAvailability: true,
 				xPicked: false,
 			},
@@ -230,7 +230,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 3.99,
 				xAvailability: true,
 				xPicked: false,
 			},
@@ -316,7 +316,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 4.99,
 				xAvailability: true,
 				xPicked: false,
 			},
@@ -402,7 +402,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 5.99,
 				xAvailability: true,
 				xPicked: false,
 			},
@@ -488,7 +488,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 6.99,
 				xAvailability: true,
 				xPicked: false,
 			},
@@ -574,7 +574,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 7.99,
 				xAvailability: true,
 				xPicked: false,
 			},
@@ -660,7 +660,7 @@ export const RESTAURANTS = [
 			{
 				xName: "Candles",
 				xImage: null,
-				xPrice: 0.99,
+				xPrice: 8.99,
 				xAvailability: true,
 				xPicked: false,
 			},

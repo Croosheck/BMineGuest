@@ -1,11 +1,4 @@
-import {
-	Dimensions,
-	Image,
-	Pressable,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text } from "react-native";
 import LoadingScreen from "../../components/LoadingScreen";
 
 import Date from "./Date";
@@ -13,11 +6,26 @@ import Tables from "./Tables";
 import Extras from "./Extras";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import ImageIcon from "../../components/ImageIcon";
+import { useDispatch } from "react-redux";
+import { clearDate, clearReservationData } from "../../redux/slices/user";
 
-const ReserveMain = ({ navigation }) => {
+const ReserveMain = ({ navigation, route }) => {
 	const TopTab = createMaterialTopTabNavigator();
+	const dispatch = useDispatch();
+	const { restaurantKey } = route.params;
+
+	useEffect(() => {
+		const unsubscribe = navigation.addListener("beforeRemove", () => {
+			dispatch(clearReservationData(restaurantKey));
+			dispatch(clearDate());
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -36,7 +44,6 @@ const ReserveMain = ({ navigation }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
-						console.log("Pressed");
 						navigation.navigate("Summary");
 					}}
 				>
@@ -50,7 +57,8 @@ const ReserveMain = ({ navigation }) => {
 		<TopTab.Navigator
 			initialRouteName="Date"
 			screenOptions={{
-				tabBarStyle: { backgroundColor: "#000000" },
+				tabBarShowLabel: false,
+				tabBarStyle: { backgroundColor: "#000A2B" },
 				tabBarLabelStyle: { fontWeight: "600" },
 				tabBarActiveTintColor: "#ffffff",
 				tabBarInactiveTintColor: "#311A1A",
@@ -60,17 +68,16 @@ const ReserveMain = ({ navigation }) => {
 				lazyPlaceholder: () => <LoadingScreen />,
 
 				// for older OS
-				tabBarPressOpacity: 0,
-
-				// tabBarShowLabel: false,
-				// tabBarIcon: ({ focused, color }) => <Text>X</Text>,
+				tabBarPressOpacity: 0.5,
 			}}
 		>
 			<TopTab.Screen
 				name="Date"
 				component={Date}
+				initialParams={{
+					restaurantKey: restaurantKey,
+				}}
 				options={{
-					tabBarShowLabel: false,
 					tabBarIcon: () => {
 						return (
 							<ImageIcon source={require("../../assets/icons/date.png")} />
@@ -81,8 +88,10 @@ const ReserveMain = ({ navigation }) => {
 			<TopTab.Screen
 				name="Tables"
 				component={Tables}
+				initialParams={{
+					restaurantKey: restaurantKey,
+				}}
 				options={{
-					tabBarShowLabel: false,
 					tabBarIcon: () => {
 						return (
 							<ImageIcon source={require("../../assets/icons/table.png")} />
@@ -93,8 +102,10 @@ const ReserveMain = ({ navigation }) => {
 			<TopTab.Screen
 				name="Extras"
 				component={Extras}
+				initialParams={{
+					restaurantKey: restaurantKey,
+				}}
 				options={{
-					tabBarShowLabel: false,
 					tabBarIcon: () => {
 						return (
 							<ImageIcon source={require("../../assets/icons/extra.png")} />

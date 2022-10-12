@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
-	Button,
 	Dimensions,
 	Pressable,
 	ScrollView,
@@ -20,12 +19,17 @@ const Summary = ({ navigation }) => {
 	);
 	const { reservationDate } = useSelector((state) => state.userReducer);
 
+	const extrasPrice = extras.reduce((acc, item) => {
+		return acc + item.xPrice;
+	}, 0);
+
 	useLayoutEffect(() => {
 		const data = {
 			rsrvDate: formatDate(reservationDate),
 			rsrvTimestamp: reservationDate,
 			table: table,
 			extras: extras,
+			extrasTotalPrice: extrasPrice,
 		};
 
 		navigation.setOptions({
@@ -44,7 +48,8 @@ const Summary = ({ navigation }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
-						uploadData(null, null, data);
+						// uploadData(null, null, data);
+						console.log("Pressed");
 					}}
 				>
 					<Text style={{ color: "#ffffff" }}>All Done!</Text>
@@ -72,11 +77,14 @@ const Summary = ({ navigation }) => {
 									key={Math.random() * 1000000}
 									style={{ color: "#ffffff" }}
 								>
-									{item.xName}
+									- {item.xName}
 								</Text>
 							);
 						})}
 					</View>
+					{extras && (
+						<Text style={styles.text}>Extras total price: {extrasPrice}</Text>
+					)}
 				</ScrollView>
 			)}
 		</View>

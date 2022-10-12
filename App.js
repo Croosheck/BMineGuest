@@ -98,12 +98,11 @@ function AppContainer() {
 					name="ReserveMain"
 					component={ReserveMain}
 					options={{
-						// headerShown: false,
 						headerTitle: "Reservation Options",
 						headerStyle: {
 							backgroundColor: "#330A0A",
-							// borderColor: "#ffffff",
-							// borderBottomWidth: 2,
+							borderColor: "#ffffff",
+							borderBottomWidth: 0.5,
 						},
 						headerTintColor: "#ffffff",
 					}}
@@ -112,11 +111,10 @@ function AppContainer() {
 					name="Summary"
 					component={Summary}
 					options={{
-						// headerShown: false,
 						headerStyle: {
 							backgroundColor: "#330A0A",
-							// borderColor: "#ffffff",
-							// borderBottomWidth: 2,
+							borderColor: "#ffffff",
+							borderBottomWidth: 0.5,
 						},
 						headerTintColor: "#ffffff",
 					}}

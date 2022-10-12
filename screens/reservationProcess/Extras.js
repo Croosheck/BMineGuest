@@ -1,28 +1,22 @@
 import { useEffect, useState } from "react";
-import {
-	Button,
-	Dimensions,
-	FlatList,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
+import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { useDispatch, useSelector } from "react-redux";
 import ItemTile from "../../components/ItemTile";
 import { addExtra, removeExtra, extraPicked } from "../../redux/slices/user";
 
-const Extras = () => {
+const Extras = ({ route }) => {
 	const [extraItems, setExtraItems] = useState();
 	const { availableRestaurants, reservationData } = useSelector(
 		(state) => state.userReducer
 	);
 
+	const { restaurantKey } = route.params;
+
 	const dispatch = useDispatch();
 
 	let pickedRestaurant;
-	let restaurantKey = 2;
 
 	useEffect(() => {
 		pickedRestaurant = availableRestaurants.filter(
@@ -50,9 +44,9 @@ const Extras = () => {
 			);
 		}
 
-		// If highlighted - remove on click
+		// If picked (highlighted) - remove on click
 		if (itemData.item.xPicked) {
-			let disableItem = reservationData.extras.find(
+			const disableItem = reservationData.extras.find(
 				(item) => item.xName === itemData.item.xName
 			);
 

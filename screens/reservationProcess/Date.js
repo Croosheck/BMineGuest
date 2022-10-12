@@ -8,12 +8,14 @@ import { formatDate } from "../../util/dateFormat";
 import AddEvent from "../../components/AddEvent";
 import { clearDate } from "../../redux/slices/user";
 
-const Date = () => {
+const Date = ({ route }) => {
 	const [displayTime, setDisplayTime] = useState();
 
 	const { reservationDate } = useSelector((state) => state.userReducer);
 
 	const dispatch = useDispatch();
+
+	const { restaurantKey } = route.params;
 
 	useEffect(() => {
 		if (!reservationDate) return;

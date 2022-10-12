@@ -17,7 +17,8 @@ const Main = () => {
 			<Tab.Navigator
 				initialRouteName="Reservations"
 				barStyle={{ backgroundColor: "#562323" }}
-				labeled={false}
+				// labeled={false}
+				shifting={true}
 			>
 				<Tab.Screen
 					name="Reservations"
@@ -32,6 +33,7 @@ const Main = () => {
 								/>
 							);
 						},
+						tabBarColor: "#450D23",
 					}}
 				/>
 				<Tab.Screen
@@ -41,6 +43,7 @@ const Main = () => {
 						tabBarIcon: ({ color }) => {
 							return <Ionicons name="restaurant" color={color} size={26} />;
 						},
+						tabBarColor: "#471313",
 					}}
 				/>
 				<Tab.Screen
@@ -50,6 +53,7 @@ const Main = () => {
 						tabBarIcon: ({ color }) => {
 							return <Ionicons name="person" color={color} size={26} />;
 						},
+						tabBarColor: "#1C7C4F",
 					}}
 				/>
 			</Tab.Navigator>

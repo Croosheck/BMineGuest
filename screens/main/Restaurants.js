@@ -1,21 +1,24 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import RestaurantListItem from "../restaurants/RestaurantListItem";
 
-import { RESTAURANTS } from "../../util/restaurants";
+import { useSelector } from "react-redux";
 
 const Restaurants = ({ navigation }) => {
+	const { availableRestaurants } = useSelector((state) => state.userReducer);
+
 	function pressHandler(itemData) {
 		navigation.navigate("RestaurantProfile", {
 			name: itemData.item.name,
 			description: itemData.item.description,
 			imageUri: itemData.item.imageUri,
+			restaurantKey: itemData.item.key,
 		});
 	}
 
 	return (
 		<View style={styles.container}>
 			<FlatList
-				data={RESTAURANTS}
+				data={availableRestaurants}
 				// numColumns={2}
 				renderItem={(itemData) => {
 					return (

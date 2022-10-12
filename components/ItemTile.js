@@ -17,7 +17,7 @@ const ItemTile = ({
 			<Pressable
 				style={[styles.innerContainer, picked && styles.itemPicked]}
 				onPress={onPress}
-				android_ripple={{ color: "#CCCCCC89" }}
+				android_ripple={{ color: "#8C6D6D91" }}
 			>
 				<View style={styles.titleContainer}>
 					<Text style={styles.title}>{title}</Text>

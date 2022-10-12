@@ -48,6 +48,7 @@ export default async function uploadData(image, type, data) {
 				: null,
 			table: data.table ? data.table : null,
 			extras: data.extras ? data.extras : null,
+			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
 		});
 	}
 
