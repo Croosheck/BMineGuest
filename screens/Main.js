@@ -33,7 +33,7 @@ const Main = () => {
 								/>
 							);
 						},
-						tabBarColor: "#450D23",
+						tabBarColor: "#6C344A",
 					}}
 				/>
 				<Tab.Screen

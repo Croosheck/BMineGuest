@@ -25,6 +25,7 @@ export const userSlice = createSlice({
 		},
 		reservationDate: "",
 		availableRestaurants: restaurants,
+		reservationsList: [],
 	},
 	reducers: {
 		addTable: (state, { payload }) => {
@@ -101,6 +102,9 @@ export const userSlice = createSlice({
 					payload.extraIndex
 				].xPicked;
 		},
+		addFetchedReservations: (state, { payload }) => {
+			state.reservationsList = payload;
+		},
 	},
 	extraReducers: {
 		[getUser.fulfilled]: (state, { payload }) => {
@@ -119,6 +123,7 @@ export const {
 	logoutUser,
 	tablePicked,
 	extraPicked,
+	addFetchedReservations,
 } = userSlice.actions;
 
 export default userSlice.reducer;

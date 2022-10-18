@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
+import { clearDate } from "../../redux/slices/user";
 
 import Calendar from "../../components/Calendar";
-import { formatDate } from "../../util/dateFormat";
 import AddEvent from "../../components/AddEvent";
-import { clearDate } from "../../redux/slices/user";
+import { formatDate } from "../../util/dateFormat";
 
 const Date = ({ route }) => {
 	const [displayTime, setDisplayTime] = useState();

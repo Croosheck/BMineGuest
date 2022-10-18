@@ -8,16 +8,21 @@ import {
 	View,
 } from "react-native";
 import { useSelector } from "react-redux";
+import { auth } from "../../firebase";
 import { formatDate } from "../../util/dateFormat";
 import uploadData from "../../util/storage";
 
-const Summary = ({ navigation }) => {
+const Summary = ({ navigation, route }) => {
 	const [displayTime, setDisplayTime] = useState();
 
 	const { table, extras } = useSelector(
 		(state) => state.userReducer.reservationData
 	);
-	const { reservationDate } = useSelector((state) => state.userReducer);
+	const { reservationDate, currentUser } = useSelector(
+		(state) => state.userReducer
+	);
+
+	const { name, restaurantKey } = route.params;
 
 	const extrasPrice = extras.reduce((acc, item) => {
 		return acc + item.xPrice;
@@ -25,11 +30,16 @@ const Summary = ({ navigation }) => {
 
 	useLayoutEffect(() => {
 		const data = {
-			rsrvDate: formatDate(reservationDate),
-			rsrvTimestamp: reservationDate,
+			restaurantKey: restaurantKey,
+			restaurantName: name,
+			reservationDate: formatDate(reservationDate),
+			reservationDateTimestamp: reservationDate,
 			table: table,
 			extras: extras,
 			extrasTotalPrice: extrasPrice,
+			clientsName: currentUser.name,
+			clientsEmail: currentUser.email,
+			clientsUid: auth.currentUser.uid,
 		};
 
 		navigation.setOptions({
@@ -48,8 +58,7 @@ const Summary = ({ navigation }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
-						// uploadData(null, null, data);
-						console.log("Pressed");
+						uploadData(null, null, data);
 					}}
 				>
 					<Text style={{ color: "#ffffff" }}>All Done!</Text>

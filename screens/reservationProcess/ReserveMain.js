@@ -14,7 +14,7 @@ import { clearDate, clearReservationData } from "../../redux/slices/user";
 const ReserveMain = ({ navigation, route }) => {
 	const TopTab = createMaterialTopTabNavigator();
 	const dispatch = useDispatch();
-	const { restaurantKey } = route.params;
+	const { restaurantKey, name } = route.params;
 
 	useEffect(() => {
 		const unsubscribe = navigation.addListener("beforeRemove", () => {
@@ -44,7 +44,10 @@ const ReserveMain = ({ navigation, route }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
-						navigation.navigate("Summary");
+						navigation.navigate("Summary", {
+							restaurantKey: restaurantKey,
+							name: name,
+						});
 					}}
 				>
 					<Text style={{ color: "#ffffff" }}>Summary</Text>

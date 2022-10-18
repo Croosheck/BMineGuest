@@ -34,12 +34,18 @@ const Extras = ({ route }) => {
 			})
 		);
 
+		const xShortFilename = itemData.item.xFileName.includes(".")
+			? itemData.item.xFileName.slice(0, -4)
+			: itemData.item.xFileName;
+
 		// Add picked extra to data object
 		if (!itemData.item.xPicked) {
 			dispatch(
 				addExtra({
 					xName: itemData.item.xName,
 					xPrice: itemData.item.xPrice,
+					xFileName: itemData.item.xFileName,
+					xShortFileName: xShortFilename,
 				})
 			);
 		}

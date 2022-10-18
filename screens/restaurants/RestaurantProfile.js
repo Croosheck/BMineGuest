@@ -9,7 +9,9 @@ import {
 } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
+import { auth } from "../../firebase";
 import { getUser } from "../../redux/slices/user";
+import { getReservations } from "../../util/storage";
 
 const RestaurantProfile = ({ navigation, route }) => {
 	const { name, imageUri, description, restaurantKey } = route.params;
@@ -26,6 +28,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 	function onReserveHandler() {
 		navigation.navigate("ReserveMain", {
 			restaurantKey: restaurantKey,
+			name: name,
 		});
 	}
 
@@ -41,6 +44,11 @@ const RestaurantProfile = ({ navigation, route }) => {
 		<Text style={[styles.description, { opacity: 0 }]}>.</Text>
 	);
 
+	async function getReservationsHandler() {
+		// const reservationsData = await getReservations();
+		// reservationsData.length > 0 && console.log(reservationsData[1].table);
+	}
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.imageContainer}>
@@ -55,9 +63,9 @@ const RestaurantProfile = ({ navigation, route }) => {
 					{usernameShown}
 				</View>
 				<View style={styles.buttonsContainer}>
-					{/* <View style={styles.button}>
-						<Button title="Social" />
-					</View> */}
+					<View style={styles.button}>
+						<Button title="test" onPress={getReservationsHandler} />
+					</View>
 					<View style={styles.button}>
 						<Button title="Reserve" onPress={onReserveHandler} />
 					</View>
