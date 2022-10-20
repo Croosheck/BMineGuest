@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, getDocs, collection, query } from "firebase/firestore";
 import { auth, db } from "../../firebase";
-
-import { RESTAURANTS as restaurants } from "../../util/restaurants";
 
 export const getUser = createAsyncThunk("user/getUser", async () => {
 	const docRef = doc(db, "users", auth.currentUser.uid);
@@ -15,6 +13,22 @@ export const getUser = createAsyncThunk("user/getUser", async () => {
 	}
 });
 
+export const getRestaurants = createAsyncThunk(
+	"user/getRestaurants",
+	async () => {
+		const q = query(collection(db, "restaurants"));
+		const querySnapshot = await getDocs(q);
+
+		const availableRestaurants = [];
+
+		querySnapshot.forEach((doc) => {
+			availableRestaurants.push(doc.data());
+		});
+
+		return availableRestaurants;
+	}
+);
+
 export const userSlice = createSlice({
 	name: "user",
 	initialState: {
@@ -24,7 +38,7 @@ export const userSlice = createSlice({
 			table: {},
 		},
 		reservationDate: "",
-		availableRestaurants: restaurants,
+		availableRestaurants: [],
 		reservationsList: [],
 	},
 	reducers: {
@@ -109,6 +123,9 @@ export const userSlice = createSlice({
 	extraReducers: {
 		[getUser.fulfilled]: (state, { payload }) => {
 			state.currentUser = payload;
+		},
+		[getRestaurants.fulfilled]: (state, { payload }) => {
+			state.availableRestaurants = [...payload];
 		},
 	},
 });

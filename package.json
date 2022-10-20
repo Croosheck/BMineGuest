@@ -21,8 +21,10 @@
     "expo": "~46.0.13",
     "expo-calendar": "~10.3.0",
     "expo-image-picker": "~13.3.1",
+    "expo-linear-gradient": "^11.4.0",
     "expo-location": "~14.3.0",
     "expo-status-bar": "~1.4.0",
+    "expo-updates": "~0.14.6",
     "firebase": "^9.10.0",
     "react": "18.0.0",
     "react-dom": "18.0.0",
@@ -38,8 +40,7 @@
     "react-redux": "^8.0.4",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.4.1",
-    "expo-updates": "~0.14.6"
+    "redux-thunk": "^2.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

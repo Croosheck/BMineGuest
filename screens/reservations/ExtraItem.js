@@ -21,8 +21,8 @@ export default ExtraItem;
 
 const styles = StyleSheet.create({
 	extraBackgroundContainer: {
-		height: Dimensions.get("window").width * 0.15,
-		width: Dimensions.get("window").width * 0.15,
+		height: Dimensions.get("window").width * 0.14,
+		width: Dimensions.get("window").width * 0.14,
 		marginHorizontal: 4,
 		transform: [{ scale: 0.9 }],
 	},

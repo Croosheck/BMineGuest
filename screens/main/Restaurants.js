@@ -1,22 +1,36 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import RestaurantListItem from "../restaurants/RestaurantListItem";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getRestaurants } from "../../redux/slices/user";
+import { useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Restaurants = ({ navigation }) => {
+	const dispatch = useDispatch();
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
+
+	useEffect(() => {
+		dispatch(getRestaurants());
+	}, []);
 
 	function pressHandler(itemData) {
 		navigation.navigate("RestaurantProfile", {
 			name: itemData.item.name,
-			description: itemData.item.description,
+			description: itemData.item.description
+				? itemData.item.description
+				: "Test Description",
 			imageUri: itemData.item.imageUri,
 			restaurantKey: itemData.item.key,
+			restaurantUid: itemData.item.uid,
 		});
 	}
 
 	return (
-		<View style={styles.container}>
+		<LinearGradient
+			style={styles.container}
+			colors={["#1C0B49", "#010C1C", "#370B0B"]}
+		>
 			<FlatList
 				data={availableRestaurants}
 				// numColumns={2}
@@ -27,11 +41,12 @@ const Restaurants = ({ navigation }) => {
 							id={itemData.item.key}
 							imageUri={itemData.item.imageUri}
 							onPress={() => pressHandler(itemData)}
+							restaurantUid={itemData.item.uid}
 						/>
 					);
 				}}
 			/>
-		</View>
+		</LinearGradient>
 	);
 };
 

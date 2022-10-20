@@ -1,271 +1,56 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import ReservationListItem from "../reservations/ReservationListItem";
-import { formatDate } from "../../util/dateFormat";
 import { getReservations } from "../../util/storage";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
 import { storage } from "../../firebase";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Reservations = () => {
 	const [reservationsData, setReservationsData] = useState([]);
 	const [extraImages, setExtraImages] = useState({});
 
-	const DUMMY_DATA = [
-		{
-			restaurantName: "Restaurant 1",
-			restaurantUid: "40TlHHofjEfRZidkxCrr4vfi1Z52",
-			filename: "11-10-2022 02:49:50 (889870563794587)",
-			rsrvTimestamp: new Date().valueOf(),
-			madeOnDate: formatDate(new Date().valueOf() - 1000 * 60 * 60 * 24 * 7),
-			table: {
-				tSeats: 2,
-				tShape: "Round",
-			},
-			extras: [
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-			],
-			extrasTotalPrice: 25,
-		},
-		{
-			restaurantName: "Restaurant 2",
-			restaurantUid: "40TlHHofjEfRZidkxCrr4vfi1Z52",
-			filename: "11-10-2022 02:49:50 (889870563794587)",
-			rsrvTimestamp: new Date().valueOf(),
-			madeOnDate: formatDate(new Date().valueOf() - 1000 * 60 * 60 * 24 * 7),
-			table: {
-				tSeats: 2,
-				tShape: "Round",
-			},
-			extras: [
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-			],
-			extrasTotalPrice: 25,
-		},
-		{
-			restaurantName: "Restaurant 3",
-			restaurantUid: "40TlHHofjEfRZidkxCrr4vfi1Z52",
-			filename: "11-10-2022 02:49:50 (889870563794587)",
-			rsrvTimestamp: new Date().valueOf(),
-			madeOnDate: formatDate(new Date().valueOf() - 1000 * 60 * 60 * 24 * 7),
-			table: {
-				tSeats: 2,
-				tShape: "Round",
-			},
-			extras: [
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-				{
-					xName: "Candles",
-					xImage: require("../../assets/imgs/candles.png"),
-					xPrice: 1.99,
-				},
-				{
-					xName: "Fresh Flowers Mix",
-					xImage: require("../../assets/imgs/freshFlowersMix.png"),
-					xPrice: 14.99,
-				},
-			],
-			extrasTotalPrice: 25,
-		},
-	];
-
 	useEffect(() => {
+		// Reservations fetch function - data and images
 		async function getReservationsHandler() {
+			// Get all the reservations data (without images)
 			const reservationsFetchedData = await getReservations();
 			setReservationsData(reservationsFetchedData);
 
 			const listRef = ref(storage, "extras");
+
+			// List all images from extras/ path
 			const response = await listAll(listRef);
 
-			// Return, if the number of images inside state === number of all images under extras/ path
+			// Return, if the number of images inside state object === number of all images under extras/ path
+			// - prevents from overloading
 			if (extraImages.length === response.items.length) return;
 
+			// For each extra item (image) from Storage - get a url and connect with extras
 			response.items.forEach(async (item) => {
 				const extraImgRef = ref(storage, `extras/${item.name}`);
 				const extraImgUri = await getDownloadURL(extraImgRef);
 
 				setExtraImages((prev) => {
+					// Cut the image extension (mostly .png's)
 					const itemName = item.name.slice(0, -4);
+
 					return {
 						...prev,
-						[`${itemName}`]: extraImgUri,
+						[itemName]: extraImgUri,
 					};
 				});
 			});
 		}
+
 		getReservationsHandler();
-		// console.log(extraImages);
-		// console.log(reservationsData[0].extras[0]);
 	}, []);
 
 	return (
-		<View style={styles.container}>
+		<LinearGradient
+			style={styles.container}
+			colors={["#3B1616", "#010C1C", "#370B0B"]}
+		>
 			<FlatList
 				data={reservationsData}
 				keyExtractor={(item, index) => index}
@@ -278,11 +63,12 @@ const Reservations = () => {
 							madeOnDate={itemData.item.madeOnTimestamp}
 							extras={itemData.item.extras}
 							extraImages={extraImages}
+							restaurantUid={itemData.item.restaurantUid}
 						/>
 					);
 				}}
 			/>
-		</View>
+		</LinearGradient>
 	);
 };
 
@@ -291,7 +77,7 @@ export default Reservations;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#311A1A",
+		backgroundColor: "#FF8181",
 	},
 	text: {
 		color: "#ffffff",

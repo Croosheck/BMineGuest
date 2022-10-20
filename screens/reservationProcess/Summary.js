@@ -22,7 +22,7 @@ const Summary = ({ navigation, route }) => {
 		(state) => state.userReducer
 	);
 
-	const { name, restaurantKey } = route.params;
+	const { name, restaurantKey, restaurantUid } = route.params;
 
 	const extrasPrice = extras.reduce((acc, item) => {
 		return acc + item.xPrice;
@@ -30,8 +30,9 @@ const Summary = ({ navigation, route }) => {
 
 	useLayoutEffect(() => {
 		const data = {
-			restaurantKey: restaurantKey,
 			restaurantName: name,
+			restaurantKey: restaurantKey,
+			restaurantUid: restaurantUid,
 			reservationDate: formatDate(reservationDate),
 			reservationDateTimestamp: reservationDate,
 			table: table,

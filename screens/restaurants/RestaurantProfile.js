@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
 	Button,
 	Dimensions,
@@ -9,12 +9,14 @@ import {
 } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
-import { auth } from "../../firebase";
 import { getUser } from "../../redux/slices/user";
-import { getReservations } from "../../util/storage";
+import { getReservations, getRestaurantProfileImage } from "../../util/storage";
 
 const RestaurantProfile = ({ navigation, route }) => {
-	const { name, imageUri, description, restaurantKey } = route.params;
+	const { name, imageUri, description, restaurantKey, restaurantUid } =
+		route.params;
+
+	const [profileImgUri, setProfileImgUri] = useState();
 
 	const dispatch = useDispatch();
 	const { name: username, email } = useSelector(
@@ -22,50 +24,43 @@ const RestaurantProfile = ({ navigation, route }) => {
 	);
 
 	useEffect(() => {
+		async function getRestaurantDataHandler() {
+			const profileImage = await getRestaurantProfileImage(restaurantUid);
+			setProfileImgUri(profileImage);
+		}
+
 		dispatch(getUser());
+		getRestaurantDataHandler();
 	}, []);
 
 	function onReserveHandler() {
 		navigation.navigate("ReserveMain", {
 			restaurantKey: restaurantKey,
 			name: name,
+			restaurantUid: restaurantUid,
 		});
 	}
 
-	const emailShown = email ? (
-		<Text style={styles.description}>{email}</Text>
-	) : (
-		<Text style={[styles.description, { opacity: 0 }]}>.</Text>
-	);
-
-	const usernameShown = username ? (
-		<Text style={styles.description}>{username}</Text>
-	) : (
-		<Text style={[styles.description, { opacity: 0 }]}>.</Text>
-	);
-
-	async function getReservationsHandler() {
-		// const reservationsData = await getReservations();
-		// reservationsData.length > 0 && console.log(reservationsData[1].table);
-	}
+	//// Fetching upcoming reservations in this particular restaurant (will be implemented in the near future)
+	// async function getReservationsHandler() {
+	// 	const reservationsData = await getReservations();
+	// }
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.imageContainer}>
 				<Text style={styles.title}>{name}</Text>
-				<Image source={imageUri} style={styles.image} />
+				<Image source={{ uri: profileImgUri }} style={styles.image} />
 			</View>
 			<View style={styles.menuContainer}>
 				<View style={styles.detailsContainer}>
 					<Text style={styles.description}>{description}</Text>
 					<Text style={styles.description}>{restaurantKey}</Text>
-					{emailShown}
-					{usernameShown}
 				</View>
 				<View style={styles.buttonsContainer}>
-					<View style={styles.button}>
+					{/* <View style={styles.button}>
 						<Button title="test" onPress={getReservationsHandler} />
-					</View>
+					</View> */}
 					<View style={styles.button}>
 						<Button title="Reserve" onPress={onReserveHandler} />
 					</View>

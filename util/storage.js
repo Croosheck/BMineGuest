@@ -1,5 +1,5 @@
 import { auth, db, storage } from "../firebase";
-import { ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { doc, collection, setDoc, getDocs, query } from "firebase/firestore";
 
 export default async function uploadData(image, type, data) {
@@ -14,20 +14,22 @@ export default async function uploadData(image, type, data) {
 
 	let imagesRef;
 
+	// Profile pic for client
 	if (type === "userProfile") {
 		imagesRef = ref(
 			storage,
 			`users/${auth.currentUser.uid}/profilePic/defaultProfile.jpg`
 		);
 	}
-	if (type === "restaurantProfile") {
-		imagesRef = ref(
-			storage,
-			`restaurants/${auth.currentUser.uid}/profilePic/defaultProfile.jpg`
-		);
-	}
+	// Profile pic for restaurant (in production)
+	// if (type === "restaurantProfile") {
+	// 	imagesRef = ref(
+	// 		storage,
+	// 		`restaurants/${auth.currentUser.uid}/restaurantPicture/defaultProfile.jpg`
+	// 	);
+	// }
 
-	// In Firestore, creates a child collection "userPosts" under the "posts" parent collection
+	// Fetching out reservation data, to both client's and restaurant's databases
 	if (data) {
 		const userReservationRef = doc(
 			db,
@@ -40,8 +42,7 @@ export default async function uploadData(image, type, data) {
 		const restaurantReservationRef = doc(
 			db,
 			"restaurants",
-			// data.restaurantUid,
-			"40TlHHofjEfRZidkxCrr4vfi1Z52",
+			data.restaurantUid,
 			"reservations",
 			fileName
 		);
@@ -54,19 +55,18 @@ export default async function uploadData(image, type, data) {
 				: null,
 			madeOnTimestamp: Date.now(),
 			restaurantName: data.restaurantName ? data.restaurantName : null,
+			restaurantKey: data.restaurantKey ? data.restaurantKey : null,
+			restaurantUid: data.restaurantUid ? data.restaurantUid : null,
 
-			//// Not ready ////
-
-			// restaurantUid: data.restaurantUid ? data.restaurantUid : null,
-
+			////// Not ready //////
 			/* coords: data.coords
 				? { lat: data.coords.lat, lng: data.coords.lng }
 				: null, */
+			//////////////////////
 
 			table: data.table ? data.table : null,
 			extras: data.extras ? data.extras : null,
 			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
-			restaurantKey: data.restaurantKey ? data.restaurantKey : null,
 		});
 
 		setDoc(restaurantReservationRef, {
@@ -89,7 +89,7 @@ export default async function uploadData(image, type, data) {
 		const response = await fetch(image);
 		const blob = await response.blob();
 
-		// File's uploading to Firebase Store
+		// Files uploading to Firebase Store
 		await uploadBytes(imagesRef, blob);
 
 		return { imagesRef, blob, formatedDate };
@@ -98,6 +98,7 @@ export default async function uploadData(image, type, data) {
 	return { imagesRef, formatedDate };
 }
 
+// Reservations list fetching function
 export async function getReservations() {
 	const reservationsQuery = query(
 		collection(db, "users", auth.currentUser.uid, "reservations")
@@ -112,4 +113,15 @@ export async function getReservations() {
 	});
 
 	return reservationsData;
+}
+
+export async function getRestaurantProfileImage(restaurantUid) {
+	const restaurantProfileRef = ref(
+		storage,
+		`restaurants/${restaurantUid}/restaurantPicture/defaultProfile.jpg`
+	);
+
+	const profileImage = await getDownloadURL(restaurantProfileRef);
+
+	return profileImage;
 }
