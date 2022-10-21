@@ -1,14 +1,106 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, FlatList, StyleSheet } from "react-native";
 import RestaurantListItem from "../restaurants/RestaurantListItem";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getRestaurants } from "../../redux/slices/user";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+
+import LottieIcon from "../../components/LottieIcon";
 
 const Restaurants = ({ navigation }) => {
 	const dispatch = useDispatch();
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
+
+	const animationProgress = useRef(new Animated.Value(0.12));
+
+	useLayoutEffect(() => {
+		// Icon animation on click
+		const unsubscribeFocus = navigation.addListener("focus", () => {
+			navigation.setOptions({
+				tabBarIcon: ({ color }) => {
+					return (
+						<LottieIcon
+							source={require("../../assets/lottie/lottieRestaurants.json")}
+							progress={animationProgress.current}
+							width={50}
+							transform={[{ translateY: -7 }]}
+							colorFilters={[
+								{
+									//circle
+									keypath: "Layer 9",
+									color: color,
+								},
+								{
+									//fork
+									keypath: "Layer 11",
+									color: color,
+								},
+								{
+									//knife
+									keypath: "Layer 10",
+									color: color,
+								},
+							]}
+						/>
+					);
+				},
+			});
+
+			Animated.timing(animationProgress.current, {
+				toValue: 0.6,
+				duration: 1000,
+				easing: Easing.linear,
+				useNativeDriver: false,
+			}).start();
+		});
+
+		// Icon animation on screen change (back to default)
+		const unsubscribeBlur = navigation.addListener("blur", () => {
+			navigation.setOptions({
+				tabBarIcon: () => {
+					return (
+						<LottieIcon
+							source={require("../../assets/lottie/lottieRestaurants.json")}
+							progress={animationProgress.current}
+							width={50}
+							transform={[{ translateY: -7 }]}
+							colorFilters={[
+								{
+									//circle
+									keypath: "Layer 9",
+									color: "#595959",
+								},
+								{
+									//fork
+									keypath: "Layer 11",
+									color: "#FF9696",
+								},
+								{
+									//knife
+									keypath: "Layer 10",
+									color: "#FF9696",
+								},
+							]}
+						/>
+					);
+				},
+			});
+
+			Animated.timing(animationProgress.current, {
+				toValue: 0.12,
+				duration: 600,
+				easing: Easing.linear,
+				useNativeDriver: false,
+			}).start();
+		});
+
+		return () => {
+			// Event listeners clearing
+			unsubscribeFocus();
+			unsubscribeBlur();
+		};
+	}, []);
 
 	useEffect(() => {
 		dispatch(getRestaurants());
@@ -33,13 +125,10 @@ const Restaurants = ({ navigation }) => {
 		>
 			<FlatList
 				data={availableRestaurants}
-				// numColumns={2}
 				renderItem={(itemData) => {
 					return (
 						<RestaurantListItem
 							name={itemData.item.name}
-							id={itemData.item.key}
-							imageUri={itemData.item.imageUri}
 							onPress={() => pressHandler(itemData)}
 							restaurantUid={itemData.item.uid}
 						/>
@@ -53,8 +142,5 @@ const Restaurants = ({ navigation }) => {
 export default Restaurants;
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#311A1A",
-	},
+	container: {},
 });

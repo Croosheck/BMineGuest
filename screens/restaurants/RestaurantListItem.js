@@ -6,19 +6,15 @@ import {
 	Pressable,
 	ImageBackground,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { getDownloadURL, ref } from "firebase/storage";
-import { storage } from "../../firebase";
+import { useEffect, useState } from "react";
 import { getRestaurantProfileImage } from "../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 
 const RestaurantListItem = ({
 	name,
-	imageUri,
 	category,
 	reservationsStatus,
 	onPress,
-	id,
 	restaurantUid,
 }) => {
 	const [profileImgUri, setProfileImgUri] = useState();

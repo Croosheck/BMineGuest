@@ -1,14 +1,109 @@
-import { FlatList, StyleSheet, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { Animated, Easing, FlatList, StyleSheet, View } from "react-native";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReservationListItem from "../reservations/ReservationListItem";
 import { getReservations } from "../../util/storage";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
 import { storage } from "../../firebase";
 import { LinearGradient } from "expo-linear-gradient";
+import LottieIcon from "../../components/LottieIcon";
 
-const Reservations = () => {
+const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
 	const [extraImages, setExtraImages] = useState({});
+
+	const animationProgress = useRef(new Animated.Value(0.315));
+
+	useLayoutEffect(() => {
+		// Icon animation on click
+		const unsubscribeFocus = navigation.addListener("focus", () => {
+			navigation.setOptions({
+				tabBarIcon: ({ color }) => {
+					return (
+						<LottieIcon
+							source={require("../../assets/lottie/lottieReservations.json")}
+							progress={animationProgress.current}
+							height={55}
+							transform={[{ translateY: -8 }, { translateX: 0 }]}
+							colorFilters={
+								[
+									// {
+									// 	//circle
+									// 	keypath: "in-book",
+									// 	color: "#FFFFFF",
+									// },
+									// {
+									// 	//fork
+									// 	keypath: "hover-book",
+									// 	color: "#FF0000",
+									// },
+									// {
+									// 	//knife
+									// 	keypath: "Layer 10",
+									// 	color: "#FF9696",
+									// },
+								]
+							}
+						/>
+					);
+				},
+			});
+
+			Animated.timing(animationProgress.current, {
+				toValue: 1,
+				duration: 900,
+				easing: Easing.linear,
+				useNativeDriver: false,
+			}).start();
+		});
+
+		// Icon animation on screen change (back to default)
+		const unsubscribeBlur = navigation.addListener("blur", () => {
+			navigation.setOptions({
+				tabBarIcon: () => {
+					return (
+						<LottieIcon
+							source={require("../../assets/lottie/lottieReservations.json")}
+							progress={animationProgress.current}
+							height={55}
+							transform={[{ translateY: -8 }, { translateX: 0 }]}
+							colorFilters={
+								[
+									// {
+									// 	//circle
+									// 	keypath: "in-book",
+									// 	color: "#FFFFFF",
+									// },
+									// {
+									// 	//fork
+									// 	keypath: "hover-book",
+									// 	color: "#FF0000",
+									// },
+									// {
+									// 	//knife
+									// 	keypath: "Layer 10",
+									// 	color: "#FF9696",
+									// },
+								]
+							}
+						/>
+					);
+				},
+			});
+
+			Animated.timing(animationProgress.current, {
+				toValue: 0.28,
+				duration: 700,
+				easing: Easing.linear,
+				useNativeDriver: false,
+			}).start();
+		});
+
+		return () => {
+			// Event listeners clearing
+			unsubscribeFocus();
+			unsubscribeBlur();
+		};
+	}, []);
 
 	useEffect(() => {
 		// Reservations fetch function - data and images

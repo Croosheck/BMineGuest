@@ -8,29 +8,24 @@ import {
 	View,
 } from "react-native";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getUser } from "../../redux/slices/user";
 import { getReservations, getRestaurantProfileImage } from "../../util/storage";
 
 const RestaurantProfile = ({ navigation, route }) => {
-	const { name, imageUri, description, restaurantKey, restaurantUid } =
-		route.params;
-
 	const [profileImgUri, setProfileImgUri] = useState();
+	const { name, description, restaurantKey, restaurantUid } = route.params;
 
 	const dispatch = useDispatch();
-	const { name: username, email } = useSelector(
-		(state) => state.userReducer.currentUser
-	);
 
 	useEffect(() => {
 		async function getRestaurantDataHandler() {
 			const profileImage = await getRestaurantProfileImage(restaurantUid);
 			setProfileImgUri(profileImage);
 		}
+		getRestaurantDataHandler();
 
 		dispatch(getUser());
-		getRestaurantDataHandler();
 	}, []);
 
 	function onReserveHandler() {
@@ -48,14 +43,13 @@ const RestaurantProfile = ({ navigation, route }) => {
 
 	return (
 		<View style={styles.container}>
+			<Text style={styles.title}>{name}</Text>
 			<View style={styles.imageContainer}>
-				<Text style={styles.title}>{name}</Text>
 				<Image source={{ uri: profileImgUri }} style={styles.image} />
 			</View>
 			<View style={styles.menuContainer}>
 				<View style={styles.detailsContainer}>
 					<Text style={styles.description}>{description}</Text>
-					<Text style={styles.description}>{restaurantKey}</Text>
 				</View>
 				<View style={styles.buttonsContainer}>
 					{/* <View style={styles.button}>
@@ -81,12 +75,19 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "#311A1A",
-		padding: 8,
+		padding: 4,
 	},
+	/////////////////
 	imageContainer: {
-		flex: 0.55,
+		// flex: 1,
 		// borderWidth: 2,
 		// borderColor: "#ffffff",
+	},
+	title: {
+		color: "#ffffff",
+		fontSize: 20,
+		textAlign: "center",
+		marginVertical: Dimensions.get("window").height * 0.02,
 	},
 	image: {
 		height: Dimensions.get("window").height * 0.35,
@@ -95,14 +96,9 @@ const styles = StyleSheet.create({
 		borderColor: "#ffffff",
 		borderRadius: 20,
 	},
-	title: {
-		color: "#ffffff",
-		fontSize: 20,
-		textAlign: "center",
-		marginVertical: Dimensions.get("window").height * 0.02,
-	},
+	////////////////
 	menuContainer: {
-		flex: 0.6,
+		flex: 1,
 		justifyContent: "space-between",
 		width: Dimensions.get("window").width,
 		// borderWidth: 2,
