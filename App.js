@@ -79,7 +79,12 @@ function AppContainer() {
 
 	return (
 		<NavigationContainer>
-			<Stack.Navigator initialRouteName="Main">
+			<Stack.Navigator
+				initialRouteName="Main"
+				// screenOptions={{
+				// 	presentation: "transparentModal",
+				// }}
+			>
 				<Stack.Screen
 					name="Main"
 					component={Main}
@@ -92,6 +97,7 @@ function AppContainer() {
 					component={RestaurantProfile}
 					options={{
 						headerShown: false,
+						presentation: "transparentModal",
 					}}
 				/>
 				<Stack.Screen
@@ -105,6 +111,7 @@ function AppContainer() {
 							borderBottomWidth: 0.5,
 						},
 						headerTintColor: "#ffffff",
+						presentation: "transparentModal",
 					}}
 				/>
 				<Stack.Screen
@@ -117,6 +124,7 @@ function AppContainer() {
 							borderBottomWidth: 0.5,
 						},
 						headerTintColor: "#ffffff",
+						presentation: "transparentModal",
 					}}
 				/>
 			</Stack.Navigator>
@@ -128,7 +136,9 @@ export default function App() {
 	return (
 		<Provider store={store}>
 			<StatusBar translucent={false} style="light" />
-			<AppContainer />
+			<View style={{ flex: 1, backgroundColor: "#000000" }}>
+				<AppContainer />
+			</View>
 		</Provider>
 	);
 }

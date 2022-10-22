@@ -9,6 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import { getRestaurantProfileImage } from "../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
+import Animated from "react-native-reanimated";
 
 const RestaurantListItem = ({
 	name,
@@ -16,6 +17,9 @@ const RestaurantListItem = ({
 	reservationsStatus,
 	onPress,
 	restaurantUid,
+	restaurantEntering,
+	titleEntering,
+	restaurantNameEntering,
 }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
 
@@ -29,24 +33,41 @@ const RestaurantListItem = ({
 	}, []);
 
 	return (
-		<LinearGradient
-			style={styles.outerContainer}
-			colors={["#000000CC", "#FFFFFF", "#020202B7"]}
-			start={{ x: 1, y: 1 }}
-			end={{ x: 0, y: 0 }}
-		>
-			<ImageBackground style={styles.container} source={{ uri: profileImgUri }}>
-				<Pressable
-					style={styles.pressableContainer}
-					android_ripple={{ color: "#B1B1B135" }}
-					onPress={onPress}
-				>
-					<View style={styles.nameContainer}>
-						<Text style={styles.name}>{name}</Text>
-					</View>
-				</Pressable>
-			</ImageBackground>
-		</LinearGradient>
+		<>
+			{profileImgUri && (
+				<Animated.View entering={restaurantEntering}>
+					<LinearGradient
+						style={styles.outerContainer}
+						colors={["#000000CC", "#FFFFFF", "#020202B7"]}
+						start={{ x: 1, y: 1 }}
+						end={{ x: 0, y: 0 }}
+					>
+						<ImageBackground
+							style={styles.container}
+							source={{ uri: profileImgUri }}
+						>
+							<Pressable
+								style={styles.pressableContainer}
+								android_ripple={{ color: "#B1B1B135" }}
+								onPress={onPress}
+							>
+								<Animated.View
+									style={styles.nameContainer}
+									entering={titleEntering}
+								>
+									<Animated.Text
+										entering={restaurantNameEntering}
+										style={styles.name}
+									>
+										{name}
+									</Animated.Text>
+								</Animated.View>
+							</Pressable>
+						</ImageBackground>
+					</LinearGradient>
+				</Animated.View>
+			)}
+		</>
 	);
 };
 

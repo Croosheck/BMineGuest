@@ -6,11 +6,20 @@ import {
 	Text,
 	View,
 } from "react-native";
+
 import React, { useEffect, useState } from "react";
+
 import { formatDate } from "../../util/dateFormat";
 import ExtraItem from "./ExtraItem";
 import { getRestaurantProfileImage } from "../../util/storage";
+
 import { LinearGradient } from "expo-linear-gradient";
+
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+} from "react-native-reanimated";
 
 const ReservationListItem = ({
 	restaurantName,
@@ -20,15 +29,51 @@ const ReservationListItem = ({
 	extras,
 	extraImages,
 	restaurantUid,
+	reservationEntering,
+	extraEntering,
 }) => {
 	const [displayedExtraName, setDisplayedExtraName] = useState();
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
+	const [animationFinished, setAnimationFinished] = useState(true);
 
 	const formatedReservationDate = formatDate(reservationDateTimestamp);
 	const formatedMadeOnDate = formatDate(madeOnDate);
 
+	const animatedTranslateX = useSharedValue(-1000);
+
+	const reanimatedExtraName = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: animatedTranslateX.value }],
+		};
+	});
+
+	let backToDefaultTimeout;
+
+	// Extras title with animation
 	function displayExtraName(itemData) {
+		const { width: WIDTH } = Dimensions.get("window");
+
+		if (displayedExtraName) {
+			if (!animationFinished) return;
+			setAnimationFinished(false);
+			animatedTranslateX.value = withSpring(WIDTH * 2, { mass: 0.6 });
+
+			backToDefaultTimeout = setTimeout(() => {
+				animatedTranslateX.value = -WIDTH * 2;
+				setDisplayedExtraName(
+					`${itemData.item.xName} (${itemData.item.xPrice}$)`
+				);
+
+				animatedTranslateX.value = withSpring(0, { mass: 0.6 });
+
+				setAnimationFinished(true);
+				clearTimeout(backToDefaultTimeout);
+			}, 80);
+			return;
+		}
+
 		setDisplayedExtraName(`${itemData.item.xName} (${itemData.item.xPrice}$)`);
+		animatedTranslateX.value = withSpring(0);
 	}
 
 	useEffect(() => {
@@ -41,49 +86,63 @@ const ReservationListItem = ({
 	}, []);
 
 	return (
-		<LinearGradient
-			colors={["#000000CC", "#FFFFFF", "#020202B7"]}
-			style={styles.gradientBackgroundContainer}
-			start={{ x: 1, y: 1 }}
-			end={{ x: 0, y: 0 }}
-		>
-			<ImageBackground
-				style={styles.innerBackgroundContainer}
-				imageStyle={styles.imageBackground}
-				resizeMode="stretch"
-				source={{ uri: reservationBackgroundUri }}
-			>
-				<View style={styles.dataContainer}>
-					<View style={styles.dataInnerContainer}>
-						<Text style={styles.restaurantName}>{restaurantName}</Text>
-						<Text style={styles.dates}>Reserved on: {formatedMadeOnDate}</Text>
-						<Text style={styles.dates}>
-							Reservation Date: {formatedReservationDate}
-						</Text>
-					</View>
-				</View>
-				<View style={styles.extrasContainer}>
-					<FlatList
-						data={extras}
-						keyExtractor={(item, index) => index}
-						horizontal={true}
-						style={styles.extrasFlatList}
-						contentContainerStyle={styles.extrasFlatListContent}
-						renderItem={(itemData) => {
-							return (
-								<ExtraItem
-									onPress={displayExtraName.bind(this, itemData)}
-									imgUri={
-										extraImages && extraImages[itemData.item.xShortFileName]
-									}
+		<>
+			{reservationBackgroundUri && extraImages && (
+				<Animated.View entering={reservationEntering}>
+					<LinearGradient
+						colors={["#000000CC", "#FFFFFF", "#020202B7"]}
+						style={styles.gradientBackgroundContainer}
+						start={{ x: 1, y: 1 }}
+						end={{ x: 0, y: 0 }}
+					>
+						<ImageBackground
+							source={{ uri: reservationBackgroundUri }}
+							style={styles.innerBackgroundContainer}
+							imageStyle={styles.imageBackground}
+							resizeMode="stretch"
+						>
+							<View style={styles.dataContainer}>
+								<View style={styles.dataInnerContainer}>
+									<Text style={styles.restaurantName}>{restaurantName}</Text>
+									<Text style={styles.dates}>
+										Reserved on: {formatedMadeOnDate}
+									</Text>
+									<Text style={styles.dates}>
+										Reservation Date: {formatedReservationDate}
+									</Text>
+								</View>
+							</View>
+							<View style={styles.extrasContainer}>
+								<FlatList
+									data={extras}
+									keyExtractor={(item, index) => index}
+									horizontal={true}
+									style={styles.extrasFlatList}
+									contentContainerStyle={styles.extrasFlatListContent}
+									renderItem={(itemData) => {
+										return (
+											<ExtraItem
+												onPress={displayExtraName.bind(this, itemData)}
+												imgUri={
+													extraImages &&
+													extraImages[itemData.item.xShortFileName]
+												}
+												extraEntering={extraEntering}
+											/>
+										);
+									}}
 								/>
-							);
-						}}
-					/>
-					<Text style={styles.displayedExtraName}>{displayedExtraName}</Text>
-				</View>
-			</ImageBackground>
-		</LinearGradient>
+								<Animated.View style={[reanimatedExtraName]}>
+									<Text style={styles.displayedExtraName}>
+										{displayedExtraName}
+									</Text>
+								</Animated.View>
+							</View>
+						</ImageBackground>
+					</LinearGradient>
+				</Animated.View>
+			)}
+		</>
 	);
 };
 
@@ -107,6 +166,7 @@ const styles = StyleSheet.create({
 	innerBackgroundContainer: {
 		flex: 1,
 		width: "100%",
+		// transform: [{ translateX: -50 }],
 	},
 	imageBackground: {
 		opacity: 0.9,
@@ -138,7 +198,7 @@ const styles = StyleSheet.create({
 		fontWeight: "500",
 	},
 	extrasContainer: {
-		flex: 0.4,
+		flex: 0.5,
 		width: "100%",
 		justifyContent: "center",
 		alignItems: "center",
@@ -159,5 +219,6 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		marginTop: 4,
 		fontWeight: "500",
+		// transform: [{ translateX: -Dimensions.get("window").width }],
 	},
 });

@@ -6,6 +6,7 @@ import { getDownloadURL, ref, listAll } from "firebase/storage";
 import { storage } from "../../firebase";
 import { LinearGradient } from "expo-linear-gradient";
 import LottieIcon from "../../components/LottieIcon";
+import { SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
 
 const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
@@ -24,25 +25,6 @@ const Reservations = ({ navigation }) => {
 							progress={animationProgress.current}
 							height={55}
 							transform={[{ translateY: -8 }, { translateX: 0 }]}
-							colorFilters={
-								[
-									// {
-									// 	//circle
-									// 	keypath: "in-book",
-									// 	color: "#FFFFFF",
-									// },
-									// {
-									// 	//fork
-									// 	keypath: "hover-book",
-									// 	color: "#FF0000",
-									// },
-									// {
-									// 	//knife
-									// 	keypath: "Layer 10",
-									// 	color: "#FF9696",
-									// },
-								]
-							}
 						/>
 					);
 				},
@@ -66,25 +48,6 @@ const Reservations = ({ navigation }) => {
 							progress={animationProgress.current}
 							height={55}
 							transform={[{ translateY: -8 }, { translateX: 0 }]}
-							colorFilters={
-								[
-									// {
-									// 	//circle
-									// 	keypath: "in-book",
-									// 	color: "#FFFFFF",
-									// },
-									// {
-									// 	//fork
-									// 	keypath: "hover-book",
-									// 	color: "#FF0000",
-									// },
-									// {
-									// 	//knife
-									// 	keypath: "Layer 10",
-									// 	color: "#FF9696",
-									// },
-								]
-							}
 						/>
 					);
 				},
@@ -114,7 +77,7 @@ const Reservations = ({ navigation }) => {
 
 			const listRef = ref(storage, "extras");
 
-			// List all images from extras/ path
+			// List all images under the /extras/ path
 			const response = await listAll(listRef);
 
 			// Return, if the number of images inside state object === number of all images under extras/ path
@@ -159,6 +122,14 @@ const Reservations = ({ navigation }) => {
 							extras={itemData.item.extras}
 							extraImages={extraImages}
 							restaurantUid={itemData.item.restaurantUid}
+							reservationEntering={ZoomInEasyUp.delay(500)
+								.duration(1000)
+								.springify()
+								.mass(0.6)}
+							extraEntering={SlideInUp.delay(700)
+								.duration(1000)
+								.springify()
+								.mass(0.6)}
 						/>
 					);
 				}}

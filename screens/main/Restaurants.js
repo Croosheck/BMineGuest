@@ -7,6 +7,11 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
 import LottieIcon from "../../components/LottieIcon";
+import {
+	SlideInRight,
+	SlideInUp,
+	ZoomInEasyDown,
+} from "react-native-reanimated";
 
 const Restaurants = ({ navigation }) => {
 	const dispatch = useDispatch();
@@ -102,9 +107,9 @@ const Restaurants = ({ navigation }) => {
 		};
 	}, []);
 
-	useEffect(() => {
-		dispatch(getRestaurants());
-	}, []);
+	// useEffect(() => {
+	// 	dispatch(getRestaurants());
+	// }, []);
 
 	function pressHandler(itemData) {
 		navigation.navigate("RestaurantProfile", {
@@ -131,6 +136,14 @@ const Restaurants = ({ navigation }) => {
 							name={itemData.item.name}
 							onPress={() => pressHandler(itemData)}
 							restaurantUid={itemData.item.uid}
+							restaurantEntering={ZoomInEasyDown.delay(500)
+								.duration(1000)
+								.springify()
+								.mass(0.6)}
+							titleEntering={SlideInUp.delay(1500).springify().mass(0.5)}
+							restaurantNameEntering={SlideInRight.delay(2000)
+								.springify()
+								.mass(0.7)}
 						/>
 					);
 				}}
