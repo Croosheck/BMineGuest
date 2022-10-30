@@ -30,7 +30,11 @@ const ReservationListItem = ({
 	extraImages,
 	restaurantUid,
 	reservationEntering,
+	reservationExiting,
 	extraEntering,
+	statusColor,
+	statusText,
+	statusTextColor,
 }) => {
 	const [displayedExtraName, setDisplayedExtraName] = useState();
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
@@ -88,7 +92,10 @@ const ReservationListItem = ({
 	return (
 		<>
 			{reservationBackgroundUri && extraImages && (
-				<Animated.View entering={reservationEntering}>
+				<Animated.View
+					entering={reservationEntering}
+					exiting={reservationExiting}
+				>
 					<LinearGradient
 						colors={["#000000CC", "#FFFFFF", "#020202B7"]}
 						style={styles.gradientBackgroundContainer}
@@ -138,6 +145,28 @@ const ReservationListItem = ({
 									</Text>
 								</Animated.View>
 							</View>
+							<View
+								style={{
+									width: 100,
+									height: 50,
+									backgroundColor: statusColor,
+									position: "absolute",
+									top: "92%",
+									left: "75%",
+									borderTopLeftRadius: 20,
+								}}
+							>
+								<Text
+									style={{
+										textAlign: "center",
+										fontWeight: "bold",
+										paddingTop: 1,
+										color: statusTextColor,
+									}}
+								>
+									{statusText}
+								</Text>
+							</View>
 						</ImageBackground>
 					</LinearGradient>
 				</Animated.View>
@@ -162,6 +191,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.5,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 24,
+		marginVertical: 20,
 	},
 	innerBackgroundContainer: {
 		flex: 1,

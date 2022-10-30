@@ -56,6 +56,11 @@ function AppContainer() {
 						component={Landing}
 						options={{
 							headerShown: false,
+							presentation: "modal",
+							transitionSpec: {
+								open: { animation: "timing" },
+								close: { animation: "timing" },
+							},
 						}}
 					/>
 					<Stack.Screen
@@ -63,6 +68,7 @@ function AppContainer() {
 						component={Register}
 						options={{
 							headerShown: false,
+							presentation: "modal",
 						}}
 					/>
 					<Stack.Screen
@@ -70,6 +76,7 @@ function AppContainer() {
 						component={Login}
 						options={{
 							headerShown: false,
+							presentation: "modal",
 						}}
 					/>
 				</Stack.Navigator>
@@ -79,17 +86,16 @@ function AppContainer() {
 
 	return (
 		<NavigationContainer>
-			<Stack.Navigator
-				initialRouteName="Main"
-				// screenOptions={{
-				// 	presentation: "transparentModal",
-				// }}
-			>
+			<Stack.Navigator initialRouteName="Main">
 				<Stack.Screen
 					name="Main"
 					component={Main}
 					options={{
 						headerShown: false,
+						transitionSpec: {
+							open: { animation: "timing" },
+							close: { animation: "timing" },
+						},
 					}}
 				/>
 				<Stack.Screen

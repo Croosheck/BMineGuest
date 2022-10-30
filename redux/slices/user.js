@@ -1,5 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getDoc, doc, getDocs, collection, query } from "firebase/firestore";
+import {
+	getDoc,
+	doc,
+	getDocs,
+	collection,
+	query,
+	onSnapshot,
+} from "firebase/firestore";
 import { auth, db } from "../../firebase";
 
 export const getUser = createAsyncThunk("user/getUser", async () => {
@@ -42,6 +49,9 @@ export const userSlice = createSlice({
 		reservationsList: [],
 	},
 	reducers: {
+		realTimeRestaurants: (state, { payload }) => {
+			state.availableRestaurants = [...payload];
+		},
 		addTable: (state, { payload }) => {
 			state.reservationData = { ...state.reservationData, ...payload };
 		},
@@ -131,6 +141,7 @@ export const userSlice = createSlice({
 });
 
 export const {
+	realTimeRestaurants,
 	addTable,
 	addExtra,
 	removeExtra,

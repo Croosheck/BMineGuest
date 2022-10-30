@@ -1,3 +1,4 @@
+import { collection, doc, onSnapshot, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
 	Button,
@@ -9,11 +10,14 @@ import {
 } from "react-native";
 
 import { useDispatch } from "react-redux";
+import { db } from "../../firebase";
 import { getUser } from "../../redux/slices/user";
 import { getReservations, getRestaurantProfileImage } from "../../util/storage";
 
 const RestaurantProfile = ({ navigation, route }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
+	const [realtime, setRealtime] = useState();
+
 	const { name, description, restaurantKey, restaurantUid } = route.params;
 
 	const dispatch = useDispatch();
@@ -41,6 +45,8 @@ const RestaurantProfile = ({ navigation, route }) => {
 	// 	const reservationsData = await getReservations();
 	// }
 
+	function testFunction() {}
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>{name}</Text>
@@ -53,7 +59,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 				</View>
 				<View style={styles.buttonsContainer}>
 					{/* <View style={styles.button}>
-						<Button title="test" onPress={getReservationsHandler} />
+						<Button title="test" onPress={testFunction} />
 					</View> */}
 					<View style={styles.button}>
 						<Button title="Reserve" onPress={onReserveHandler} />

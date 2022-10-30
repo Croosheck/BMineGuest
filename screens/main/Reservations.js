@@ -3,10 +3,11 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReservationListItem from "../reservations/ReservationListItem";
 import { getReservations } from "../../util/storage";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
-import { storage } from "../../firebase";
+import { auth, db, storage } from "../../firebase";
 import { LinearGradient } from "expo-linear-gradient";
 import LottieIcon from "../../components/LottieIcon";
-import { SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
+import { SlideInRight, SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
+import { collection, onSnapshot, query } from "firebase/firestore";
 
 const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
@@ -69,11 +70,25 @@ const Reservations = ({ navigation }) => {
 	}, []);
 
 	useEffect(() => {
+		//////////////////////////////////////////////////////////
+		/// Realtime ///
+		const q = query(
+			collection(db, "users", auth.currentUser.uid, "reservations")
+		);
+		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			const reservations = [];
+			querySnapshot.forEach((doc) => {
+				reservations.push(doc.data());
+			});
+			setReservationsData(reservations);
+		});
+		//////////////////////////////////////////////////////////
+
 		// Reservations fetch function - data and images
 		async function getReservationsHandler() {
 			// Get all the reservations data (without images)
-			const reservationsFetchedData = await getReservations();
-			setReservationsData(reservationsFetchedData);
+			// const reservationsFetchedData = await getReservations();
+			// setReservationsData(reservationsFetchedData);
 
 			const listRef = ref(storage, "extras");
 
@@ -114,6 +129,26 @@ const Reservations = ({ navigation }) => {
 				keyExtractor={(item, index) => index}
 				// numColumns={2}
 				renderItem={(itemData) => {
+					function getReservationStatusHandler() {
+						if (!itemData.item.confirmed && !itemData.item.cancelled)
+							return {
+								status: "Pending",
+								bgColor: "#79B4FDA6",
+							};
+						if (itemData.item.confirmed)
+							return {
+								status: "Confirmed",
+								bgColor: "#FFFA66A6",
+							};
+						if (itemData.item.cancelled)
+							return {
+								status: "Cancelled",
+								bgColor: "#FF5858A6",
+							};
+					}
+
+					const reservationStatus = getReservationStatusHandler();
+
 					return (
 						<ReservationListItem
 							restaurantName={itemData.item.restaurantName}
@@ -126,10 +161,16 @@ const Reservations = ({ navigation }) => {
 								.duration(1000)
 								.springify()
 								.mass(0.6)}
-							extraEntering={SlideInUp.delay(700)
+							extraEntering={SlideInUp.delay(800)
 								.duration(1000)
 								.springify()
 								.mass(0.6)}
+							reservationExiting={SlideInRight.duration(800)
+								.springify()
+								.mass(0.6)}
+							statusColor={reservationStatus.bgColor}
+							statusText={reservationStatus.status}
+							statusTextColor="#ffffff"
 						/>
 					);
 				}}

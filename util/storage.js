@@ -67,6 +67,8 @@ export default async function uploadData(image, type, data) {
 			table: data.table ? data.table : null,
 			extras: data.extras ? data.extras : null,
 			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
+			confirmed: false,
+			cancelled: false,
 		});
 
 		setDoc(restaurantReservationRef, {
@@ -82,6 +84,8 @@ export default async function uploadData(image, type, data) {
 			table: data.table ? data.table : null,
 			extras: data.extras ? data.extras : null,
 			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
+			confirmed: false,
+			cancelled: false,
 		});
 	}
 

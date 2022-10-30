@@ -107,10 +107,6 @@ const Restaurants = ({ navigation }) => {
 		};
 	}, []);
 
-	// useEffect(() => {
-	// 	dispatch(getRestaurants());
-	// }, []);
-
 	function pressHandler(itemData) {
 		navigation.navigate("RestaurantProfile", {
 			name: itemData.item.name,
