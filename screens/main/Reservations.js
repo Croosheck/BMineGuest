@@ -1,7 +1,13 @@
-import { Animated, Easing, FlatList, StyleSheet, View } from "react-native";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+	Animated,
+	Easing,
+	FlatList,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReservationListItem from "../reservations/ReservationListItem";
-import { getReservations } from "../../util/storage";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
 import { auth, db, storage } from "../../firebase";
 import { LinearGradient } from "expo-linear-gradient";
@@ -86,10 +92,6 @@ const Reservations = ({ navigation }) => {
 
 		// Reservations fetch function - data and images
 		async function getReservationsHandler() {
-			// Get all the reservations data (without images)
-			// const reservationsFetchedData = await getReservations();
-			// setReservationsData(reservationsFetchedData);
-
 			const listRef = ref(storage, "extras");
 
 			// List all images under the /extras/ path
@@ -118,6 +120,17 @@ const Reservations = ({ navigation }) => {
 
 		getReservationsHandler();
 	}, []);
+
+	if (!reservationsData.length > 0) {
+		return (
+			<LinearGradient
+				style={[styles.container, styles.emptyListLabel]}
+				colors={["#3B1616", "#010C1C", "#370B0B"]}
+			>
+				<Text style={styles.emptyListLabel}>No active reservations yet.</Text>
+			</LinearGradient>
+		);
+	}
 
 	return (
 		<LinearGradient
@@ -171,6 +184,10 @@ const Reservations = ({ navigation }) => {
 							statusColor={reservationStatus.bgColor}
 							statusText={reservationStatus.status}
 							statusTextColor="#ffffff"
+							statusEntering={SlideInRight.delay(1600)
+								.duration(500)
+								.springify()
+								.mass(0.65)}
 						/>
 					);
 				}}
@@ -188,5 +205,11 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		color: "#ffffff",
+	},
+	emptyListLabel: {
+		justifyContent: "center",
+		alignItems: "center",
+		color: "#ffffff",
+		fontSize: 20,
 	},
 });

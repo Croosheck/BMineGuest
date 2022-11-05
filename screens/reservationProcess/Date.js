@@ -7,6 +7,7 @@ import { clearDate } from "../../redux/slices/user";
 import Calendar from "../../components/Calendar";
 import AddEvent from "../../components/AddEvent";
 import { formatDate } from "../../util/dateFormat";
+import ClosestDateReservation from "../../components/ClosestDateReservation";
 
 const Date = ({ route }) => {
 	const [displayTime, setDisplayTime] = useState();
@@ -15,7 +16,7 @@ const Date = ({ route }) => {
 
 	const dispatch = useDispatch();
 
-	const { restaurantKey } = route.params;
+	const { restaurantKey, reservationAdvance, openDays } = route.params;
 
 	useEffect(() => {
 		if (!reservationDate) return;
@@ -29,10 +30,29 @@ const Date = ({ route }) => {
 
 	return (
 		<View style={styles.container}>
-			<Calendar />
-			{reservationDate && <AddEvent eventDate={reservationDate} />}
-			<Text style={styles.text}>{displayTime}</Text>
-			<Button title="Clear date" onPress={clearDateHandler} />
+			<ClosestDateReservation reservationAdvance={reservationAdvance} />
+			{displayTime && (
+				<Text style={styles.label}>Your picked reservation:</Text>
+			)}
+			{displayTime && (
+				<Text style={styles.pickedReservation}>{displayTime}</Text>
+			)}
+			<View style={styles.buttonsContainer}>
+				<View style={styles.calendarButtonsContainer}>
+					<View style={styles.calendarButton}>
+						<Calendar
+							reservationAdvance={reservationAdvance}
+							openDays={openDays}
+						/>
+					</View>
+					{reservationDate && (
+						<View style={styles.calendarButton}>
+							<Button title="Clear date" onPress={clearDateHandler} />
+						</View>
+					)}
+				</View>
+				{reservationDate && <AddEvent eventDate={reservationDate} />}
+			</View>
 		</View>
 	);
 };
@@ -47,10 +67,29 @@ const styles = StyleSheet.create({
 		backgroundColor: "#311A1A",
 		padding: 8,
 	},
-	text: {
+	label: {
+		color: "#ffffff",
+	},
+	pickedReservation: {
 		color: "#ffffff",
 		fontSize: 20,
 		textAlign: "center",
 		marginVertical: Dimensions.get("window").height * 0.02,
+		marginBottom: Dimensions.get("window").height * 0.25,
+	},
+	buttonsContainer: {
+		flex: 0.5,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	calendarButtonsContainer: {
+		flex: 1,
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		width: Dimensions.get("window").width * 0.9,
+	},
+	calendarButton: {
+		width: "40%",
 	},
 });

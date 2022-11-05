@@ -116,6 +116,8 @@ const Restaurants = ({ navigation }) => {
 			imageUri: itemData.item.imageUri,
 			restaurantKey: itemData.item.key,
 			restaurantUid: itemData.item.uid,
+			reservationAdvance: itemData.item.reservationAdvance,
+			openDays: itemData.item.openDays,
 		});
 	}
 

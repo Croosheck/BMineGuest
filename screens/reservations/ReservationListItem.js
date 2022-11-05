@@ -20,6 +20,7 @@ import Animated, {
 	useSharedValue,
 	withSpring,
 } from "react-native-reanimated";
+import { ScrollView } from "react-native-gesture-handler";
 
 const ReservationListItem = ({
 	restaurantName,
@@ -32,6 +33,7 @@ const ReservationListItem = ({
 	reservationEntering,
 	reservationExiting,
 	extraEntering,
+	statusEntering,
 	statusColor,
 	statusText,
 	statusTextColor,
@@ -156,7 +158,8 @@ const ReservationListItem = ({
 									borderTopLeftRadius: 20,
 								}}
 							>
-								<Text
+								<Animated.Text
+									entering={statusEntering}
 									style={{
 										textAlign: "center",
 										fontWeight: "bold",
@@ -165,7 +168,7 @@ const ReservationListItem = ({
 									}}
 								>
 									{statusText}
-								</Text>
+								</Animated.Text>
 							</View>
 						</ImageBackground>
 					</LinearGradient>

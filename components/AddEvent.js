@@ -35,9 +35,29 @@ const AddEvent = ({ eventDate }) => {
 		const defaultCalendarSource =
 			Platform.OS === "ios"
 				? await getDefaultCalendarSource()
-				: { isLocalAccount: true, name: "Restaurant Reservation" };
+				: { isLocalAccount: true, name: "BMineGuestCalendar" };
+
+		const calendars = await SystemCalendar.getCalendarsAsync(
+			SystemCalendar.EntityTypes.EVENT
+		);
+		const isCalendarExisting = calendars.some(
+			(item) => item.source.name === "BMineGuestCalendar"
+		);
+
+		// Picks an existing calendar, if option has been used already
+		if (isCalendarExisting) {
+			const reservationsCalendar = calendars.find(
+				(item) => item.source.name === "BMineGuestCalendar"
+			);
+
+			const existingCalendarID = reservationsCalendar.id;
+
+			return existingCalendarID;
+		}
+
+		// Creates new calendar, if option has has been used for the 1st time
 		const newCalendarID = await SystemCalendar.createCalendarAsync({
-			title: "Reservations Calendar",
+			title: "BMineGuestCalendar",
 			color: "blue",
 			entityType: SystemCalendar.EntityTypes.EVENT,
 			sourceId: defaultCalendarSource.id,
@@ -46,6 +66,7 @@ const AddEvent = ({ eventDate }) => {
 			ownerAccount: "personal",
 			accessLevel: SystemCalendar.CalendarAccessLevel.OWNER,
 		});
+
 		return newCalendarID;
 	}
 
@@ -53,6 +74,7 @@ const AddEvent = ({ eventDate }) => {
 		try {
 			const calendarId = await createCalendar();
 
+			// Adds new event to phone calendar
 			const res = await SystemCalendar.createEventAsync(calendarId, {
 				endDate: new Date(eventDate),
 				startDate: new Date(eventDate),
@@ -67,7 +89,7 @@ const AddEvent = ({ eventDate }) => {
 			});
 			Alert.alert(
 				"Success!",
-				"Your reservation has been added to Your calendar."
+				"Your reservation has been added to Your phone calendar."
 			);
 			dispatch(clearDate());
 		} catch (e) {

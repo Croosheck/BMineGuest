@@ -1,13 +1,16 @@
+import { getDownloadURL, listAll, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { useDispatch, useSelector } from "react-redux";
 import ItemTile from "../../components/ItemTile";
+import { storage } from "../../firebase";
 import { addExtra, removeExtra, extraPicked } from "../../redux/slices/user";
 
 const Extras = ({ route }) => {
 	const [extraItems, setExtraItems] = useState();
+	const [extraImages, setExtraImages] = useState({});
 	const { availableRestaurants, reservationData } = useSelector(
 		(state) => state.userReducer
 	);
@@ -21,8 +24,32 @@ const Extras = ({ route }) => {
 	useEffect(() => {
 		pickedRestaurant = availableRestaurants.filter(
 			(restaurant) => restaurant.key === restaurantKey
-		);
-		setExtraItems(pickedRestaurant[0].extras);
+		)[0];
+		setExtraItems(pickedRestaurant.extras);
+
+		async function getExtraImages() {
+			const listRef = ref(storage, "extras");
+
+			const response = await listAll(listRef);
+
+			if (extraImages.length === response.items.length) return;
+
+			response.items.forEach(async (item) => {
+				const extraImgRef = ref(storage, `extras/${item.name}`);
+				const extraImgUri = await getDownloadURL(extraImgRef);
+
+				setExtraImages((prev) => {
+					// Cut the image extension (mostly .png's)
+					const itemName = item.name.slice(0, -4);
+
+					return {
+						...prev,
+						[itemName]: extraImgUri,
+					};
+				});
+			});
+		}
+		getExtraImages();
 	}, [availableRestaurants]);
 
 	function manageExtra(itemData) {
@@ -71,36 +98,25 @@ const Extras = ({ route }) => {
 							<ItemTile
 								title={`${itemData.item.xName}`}
 								textBelow={`${
-									itemData.item.xPrice === 0 ? "Free" : itemData.item.xPrice
+									itemData.item.xPrice === 0
+										? "Free"
+										: itemData.item.xPrice + "$"
 								}`}
 								onPress={() => manageExtra(itemData)}
 								picked={itemData.item.xPicked}
+								imgUri={extraImages[itemData.item.xFileName.slice(0, -4)]}
 							/>
 						);
 					}}
 				/>
 			)}
-			{reservationData.extras && (
-				<ScrollView>
-					<View style={{ flexDirection: "column" }}>
-						{reservationData.extras.map((item) => {
-							return (
-								<Text
-									key={Math.random() * 1000000}
-									style={{ color: "#ffffff" }}
-								>
-									- {item.xName}
-								</Text>
-							);
-						})}
-					</View>
-				</ScrollView>
-			)}
-			<Text style={{ color: "#ffffff", fontWeight: "500", fontSize: 20 }}>
+			<Text style={styles.totalPriceContainer}>
 				Total price:{" "}
-				{reservationData.extras.reduce((acc, item) => {
-					return acc + item.xPrice;
-				}, 0)}
+				{reservationData.extras
+					.reduce((acc, item) => {
+						return acc + item.xPrice;
+					}, 0)
+					.toFixed(2) + "$"}
 			</Text>
 		</View>
 	);
@@ -114,10 +130,11 @@ const styles = StyleSheet.create({
 		backgroundColor: "#311A1A",
 		padding: 8,
 	},
-	text: {
+	totalPriceContainer: {
 		color: "#ffffff",
+		fontWeight: "500",
 		fontSize: 20,
+		paddingTop: 3,
 		textAlign: "center",
-		marginVertical: Dimensions.get("window").height * 0.02,
 	},
 });

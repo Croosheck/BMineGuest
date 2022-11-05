@@ -8,16 +8,16 @@ import { store } from "./redux/store";
 import Landing from "./screens/auth/Landing";
 import Register from "./screens/auth/Register";
 import Login from "./screens/auth/Login";
-
 import Main from "./screens/Main";
+
+import RestaurantProfile from "./screens/restaurants/RestaurantProfile";
+import ReserveMain from "./screens/reservationProcess/ReserveMain";
+import Summary from "./screens/reservationProcess/Summary";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import { getAuth } from "firebase/auth";
-import RestaurantProfile from "./screens/restaurants/RestaurantProfile";
-import ReserveMain from "./screens/reservationProcess/ReserveMain";
-import Summary from "./screens/reservationProcess/Summary";
 
 function AppContainer() {
 	const Stack = createStackNavigator();

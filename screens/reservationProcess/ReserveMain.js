@@ -14,7 +14,8 @@ import { clearDate, clearReservationData } from "../../redux/slices/user";
 const ReserveMain = ({ navigation, route }) => {
 	const TopTab = createMaterialTopTabNavigator();
 	const dispatch = useDispatch();
-	const { restaurantKey, name, restaurantUid } = route.params;
+	const { restaurantKey, name, restaurantUid, reservationAdvance, openDays } =
+		route.params;
 
 	useEffect(() => {
 		// Resets all tabs before leaving
@@ -81,6 +82,8 @@ const ReserveMain = ({ navigation, route }) => {
 				component={Date}
 				initialParams={{
 					restaurantKey: restaurantKey,
+					reservationAdvance: reservationAdvance,
+					openDays: openDays,
 				}}
 				options={{
 					tabBarIcon: () => {

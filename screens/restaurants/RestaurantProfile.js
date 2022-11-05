@@ -18,7 +18,14 @@ const RestaurantProfile = ({ navigation, route }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
 	const [realtime, setRealtime] = useState();
 
-	const { name, description, restaurantKey, restaurantUid } = route.params;
+	const {
+		name,
+		description,
+		restaurantKey,
+		restaurantUid,
+		reservationAdvance,
+		openDays,
+	} = route.params;
 
 	const dispatch = useDispatch();
 
@@ -37,6 +44,8 @@ const RestaurantProfile = ({ navigation, route }) => {
 			restaurantKey: restaurantKey,
 			name: name,
 			restaurantUid: restaurantUid,
+			reservationAdvance: reservationAdvance,
+			openDays: openDays,
 		});
 	}
 
