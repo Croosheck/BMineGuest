@@ -143,10 +143,23 @@ const Reservations = ({ navigation }) => {
 				// numColumns={2}
 				renderItem={(itemData) => {
 					function getReservationStatusHandler() {
-						if (!itemData.item.confirmed && !itemData.item.cancelled)
+						if (
+							!itemData.item.confirmed &&
+							!itemData.item.cancelled &&
+							!itemData.item.callRequest
+						)
 							return {
 								status: "Pending",
 								bgColor: "#79B4FDA6",
+							};
+						if (
+							!itemData.item.confirmed &&
+							!itemData.item.cancelled &&
+							itemData.item.callRequest
+						)
+							return {
+								status: "Call Us!",
+								bgColor: "#FFFFFFA6",
 							};
 						if (itemData.item.confirmed)
 							return {

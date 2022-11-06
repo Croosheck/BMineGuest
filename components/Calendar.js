@@ -49,27 +49,29 @@ const Calendar = ({ reservationAdvance, openDays }) => {
 
 		const pickedDay = openDays.find((item) => item.day === pickedDayNumber);
 
-		const hoursCheck =
-			pickedDayHours >= pickedDay.hours.reservationsOpen &&
-			pickedDayHours <= pickedDay.hours.reservationsClose;
+		const upperCaseDay =
+			pickedDay.dayLong.slice(0, 1).toUpperCase() + pickedDay.dayLong.slice(1);
 
 		if (!pickedDay.isOpen) {
 			Alert.alert(
-				`We are closed on every ${pickedDay.dayLong}`,
+				`We are closed every ${upperCaseDay}`,
 				"You can still try picking another day!",
 				alertButtons
 			);
 			hideDatePicker();
 			return;
 		}
+
+		const hoursCheck =
+			pickedDayHours >= pickedDay.hours.reservationsOpen &&
+			pickedDayHours <= pickedDay.hours.reservationsClose;
+
 		if (!hoursCheck) {
 			Alert.alert(
-				`Not able to place reservation at ${pickedDayHours}:${String(
+				`Not able to place reservation for ${pickedDayHours}:${String(
 					pickedDayMinutes
 				).padStart(2, "0")}.`,
-				`Every ${
-					pickedDay.dayLong
-				}, You can pick Your reservation time between ${String(
+				`Every ${upperCaseDay}, You can pick Your reservation time between ${String(
 					pickedDay.hours.reservationsOpen
 				).padStart(2, "0")}-${String(
 					pickedDay.hours.reservationsClose
