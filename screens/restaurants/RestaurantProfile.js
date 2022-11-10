@@ -1,4 +1,3 @@
-import { collection, doc, onSnapshot, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
 	Button,
@@ -10,13 +9,12 @@ import {
 } from "react-native";
 
 import { useDispatch } from "react-redux";
-import { db } from "../../firebase";
 import { getUser } from "../../redux/slices/user";
-import { getReservations, getRestaurantProfileImage } from "../../util/storage";
+import { getRestaurantProfileImage } from "../../util/storage";
 
 const RestaurantProfile = ({ navigation, route }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
-	const [realtime, setRealtime] = useState();
+	const [howMany, setHowMany] = useState(1);
 
 	const {
 		name,
@@ -25,9 +23,25 @@ const RestaurantProfile = ({ navigation, route }) => {
 		restaurantUid,
 		reservationAdvance,
 		openDays,
+		reservationLimit,
 	} = route.params;
 
 	const dispatch = useDispatch();
+
+	function howManyHandler(type) {
+		if (type === "increment") {
+			setHowMany((prev) => {
+				if (prev >= reservationLimit) return reservationLimit;
+				return prev + 1;
+			});
+		}
+		if (type === "decrement") {
+			setHowMany((prev) => {
+				if (prev <= 1) return 1;
+				return prev - 1;
+			});
+		}
+	}
 
 	useEffect(() => {
 		async function getRestaurantDataHandler() {
@@ -46,6 +60,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 			restaurantUid: restaurantUid,
 			reservationAdvance: reservationAdvance,
 			openDays: openDays,
+			howMany: howMany,
 		});
 	}
 
@@ -53,8 +68,6 @@ const RestaurantProfile = ({ navigation, route }) => {
 	// async function getReservationsHandler() {
 	// 	const reservationsData = await getReservations();
 	// }
-
-	function testFunction() {}
 
 	return (
 		<View style={styles.container}>
@@ -67,15 +80,21 @@ const RestaurantProfile = ({ navigation, route }) => {
 					<Text style={styles.description}>{description}</Text>
 				</View>
 				<View style={styles.buttonsContainer}>
-					{/* <View style={styles.button}>
-						<Button title="test" onPress={testFunction} />
-					</View> */}
-					<View style={styles.button}>
-						<Button title="Reserve" onPress={onReserveHandler} />
+					<View style={styles.setButton}>
+						<Button
+							title="-"
+							onPress={howManyHandler.bind(this, "decrement")}
+						/>
 					</View>
-					{/* <View style={styles.button}>
-						<Button title="Navigate" />
-					</View> */}
+					<View style={styles.button}>
+						<Button title={`Book for ${howMany}`} onPress={onReserveHandler} />
+					</View>
+					<View style={styles.setButton}>
+						<Button
+							title="+"
+							onPress={howManyHandler.bind(this, "increment")}
+						/>
+					</View>
 				</View>
 			</View>
 		</View>
@@ -133,12 +152,18 @@ const styles = StyleSheet.create({
 	buttonsContainer: {
 		flexDirection: "row",
 		justifyContent: "center",
+		alignItems: "center",
 		marginBottom: Dimensions.get("window").height * 0.02,
 		// borderWidth: 2,
 		// borderColor: "#ffffff",
 	},
 	button: {
-		minWidth: Dimensions.get("window").width * 0.25,
+		minWidth: Dimensions.get("window").width * 0.3,
+		height: Dimensions.get("window").width * 0.1,
 		marginHorizontal: 12,
+	},
+	setButton: {
+		width: Dimensions.get("window").width * 0.1,
+		height: Dimensions.get("window").width * 0.1,
 	},
 });

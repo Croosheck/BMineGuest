@@ -118,6 +118,7 @@ const Restaurants = ({ navigation }) => {
 			restaurantUid: itemData.item.uid,
 			reservationAdvance: itemData.item.reservationAdvance,
 			openDays: itemData.item.openDays,
+			reservationLimit: itemData.item.reservationLimit,
 		});
 	}
 

@@ -37,7 +37,7 @@ const ItemTile = ({
 				<View
 					style={[
 						styles.labelContainer,
-						picked && { backgroundColor: "#00000096" },
+						picked && { backgroundColor: "#1F07076F" },
 					]}
 				>
 					<View style={styles.titleContainer}>
@@ -90,8 +90,11 @@ const styles = StyleSheet.create({
 	itemPicked: {
 		flex: 1,
 		width: "100%",
-		backgroundColor: "#0B006F83",
+		backgroundColor: "#4E4E4E5A",
+		borderWidth: 4,
 		opacity: 1,
+		borderColor: "#ffffff",
+		borderRadius: 30,
 	},
 	innerContainer: {
 		flex: 1,
