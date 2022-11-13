@@ -20,11 +20,24 @@ const Extras = ({ route }) => {
 	const dispatch = useDispatch();
 
 	let pickedRestaurant;
+	let modifiedExtras;
+
+	const pickedRestaurantWithoutIndexes = availableRestaurants.filter(
+		(restaurant) => restaurant.key === restaurantKey
+	)[0];
+
+	modifiedExtras = pickedRestaurantWithoutIndexes.extras.map((extra, i) => ({
+		...extra,
+		index: i,
+		picked: false,
+	}));
+
+	pickedRestaurant = {
+		...pickedRestaurantWithoutIndexes,
+		extras: [...modifiedExtras],
+	};
 
 	useEffect(() => {
-		pickedRestaurant = availableRestaurants.filter(
-			(restaurant) => restaurant.key === restaurantKey
-		)[0];
 		setExtraItems(pickedRestaurant.extras);
 
 		async function getExtraImages() {
@@ -54,19 +67,14 @@ const Extras = ({ route }) => {
 
 	function manageExtra(itemData) {
 		// Highlight picked extra
-		dispatch(
-			extraPicked({
-				key: restaurantKey,
-				extraIndex: itemData.index,
-			})
-		);
+		itemData.item.picked = !itemData.item.picked;
 
 		const xShortFilename = itemData.item.xFileName.includes(".")
 			? itemData.item.xFileName.slice(0, -4)
 			: itemData.item.xFileName;
 
 		// Add picked extra to data object
-		if (!itemData.item.xPicked) {
+		if (itemData.item.picked) {
 			dispatch(
 				addExtra({
 					xName: itemData.item.xName,
@@ -78,7 +86,7 @@ const Extras = ({ route }) => {
 		}
 
 		// If picked (highlighted) - remove on click
-		if (itemData.item.xPicked) {
+		if (!itemData.item.picked) {
 			const disableItem = reservationData.extras.find(
 				(item) => item.xName === itemData.item.xName
 			);
@@ -103,7 +111,7 @@ const Extras = ({ route }) => {
 										: itemData.item.xPrice + "$"
 								}`}
 								onPress={() => manageExtra(itemData)}
-								picked={itemData.item.xPicked}
+								picked={itemData.item.picked}
 								imgUri={extraImages[itemData.item.xFileName.slice(0, -4)]}
 							/>
 						);

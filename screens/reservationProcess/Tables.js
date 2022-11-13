@@ -16,9 +16,13 @@ import {
 } from "../../redux/slices/user";
 
 import TableTile from "../../components/TableTile";
+import { getDownloadURL, listAll, ref } from "firebase/storage";
+import { storage } from "../../firebase";
 
 const Tables = ({ route }) => {
 	const [tables, setTables] = useState();
+	const [tableImages, setTableImages] = useState({});
+	const [filteredPlacements, setFilteredPlacements] = useState([]);
 
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
 
@@ -28,17 +32,66 @@ const Tables = ({ route }) => {
 
 	let pickedRestaurant;
 	let filteredTables = [];
+	let allPlacementsButtons = [];
+	let modifiedTables;
+
+	const pickedRestaurantWithoutIndexes = availableRestaurants.find(
+		(restaurant) => restaurant.key === restaurantKey
+	);
+
+	//Adding index and picked properties, to allow highlighting functionality
+	modifiedTables = pickedRestaurantWithoutIndexes.tables.map((table, i) => ({
+		...table,
+		index: i,
+		picked: false,
+	}));
+
+	pickedRestaurant = {
+		...pickedRestaurantWithoutIndexes,
+		tables: [...modifiedTables],
+	};
 
 	useEffect(() => {
 		filteredTables = [];
 
-		pickedRestaurant = availableRestaurants.filter(
-			(restaurant) => restaurant.key === restaurantKey
+		allPlacementsButtons = pickedRestaurant.tables.map(
+			(table) => table.tPlacement
 		);
+		setFilteredPlacements(["All", ...new Set(allPlacementsButtons)]);
+
+		async function getTablesImages() {
+			const listRef = ref(
+				storage,
+				`restaurants/${pickedRestaurant.uid}/tables`
+			);
+
+			const response = await listAll(listRef);
+
+			if (tableImages.length === response.items.length) return;
+
+			response.items.forEach(async (item) => {
+				const tableImgRef = ref(
+					storage,
+					`restaurants/${pickedRestaurant.uid}/tables/${item.name}`
+				);
+
+				const tableImgUri = await getDownloadURL(tableImgRef);
+
+				setTableImages((prev) => {
+					// Cut the image extension (mostly .jpg's)
+					const itemName = item.name.slice(0, -4);
+
+					return {
+						...prev,
+						[itemName]: tableImgUri,
+					};
+				});
+			});
+		}
 
 		// Filter tables based on number of people (to avoid wasting free places)
 		function findTablesHandler(difference = 0, all = false) {
-			pickedRestaurant[0].tables.forEach((table, i) => {
+			pickedRestaurant.tables.forEach((table, i) => {
 				if (all && table.tAvailability && table.tSeats / howMany <= 3) {
 					filteredTables.push({ ...table, index: i });
 					return;
@@ -87,8 +140,9 @@ const Tables = ({ route }) => {
 
 		// setTables(filteredTables);
 
-		setTables(pickedRestaurant[0].tables);
-	}, [availableRestaurants]);
+		setTables(pickedRestaurant.tables);
+		getTablesImages();
+	}, []);
 
 	function addDataHandler(itemData) {
 		dispatch(
@@ -96,41 +150,40 @@ const Tables = ({ route }) => {
 				table: {
 					tShape: itemData.item.tShape,
 					tSeats: itemData.item.tSeats,
+					tPlacement: itemData.item.tPlacement,
 				},
 			})
 		);
-		dispatch(
-			tablePicked({
-				key: restaurantKey,
-				// tableIndex: itemData.item.index,
-				tableIndex: itemData.index,
-			})
-		);
+
+		//Item highlighting logic
+		setTables((prev) => {
+			if (prev.some((table) => table.picked === true)) {
+				prev.forEach((table) => (table.picked = false));
+			}
+
+			prev[itemData.index].picked = true;
+			return prev;
+		});
 	}
 
-	function removeDataHandler() {
-		dispatch(removeReservationItem({ table: "" }));
-	}
-
-	const tableImage = {
-		448215317: require("../../assets/test/448215317.jpg"),
-		1082098712: require("../../assets/test/1082098712.jpg"),
-		3030495495: require("../../assets/test/3030495495.jpg"),
-		5297085268: require("../../assets/test/5297085268.jpg"),
-		9144166763: require("../../assets/test/9144166763.jpg"),
-		9991969801: require("../../assets/test/9991969801.jpg"),
-	};
+	// const tableImage = {
+	// 	118427365: require("../../assets/test/118427365.jpg"),
+	// 	1082098712: require("../../assets/test/1082098712.jpg"),
+	// 	1152363266: require("../../assets/test/1152363266.jpg"),
+	// 	1236348563: require("../../assets/test/1236348563.jpg"),
+	// 	3030495495: require("../../assets/test/3030495495.jpg"),
+	// 	5236388674: require("../../assets/test/5236388674.jpg"),
+	// 	6347299673: require("../../assets/test/6347299673.jpg"),
+	// 	8124363672: require("../../assets/test/8124363672.jpg"),
+	// 	9991969801: require("../../assets/test/9991969801.jpg"),
+	// };
 
 	function filterTablesHandler(placement) {
-		pickedRestaurant = availableRestaurants.filter(
-			(restaurant) => restaurant.key === restaurantKey
-		);
-
 		if (placement === "All") {
-			setTables(pickedRestaurant[0].tables);
+			setTables(pickedRestaurant.tables);
 			return;
 		}
-		const filtered = pickedRestaurant[0].tables.filter(
+		const filtered = pickedRestaurant.tables.filter(
 			(table) => table.tPlacement === placement
 		);
 		setTables(filtered);
@@ -143,33 +196,16 @@ const Tables = ({ route }) => {
 				contentContainerStyle={styles.placementContentContainer}
 				horizontal
 			>
-				<View style={styles.placementButtonContainer}>
-					<Button title="All" onPress={filterTablesHandler.bind(this, "All")} />
-				</View>
-				<View style={styles.placementButtonContainer}>
-					<Button
-						title="1st Floor"
-						onPress={filterTablesHandler.bind(this, "1st Floor")}
-					/>
-				</View>
-				<View style={styles.placementButtonContainer}>
-					<Button
-						title="2nd Floor"
-						onPress={filterTablesHandler.bind(this, "2nd Floor")}
-					/>
-				</View>
-				<View style={styles.placementButtonContainer}>
-					<Button
-						title="Terrace"
-						onPress={filterTablesHandler.bind(this, "Terrace")}
-					/>
-				</View>
-				<View style={styles.placementButtonContainer}>
-					<Button
-						title="Outside"
-						onPress={filterTablesHandler.bind(this, "Outside")}
-					/>
-				</View>
+				{filteredPlacements.map((placement, i) => {
+					return (
+						<View style={styles.placementButtonContainer} key={i}>
+							<Button
+								title={placement}
+								onPress={filterTablesHandler.bind(this, placement)}
+							/>
+						</View>
+					);
+				})}
 			</ScrollView>
 			{tables && (
 				<FlatList
@@ -179,14 +215,14 @@ const Tables = ({ route }) => {
 					renderItem={(itemData) => {
 						return (
 							<TableTile
-								title={`${itemData.item.tShape}`}
+								// title={`${itemData.item.tShape}`}
 								textBelow={`${itemData.item.tSeats}`}
 								onPress={() => addDataHandler(itemData)}
-								picked={itemData.item.tPicked}
+								picked={itemData.item.picked}
 								iconName="human-male-female"
 								iconSize={20}
 								iconColor="#ffffff"
-								imgUri={tableImage[itemData.item.tId]}
+								imgUri={tableImages[itemData.item.tId]}
 								tPlacement={itemData.item.tPlacement}
 							/>
 						);

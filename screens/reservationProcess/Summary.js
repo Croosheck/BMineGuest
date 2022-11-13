@@ -24,9 +24,11 @@ const Summary = ({ navigation, route }) => {
 
 	const { name, restaurantKey, restaurantUid } = route.params;
 
-	const extrasPrice = extras.reduce((acc, item) => {
-		return acc + item.xPrice;
-	}, 0);
+	const extrasPrice = extras
+		.reduce((acc, item) => {
+			return acc + item.xPrice;
+		}, 0)
+		.toFixed(2);
 
 	useLayoutEffect(() => {
 		const data = {
