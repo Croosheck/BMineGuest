@@ -18,6 +18,7 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
 	const [extraImages, setExtraImages] = useState({});
+	const [loaded, setLoaded] = useState(false);
 
 	const animationProgress = useRef(new Animated.Value(0.315));
 
@@ -82,10 +83,14 @@ const Reservations = ({ navigation }) => {
 			collection(db, "users", auth.currentUser.uid, "reservations")
 		);
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			if (querySnapshot.size === 0) setLoaded(true);
 			const reservations = [];
 			querySnapshot.forEach((doc) => {
+				if (doc.data) setLoaded(true);
 				reservations.push(doc.data());
 			});
+
+			setLoaded(true);
 			setReservationsData(reservations);
 		});
 		//////////////////////////////////////////////////////////
@@ -121,7 +126,18 @@ const Reservations = ({ navigation }) => {
 		getReservationsHandler();
 	}, []);
 
-	if (!reservationsData.length > 0) {
+	if (!loaded) {
+		return (
+			<LinearGradient
+				style={[styles.container, styles.emptyListLabel]}
+				colors={["#3B1616", "#010C1C", "#370B0B"]}
+			>
+				<Text style={styles.emptyListLabel}>Loading...</Text>
+			</LinearGradient>
+		);
+	}
+
+	if (reservationsData.length === 0 && loaded) {
 		return (
 			<LinearGradient
 				style={[styles.container, styles.emptyListLabel]}

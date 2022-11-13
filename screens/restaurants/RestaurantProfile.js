@@ -87,7 +87,10 @@ const RestaurantProfile = ({ navigation, route }) => {
 						/>
 					</View>
 					<View style={styles.button}>
-						<Button title={`Book for ${howMany}`} onPress={onReserveHandler} />
+						<Button
+							title={`Booking for ${howMany}`}
+							onPress={onReserveHandler}
+						/>
 					</View>
 					<View style={styles.setButton}>
 						<Button
@@ -158,7 +161,7 @@ const styles = StyleSheet.create({
 		// borderColor: "#ffffff",
 	},
 	button: {
-		minWidth: Dimensions.get("window").width * 0.3,
+		minWidth: Dimensions.get("window").width * 0.34,
 		height: Dimensions.get("window").width * 0.1,
 		marginHorizontal: 12,
 	},
