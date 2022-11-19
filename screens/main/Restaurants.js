@@ -119,6 +119,7 @@ const Restaurants = ({ navigation }) => {
 			reservationAdvance: itemData.item.reservationAdvance,
 			openDays: itemData.item.openDays,
 			reservationLimit: itemData.item.reservationLimit,
+			reservationsEnabled: itemData.item.reservationsEnabled,
 		});
 	}
 

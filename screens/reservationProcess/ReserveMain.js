@@ -21,6 +21,7 @@ const ReserveMain = ({ navigation, route }) => {
 		reservationAdvance,
 		openDays,
 		howMany,
+		reservationsEnabled,
 	} = route.params;
 
 	useEffect(() => {
@@ -90,6 +91,7 @@ const ReserveMain = ({ navigation, route }) => {
 					restaurantKey: restaurantKey,
 					reservationAdvance: reservationAdvance,
 					openDays: openDays,
+					reservationsEnabled: reservationsEnabled,
 				}}
 				options={{
 					tabBarIcon: () => {

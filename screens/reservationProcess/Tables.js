@@ -5,15 +5,12 @@ import {
 	FlatList,
 	ScrollView,
 	StyleSheet,
+	Text,
 	View,
 } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-	addTable,
-	removeReservationItem,
-	tablePicked,
-} from "../../redux/slices/user";
+import { addTable } from "../../redux/slices/user";
 
 import TableTile from "../../components/TableTile";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
@@ -119,28 +116,33 @@ const Tables = ({ route }) => {
 			});
 		}
 
-		// //Try to find tables equal to a number of people only
-		// findTablesHandler();
+		if (pickedRestaurant.tablesFiltering) {
+			//Try to find tables equal to a number of people only
+			findTablesHandler();
 
-		// //If there's none of these, find tables greater by 1 seat
-		// if (filteredTables.length === 0) {
-		// 	findTablesHandler(1);
-		// }
+			//If there's none of these, find tables greater by 1 seat
+			if (filteredTables.length === 0) {
+				findTablesHandler(1);
+			}
 
-		// //If there's none of these, find tables greater by 2 seat
-		// if (filteredTables.length === 0) {
-		// 	findTablesHandler(2);
-		// }
+			//If there's none of these, find tables greater by 2 seat
+			if (filteredTables.length === 0) {
+				findTablesHandler(2);
+			}
 
-		// //If there's none of these, list ALL AVAILABLE tables
-		// // (not greater than 3 * number of people)
-		// if (filteredTables.length === 0) {
-		// 	findTablesHandler(0, true);
-		// }
+			//If there's none of these, list ALL AVAILABLE tables
+			// (not greater than 3 * number of people)
+			if (filteredTables.length === 0) {
+				findTablesHandler(0, true);
+			}
 
-		// setTables(filteredTables);
+			setTables(filteredTables);
+		}
 
-		setTables(pickedRestaurant.tables);
+		if (!pickedRestaurant.tablesFiltering) {
+			setTables(pickedRestaurant.tables);
+		}
+
 		getTablesImages();
 	}, []);
 
@@ -241,17 +243,14 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "#311A1A",
-		paddingTop: 0,
 	},
 	placementButtonsContainer: {
-		backgroundColor: "#5E5E5E23",
+		backgroundColor: "transparent",
 		width: Dimensions.get("window").width,
-		zIndex: 999,
 	},
 	placementContentContainer: {
-		paddingVertical: 8,
-		justifyContent: "space-around",
 		alignItems: "center",
+		height: 70,
 	},
 	placementButtonContainer: {
 		marginHorizontal: 10,

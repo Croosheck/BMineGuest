@@ -7,7 +7,7 @@ import { clearDate } from "../../redux/slices/user";
 import Calendar from "../../components/Calendar";
 import AddEvent from "../../components/AddEvent";
 import { formatDate } from "../../util/dateFormat";
-import ClosestDateReservation from "../../components/ClosestDateReservation";
+import { closestDateReservation } from "../../util/closestDateReservation";
 
 const Date = ({ route }) => {
 	const [displayTime, setDisplayTime] = useState();
@@ -16,7 +16,8 @@ const Date = ({ route }) => {
 
 	const dispatch = useDispatch();
 
-	const { restaurantKey, reservationAdvance, openDays } = route.params;
+	const { restaurantKey, reservationAdvance, openDays, reservationsEnabled } =
+		route.params;
 
 	useEffect(() => {
 		if (!reservationDate) return;
@@ -28,9 +29,19 @@ const Date = ({ route }) => {
 		setDisplayTime();
 	}
 
+	const closestReservationTimestamp = closestDateReservation({
+		reservationAdvance,
+		reservationsEnabled,
+		openDays,
+	});
+
 	return (
 		<View style={styles.container}>
-			<ClosestDateReservation reservationAdvance={reservationAdvance} />
+			<Text
+				style={styles.closestDateText}
+			>{`Closest possible reservation date:\n${formatDate(
+				closestReservationTimestamp
+			)}`}</Text>
 			{displayTime && (
 				<Text style={styles.label}>Your picked reservation:</Text>
 			)}
@@ -66,6 +77,12 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		backgroundColor: "#311A1A",
 		padding: 8,
+	},
+	closestDateText: {
+		marginBottom: "auto",
+		color: "#ffffff",
+		fontSize: 20,
+		textAlign: "center",
 	},
 	label: {
 		color: "#ffffff",

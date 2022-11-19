@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { pickDate } from "../redux/slices/user";
 import { calendar, reminder } from "../util/permissions";
 
-const Calendar = ({ reservationAdvance, openDays }) => {
+const Calendar = ({ reservationAdvance, openDays, reservationsEnabled }) => {
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 	const dispatch = useDispatch();
 
