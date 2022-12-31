@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
 	Dimensions,
 	Image,
+	ImageBackground,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -15,24 +16,27 @@ import OutlinedButton from "../../components/OutlinedButton";
 import { getUser } from "../../redux/slices/user";
 import { formatDate } from "../../util/dateFormat";
 import { getRestaurantProfileImage } from "../../util/storage";
+import { getDownloadURL, listAll, ref } from "firebase/storage";
+import { auth, storage } from "../../firebase";
 
 const MARGIN_LEFT = 20;
 const MARGIN_RIGHT = 20;
 
-const TEST_IMAGES = [
-	{ src: require("../../assets/test/118427365.jpg") },
-	{ src: require("../../assets/test/1082098712.jpg") },
-	{ src: require("../../assets/test/1152363266.jpg") },
-	{ src: require("../../assets/test/1236348563.jpg") },
-	{ src: require("../../assets/test/3030495495.jpg") },
-	{ src: require("../../assets/test/5236388674.jpg") },
-	{ src: require("../../assets/test/6347299673.jpg") },
-	{ src: require("../../assets/test/8124363672.jpg") },
-	{ src: require("../../assets/test/9991969801.jpg") },
-];
+// const TEST_IMAGES = [
+// 	{ src: require("../../assets/test/118427365.jpg") },
+// 	{ src: require("../../assets/test/1082098712.jpg") },
+// 	{ src: require("../../assets/test/1152363266.jpg") },
+// 	{ src: require("../../assets/test/1236348563.jpg") },
+// 	{ src: require("../../assets/test/3030495495.jpg") },
+// 	{ src: require("../../assets/test/5236388674.jpg") },
+// 	{ src: require("../../assets/test/6347299673.jpg") },
+// 	{ src: require("../../assets/test/8124363672.jpg") },
+// 	{ src: require("../../assets/test/9991969801.jpg") },
+// ];
 const RestaurantProfile = ({ navigation, route }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
 	const [howMany, setHowMany] = useState(1);
+	const [profileGallery, setProfileGallery] = useState([]);
 
 	const {
 		name,
@@ -43,6 +47,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 		openDays,
 		reservationLimit,
 		reservationsEnabled,
+		restaurantTags,
 	} = route.params;
 
 	const dispatch = useDispatch();
@@ -67,7 +72,30 @@ const RestaurantProfile = ({ navigation, route }) => {
 			const profileImage = await getRestaurantProfileImage(restaurantUid);
 			setProfileImgUri(profileImage);
 		}
+
+		async function getGalleryImages() {
+			const listRef = ref(
+				storage,
+				`restaurants/${restaurantUid}/profileGallery`
+			);
+			const response = await listAll(listRef);
+
+			if (profileGallery.length >= response.items.length) return;
+
+			response.items.forEach(async (item) => {
+				const galleryImgRef = ref(
+					storage,
+					`restaurants/${restaurantUid}/profileGallery/${item.name}`
+				);
+
+				const galleryImgUri = await getDownloadURL(galleryImgRef);
+
+				setProfileGallery((gallery) => [...gallery, galleryImgUri]);
+			});
+		}
+
 		getRestaurantDataHandler();
+		getGalleryImages();
 
 		dispatch(getUser());
 	}, []);
@@ -95,6 +123,34 @@ const RestaurantProfile = ({ navigation, route }) => {
 		openDays,
 	});
 
+	const isAnyOpen = openDays.some((day) => day.isOpen);
+
+	const dateContent =
+		closestReservationTimestamp && reservationsEnabled && isAnyOpen ? (
+			<View style={styles.closestDateInnerContainer}>
+				<Text style={styles.closestDate}>{`Nearest\navail. date:`}</Text>
+				<Text style={[styles.closestDate, styles.dateStyle]}>
+					{formatDate(closestReservationTimestamp, "onlyDate")}
+				</Text>
+			</View>
+		) : (
+			<View style={styles.closestDateInnerContainer}>
+				<Text
+					style={[
+						styles.closestDate,
+						styles.dateStyle,
+						{
+							top: "9%",
+							fontSize: 16.5,
+							textShadowRadius: 2,
+						},
+					]}
+				>
+					Reservations currently disabled.
+				</Text>
+			</View>
+		);
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.imageContainer}>
@@ -105,22 +161,25 @@ const RestaurantProfile = ({ navigation, route }) => {
 					<View style={styles.titleContainer}>
 						<Text style={styles.title}>{name}</Text>
 					</View>
-					<LinearGradient
+					<ImageBackground
 						style={styles.closestDateContainer}
-						colors={["#C29100", "#B10606"]}
-						start={{ x: 0.3, y: 0.3 }}
-						end={{ x: 0.9, y: 0.9 }}
+						imageStyle={styles.closestDatePlateImage}
+						// colors={["#C29100", "#B10606"]}
+						// start={{ x: 0.3, y: 0.3 }}
+						// end={{ x: 0.9, y: 0.9 }}
+						source={require("../../assets/restaurantProfile/plate1.png")}
 					>
-						<Text style={styles.closestDate}>{`Closest\nAv. Date:\n${formatDate(
-							closestReservationTimestamp,
-							"onlyDate"
-						)}`}</Text>
-					</LinearGradient>
+						{dateContent}
+					</ImageBackground>
 				</View>
 				<View style={styles.tagsContainer}>
-					<Text style={styles.tag}>Dogs</Text>
-					<Text style={styles.tag}>Smoke Area</Text>
-					<Text style={styles.tag}>Silent Area</Text>
+					<ScrollView contentContainerStyle={styles.tagsContent} horizontal>
+						{restaurantTags.map((tag, i) => (
+							<Text style={styles.tag} key={i}>
+								{tag.tagName}
+							</Text>
+						))}
+					</ScrollView>
 				</View>
 				<View style={styles.descriptionContainer}>
 					<View style={styles.descriptionInnerContainer}>
@@ -133,31 +192,37 @@ const RestaurantProfile = ({ navigation, route }) => {
 						contentContainerStyle={styles.restaurantImagesScrollViewContent}
 						horizontal
 					>
-						{TEST_IMAGES.map((img, i) => {
+						{profileGallery.map((imgUri, i) => {
 							return (
 								<Image
 									key={i}
-									source={img.src}
 									style={styles.restaurantGalleryImage}
+									source={{ uri: imgUri }}
 								/>
 							);
 						})}
 					</ScrollView>
 				</View>
-				{reservationsEnabled && (
+				{reservationsEnabled && isAnyOpen && (
 					<View style={styles.buttonsContainer}>
 						<View style={styles.setButton}>
 							<OutlinedButton
 								title="-"
 								onPress={howManyHandler.bind(this, "decrement")}
 								style={{ borderWidth: 1 }}
-								titleStyle={{ fontSize: 25, fontWeight: "default" }}
+								titleStyle={{
+									fontSize: 28,
+									fontWeight: "default",
+									textShadowColor: "white",
+									textShadowRadius: 6,
+								}}
 							/>
 						</View>
 						<View style={styles.button}>
 							<OutlinedButton
 								title={`Reservation for ${howMany}`}
 								onPress={onReserveHandler}
+								titleStyle={{ textShadowColor: "white", textShadowRadius: 6 }}
 							/>
 						</View>
 						<View style={styles.setButton}>
@@ -165,7 +230,12 @@ const RestaurantProfile = ({ navigation, route }) => {
 								title="+"
 								onPress={howManyHandler.bind(this, "increment")}
 								style={{ borderWidth: 1 }}
-								titleStyle={{ fontSize: 25, fontWeight: "default" }}
+								titleStyle={{
+									fontSize: 28,
+									fontWeight: "default",
+									textShadowColor: "white",
+									textShadowRadius: 6,
+								}}
 							/>
 						</View>
 					</View>
@@ -221,52 +291,73 @@ const styles = StyleSheet.create({
 	title: {
 		color: "#ffffff",
 		fontSize: 22,
-		fontWeight: "bold",
+		fontWeight: "900",
+		letterSpacing: 0.7,
 		marginLeft: MARGIN_LEFT,
+
+		textShadowColor: "white",
+		textShadowRadius: 3,
 	},
 	closestDateContainer: {
-		width: 110,
-		height: 110,
-		borderRadius: 55,
+		width: 130,
+		height: 130,
 		position: "absolute",
 		right: 0,
 		bottom: 0,
 		marginRight: 10,
-		// backgroundColor: "#C29100",
-		borderWidth: 2,
+
+		// borderWidth: 2,
+		// borderColor: "#FFFFFF",
+		// borderRadius: 65,
+	},
+	closestDatePlateImage: {
+		// borderWidth: 2,
 		borderColor: "#FFFFFF",
+		borderRadius: 65,
+	},
+	closestDateInnerContainer: {
+		position: "absolute",
+		bottom: "30%",
+		left: 0,
+		right: 0,
 	},
 	closestDate: {
 		textAlign: "center",
 		color: "#ffffff",
-		position: "absolute",
-		bottom: "35%",
-		left: 0,
-		right: 0,
-		fontWeight: "bold",
+		fontWeight: "500",
 		fontSize: 15,
+		textShadowColor: "white",
+		textShadowRadius: 6,
 	},
 	dateStyle: {
-		color: "#000000",
-		marginTop: 10,
-		paddingTop: 10,
-		fontSize: 16,
 		fontWeight: "900",
+		// color: "#57851A",
+		color: "#00FFAE",
+		marginTop: 5,
+		top: "-5%",
+		fontSize: 18,
 	},
 	tagsContainer: {
 		width: "100%",
-		flexDirection: "row",
+	},
+	tagsContent: {
+		marginVertical: 10,
 		marginLeft: MARGIN_LEFT,
-		marginTop: 10,
+		paddingRight: 20,
 	},
 	tag: {
-		marginRight: 15,
-		backgroundColor: "#C29200CA",
+		height: 25,
+		marginRight: 10,
+		backgroundColor: "#2C60C7",
 		paddingHorizontal: 12,
-		paddingVertical: 2,
+		paddingVertical: 1,
+		paddingBottom: 2,
 		borderRadius: 20,
-		fontWeight: "bold",
+		fontWeight: "600",
 		color: "#ffffff",
+
+		textShadowColor: "white",
+		textShadowRadius: 4,
 	},
 	descriptionContainer: {
 		flex: 0.3,

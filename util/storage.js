@@ -69,6 +69,7 @@ export default async function uploadData(image, type, data) {
 			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
 			confirmed: false,
 			cancelled: false,
+			howMany: data.howMany,
 		});
 
 		setDoc(restaurantReservationRef, {
@@ -86,6 +87,7 @@ export default async function uploadData(image, type, data) {
 			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
 			confirmed: false,
 			cancelled: false,
+			howMany: data.howMany,
 		});
 	}
 

@@ -35,6 +35,8 @@ const Date = ({ route }) => {
 		openDays,
 	});
 
+	// console.log(openDays);
+
 	return (
 		<View style={styles.container}>
 			<Text
@@ -42,11 +44,32 @@ const Date = ({ route }) => {
 			>{`Closest possible reservation date:\n${formatDate(
 				closestReservationTimestamp
 			)}`}</Text>
+			<View style={styles.openDays}>
+				{openDays.map((day, i) => {
+					const dayToUpperCase =
+						day.dayLong.slice(0, 1).toUpperCase() + day.dayLong.slice(1);
+					const reservationsOpenHour = String(
+						day.hours.reservationsOpen
+					).padStart(2, 0);
+					const reservationsCloseHour = String(
+						day.hours.reservationsClose
+					).padStart(2, 0);
+
+					return (
+						<View style={styles.openDayContainer} key={i}>
+							<Text style={styles.openDay}>{dayToUpperCase}: </Text>
+							<Text style={styles.openDay}>
+								{reservationsOpenHour} - {reservationsCloseHour}
+							</Text>
+						</View>
+					);
+				})}
+			</View>
 			{displayTime && (
-				<Text style={styles.label}>Your picked reservation:</Text>
-			)}
-			{displayTime && (
-				<Text style={styles.pickedReservation}>{displayTime}</Text>
+				<View style={styles.pickedReservation}>
+					<Text style={styles.label}>Your picked reservation:</Text>
+					<Text style={styles.pickedDate}>{displayTime}</Text>
+				</View>
 			)}
 			<View style={styles.buttonsContainer}>
 				<View style={styles.calendarButtonsContainer}>
@@ -54,6 +77,8 @@ const Date = ({ route }) => {
 						<Calendar
 							reservationAdvance={reservationAdvance}
 							openDays={openDays}
+							closestReservationTimestamp={closestReservationTimestamp}
+							buttonTitle={reservationDate ? "Change Date" : "Show Calendar"}
 						/>
 					</View>
 					{reservationDate && (
@@ -84,15 +109,35 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		textAlign: "center",
 	},
+	openDays: {
+		width: "50%",
+		padding: 10,
+		borderWidth: 0.5,
+		borderColor: "#ffffff",
+	},
+	openDayContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+	},
+	openDay: {
+		color: "#ffffff",
+		fontSize: 18,
+		textShadowColor: "#FFFFFF52",
+		textShadowOffset: { height: -2, width: 2 },
+		textShadowRadius: 2,
+	},
+	pickedReservation: {
+		borderWidth: 0.5,
+		borderColor: "#ffffff",
+	},
 	label: {
 		color: "#ffffff",
 	},
-	pickedReservation: {
+	pickedDate: {
 		color: "#ffffff",
 		fontSize: 20,
 		textAlign: "center",
-		marginVertical: Dimensions.get("window").height * 0.02,
-		marginBottom: Dimensions.get("window").height * 0.25,
 	},
 	buttonsContainer: {
 		flex: 0.5,

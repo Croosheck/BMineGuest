@@ -20,7 +20,6 @@ import Animated, {
 	useSharedValue,
 	withSpring,
 } from "react-native-reanimated";
-import { ScrollView } from "react-native-gesture-handler";
 
 const ReservationListItem = ({
 	restaurantName,

@@ -57,6 +57,7 @@ const ReserveMain = ({ navigation, route }) => {
 							restaurantKey: restaurantKey,
 							name: name,
 							restaurantUid: restaurantUid,
+							howMany: howMany,
 						});
 					}}
 				>

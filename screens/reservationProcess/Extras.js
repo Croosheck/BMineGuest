@@ -1,12 +1,11 @@
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
 import ItemTile from "../../components/ItemTile";
 import { storage } from "../../firebase";
-import { addExtra, removeExtra, extraPicked } from "../../redux/slices/user";
+import { addExtra, removeExtra } from "../../redux/slices/user";
 
 const Extras = ({ route }) => {
 	const [extraItems, setExtraItems] = useState();

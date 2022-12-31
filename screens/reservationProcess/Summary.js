@@ -22,7 +22,7 @@ const Summary = ({ navigation, route }) => {
 		(state) => state.userReducer
 	);
 
-	const { name, restaurantKey, restaurantUid } = route.params;
+	const { name, restaurantKey, restaurantUid, howMany } = route.params;
 
 	const extrasPrice = extras
 		.reduce((acc, item) => {
@@ -43,6 +43,7 @@ const Summary = ({ navigation, route }) => {
 			clientsName: currentUser.name,
 			clientsEmail: currentUser.email,
 			clientsUid: auth.currentUser.uid,
+			howMany: howMany,
 		};
 
 		navigation.setOptions({
@@ -78,8 +79,9 @@ const Summary = ({ navigation, route }) => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.text}>{displayTime}</Text>
-			{table && <Text style={styles.text}>Shape: {table.tShape}</Text>}
+			{table && <Text style={styles.text}>Placement: {table.tPlacement}</Text>}
 			{table && <Text style={styles.text}>Seats: {table.tSeats}</Text>}
+			{table && <Text style={styles.text}>ID: {table.tId}</Text>}
 			{extras && (
 				<ScrollView>
 					<View style={{ flexDirection: "column" }}>

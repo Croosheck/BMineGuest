@@ -8,6 +8,7 @@ import {
 	Text,
 	View,
 } from "react-native";
+import OutlinedButton from "../../components/OutlinedButton";
 
 import { useDispatch, useSelector } from "react-redux";
 import { addTable } from "../../redux/slices/user";
@@ -15,11 +16,13 @@ import { addTable } from "../../redux/slices/user";
 import TableTile from "../../components/TableTile";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import { storage } from "../../firebase";
+import FilterButton from "../../components/FilterButton";
 
 const Tables = ({ route }) => {
-	const [tables, setTables] = useState();
+	const [tables, setTables] = useState([]);
 	const [tableImages, setTableImages] = useState({});
 	const [filteredPlacements, setFilteredPlacements] = useState([]);
+	const [message, setMessage] = useState("");
 
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
 
@@ -47,6 +50,36 @@ const Tables = ({ route }) => {
 		...pickedRestaurantWithoutIndexes,
 		tables: [...modifiedTables],
 	};
+
+	// Filter tables based on number of people (to avoid wasting free places)
+	function findTablesHandler(difference = 0, all = false) {
+		pickedRestaurant.tables.forEach((table, i) => {
+			if (all && table.tAvailability && table.tSeats / howMany <= 3) {
+				filteredTables.push({ ...table, index: i });
+				return;
+			}
+			if (
+				table.tAvailability &&
+				table.tSeats === howMany &&
+				table.tSeats % howMany === 0 &&
+				table.tSeats % howMany === difference &&
+				difference === 0
+			) {
+				filteredTables.push({ ...table, index: i });
+				return;
+			}
+			if (
+				table.tAvailability &&
+				difference !== 0 &&
+				table.tSeats / howMany >= 1 &&
+				table.tSeats / howMany < 2 &&
+				table.tSeats % howMany <= difference
+			) {
+				filteredTables.push({ ...table, index: i });
+				return;
+			}
+		});
+	}
 
 	useEffect(() => {
 		filteredTables = [];
@@ -86,36 +119,6 @@ const Tables = ({ route }) => {
 			});
 		}
 
-		// Filter tables based on number of people (to avoid wasting free places)
-		function findTablesHandler(difference = 0, all = false) {
-			pickedRestaurant.tables.forEach((table, i) => {
-				if (all && table.tAvailability && table.tSeats / howMany <= 3) {
-					filteredTables.push({ ...table, index: i });
-					return;
-				}
-				if (
-					table.tAvailability &&
-					table.tSeats === howMany &&
-					table.tSeats % howMany === 0 &&
-					table.tSeats % howMany === difference &&
-					difference === 0
-				) {
-					filteredTables.push({ ...table, index: i });
-					return;
-				}
-				if (
-					table.tAvailability &&
-					difference !== 0 &&
-					table.tSeats / howMany >= 1 &&
-					table.tSeats / howMany < 2 &&
-					table.tSeats % howMany <= difference
-				) {
-					filteredTables.push({ ...table, index: i });
-					return;
-				}
-			});
-		}
-
 		if (pickedRestaurant.tablesFiltering) {
 			//Try to find tables equal to a number of people only
 			findTablesHandler();
@@ -150,6 +153,7 @@ const Tables = ({ route }) => {
 		dispatch(
 			addTable({
 				table: {
+					tId: itemData.item.tId,
 					tShape: itemData.item.tShape,
 					tSeats: itemData.item.tSeats,
 					tPlacement: itemData.item.tPlacement,
@@ -181,14 +185,21 @@ const Tables = ({ route }) => {
 	// };
 
 	function filterTablesHandler(placement) {
+		findTablesHandler();
+
 		if (placement === "All") {
-			setTables(pickedRestaurant.tables);
+			setTables(filteredTables);
+
 			return;
 		}
-		const filtered = pickedRestaurant.tables.filter(
+
+		const filtered = filteredTables.filter(
 			(table) => table.tPlacement === placement
 		);
 		setTables(filtered);
+		if (filtered.length === 0) {
+			setMessage(`Nothing on the ${placement} category is available.`);
+		}
 	}
 
 	return (
@@ -197,19 +208,21 @@ const Tables = ({ route }) => {
 				style={styles.placementButtonsContainer}
 				contentContainerStyle={styles.placementContentContainer}
 				horizontal
+				fadingEdgeLength={50}
+				showsHorizontalScrollIndicator={false}
 			>
 				{filteredPlacements.map((placement, i) => {
 					return (
-						<View style={styles.placementButtonContainer} key={i}>
-							<Button
-								title={placement}
-								onPress={filterTablesHandler.bind(this, placement)}
-							/>
-						</View>
+						<FilterButton
+							key={i}
+							title={placement}
+							onPress={filterTablesHandler.bind(this, placement)}
+							style={styles.filterButton}
+						/>
 					);
 				})}
 			</ScrollView>
-			{tables && (
+			{tables.length > 0 ? (
 				<FlatList
 					data={tables}
 					style={styles.tablesListContainer}
@@ -230,6 +243,10 @@ const Tables = ({ route }) => {
 						);
 					}}
 				/>
+			) : (
+				<View style={styles.messageContainer}>
+					<Text style={styles.messageContent}>{message}</Text>
+				</View>
 			)}
 		</View>
 	);
@@ -245,19 +262,29 @@ const styles = StyleSheet.create({
 		backgroundColor: "#311A1A",
 	},
 	placementButtonsContainer: {
-		backgroundColor: "transparent",
-		width: Dimensions.get("window").width,
+		maxHeight: "10%",
 	},
 	placementContentContainer: {
 		alignItems: "center",
-		height: 70,
+		height: 40,
+		marginVertical: 10,
 	},
-	placementButtonContainer: {
+	filterButton: {
+		backgroundColor: "#794D4D",
 		marginHorizontal: 10,
+		padding: 10,
 		width: 100,
 	},
 	tablesListContainer: {
 		height: "100%",
 		width: "100%",
+	},
+	messageContainer: {
+		height: "90%",
+		justifyContent: "center",
+	},
+	messageContent: {
+		color: "#ffffff",
+		fontSize: 18,
 	},
 });

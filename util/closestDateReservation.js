@@ -1,7 +1,7 @@
 export const closestDateReservation = ({
 	reservationAdvance,
-	openDays,
 	reservationsEnabled,
+	openDays,
 }) => {
 	const anyOpenDay = openDays.some((dayData) => dayData.isOpen);
 

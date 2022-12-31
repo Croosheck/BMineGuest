@@ -1,4 +1,3 @@
-import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
 	Dimensions,
@@ -12,11 +11,7 @@ import Animated, {
 	withTiming,
 	withSpring,
 	useAnimatedStyle,
-	Easing,
-	SlideInDown,
-	SlideInRight,
 } from "react-native-reanimated";
-import { db } from "../../firebase";
 
 const ExtraItem = ({ onPress, imgUri, extraEntering }) => {
 	const [touched, setTouched] = useState();

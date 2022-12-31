@@ -5,9 +5,17 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { useDispatch } from "react-redux";
 import { pickDate } from "../redux/slices/user";
+import { formatDate } from "../util/dateFormat";
 import { calendar, reminder } from "../util/permissions";
 
-const Calendar = ({ reservationAdvance, openDays, reservationsEnabled }) => {
+const MS_PER_HOUR = 3600000;
+
+const Calendar = ({
+	reservationAdvance,
+	openDays,
+	closestReservationTimestamp,
+	buttonTitle,
+}) => {
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 	const dispatch = useDispatch();
 
@@ -43,11 +51,13 @@ const Calendar = ({ reservationAdvance, openDays, reservationsEnabled }) => {
 	const handleConfirm = (date) => {
 		const timestamp = new Date(date).valueOf();
 
-		const pickedDayNumber = new Date(timestamp).getDay();
+		const pickedDayWeekDayNumber = new Date(timestamp).getDay();
 		const pickedDayHours = new Date(timestamp).getHours();
 		const pickedDayMinutes = new Date(timestamp).getMinutes();
 
-		const pickedDay = openDays.find((item) => item.day === pickedDayNumber);
+		const pickedDay = openDays.find(
+			(item) => item.day === pickedDayWeekDayNumber
+		);
 
 		const upperCaseDay =
 			pickedDay.dayLong.slice(0, 1).toUpperCase() + pickedDay.dayLong.slice(1);
@@ -62,9 +72,27 @@ const Calendar = ({ reservationAdvance, openDays, reservationsEnabled }) => {
 			return;
 		}
 
+		const nowTimestamp = Date.now();
+
+		//future dates only
+		const todaysHourCheck = timestamp > nowTimestamp;
+
 		const hoursCheck =
 			pickedDayHours >= pickedDay.hours.reservationsOpen &&
-			pickedDayHours <= pickedDay.hours.reservationsClose;
+			pickedDayHours < pickedDay.hours.reservationsClose &&
+			todaysHourCheck;
+
+		if (!todaysHourCheck) {
+			Alert.alert(
+				`Not able to place reservation for ${pickedDayHours}:${String(
+					pickedDayMinutes
+				).padStart(2, "0")}.`,
+				`Unfortunately, our time travel machine is broken :(`,
+				alertButtons
+			);
+			hideDatePicker();
+			return;
+		}
 
 		if (!hoursCheck) {
 			Alert.alert(
@@ -73,9 +101,9 @@ const Calendar = ({ reservationAdvance, openDays, reservationsEnabled }) => {
 				).padStart(2, "0")}.`,
 				`Every ${upperCaseDay}, You can pick Your reservation time between ${String(
 					pickedDay.hours.reservationsOpen
-				).padStart(2, "0")}-${String(
+				).padStart(2, "0")}:00-${String(
 					pickedDay.hours.reservationsClose
-				).padStart(2, "0")}`,
+				).padStart(2, "0")}:00`,
 				alertButtons
 			);
 			hideDatePicker();
@@ -95,12 +123,10 @@ const Calendar = ({ reservationAdvance, openDays, reservationsEnabled }) => {
 		hideDatePicker();
 	};
 
-	const nowTimestamp = new Date().valueOf();
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.buttonContainer}>
-				<Button title="Show Calendar" onPress={showDatePicker} />
+				<Button title={buttonTitle} onPress={showDatePicker} />
 			</View>
 			<DateTimePickerModal
 				isVisible={isDatePickerVisible}
@@ -109,7 +135,7 @@ const Calendar = ({ reservationAdvance, openDays, reservationsEnabled }) => {
 				onCancel={hideDatePicker}
 				hideDatePicker={hideDatePicker}
 				date={new Date()}
-				minimumDate={new Date(nowTimestamp + reservationAdvance)}
+				minimumDate={new Date(closestReservationTimestamp)}
 				positiveButtonLabel="OK!"
 				minuteInterval={5}
 			/>

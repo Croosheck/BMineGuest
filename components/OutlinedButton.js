@@ -1,5 +1,4 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
 
 const OutlinedButton = ({ title, onPress, style, titleStyle }) => {
 	return (
@@ -9,7 +8,7 @@ const OutlinedButton = ({ title, onPress, style, titleStyle }) => {
 					styles.innerContainer,
 					pressed && styles.pressed,
 				]}
-				android_ripple={{ color: "#FF73005F" }}
+				android_ripple={{ color: "#7B7B7B56" }}
 				onPress={onPress}
 			>
 				<Text style={[styles.title, titleStyle]}>{title}</Text>
@@ -35,12 +34,13 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	pressed: {
-		opacity: 0.6,
+		opacity: 0.7,
 	},
 	title: {
 		color: "#ffffff",
 		fontSize: 16,
 		fontWeight: "bold",
 		textAlign: "center",
+		bottom: "4%",
 	},
 });

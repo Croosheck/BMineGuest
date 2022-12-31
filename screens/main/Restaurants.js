@@ -120,6 +120,7 @@ const Restaurants = ({ navigation }) => {
 			openDays: itemData.item.openDays,
 			reservationLimit: itemData.item.reservationLimit,
 			reservationsEnabled: itemData.item.reservationsEnabled,
+			restaurantTags: itemData.item.restaurantTags,
 		});
 	}
 
