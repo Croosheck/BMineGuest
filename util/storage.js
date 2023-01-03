@@ -1,6 +1,14 @@
 import { auth, db, storage } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { doc, collection, setDoc, getDocs, query } from "firebase/firestore";
+import {
+	doc,
+	collection,
+	setDoc,
+	getDocs,
+	query,
+	updateDoc,
+	increment,
+} from "firebase/firestore";
 
 export default async function uploadData(image, type, data) {
 	const getDate = new Date();
@@ -31,6 +39,7 @@ export default async function uploadData(image, type, data) {
 
 	// Fetching out reservation data, to both client's and restaurant's databases
 	if (data) {
+		const userProfileRef = doc(db, "users", auth.currentUser.uid);
 		const userReservationRef = doc(
 			db,
 			"users",
@@ -70,6 +79,10 @@ export default async function uploadData(image, type, data) {
 			confirmed: false,
 			cancelled: false,
 			howMany: data.howMany,
+		});
+
+		await updateDoc(userProfileRef, {
+			totalReservations: increment(1),
 		});
 
 		setDoc(restaurantReservationRef, {

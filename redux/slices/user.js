@@ -7,9 +7,9 @@ export const getUser = createAsyncThunk("user/getUser", async () => {
 	const docSnap = await getDoc(docRef);
 
 	if (docSnap.exists()) {
-		const { email, name } = docSnap.data();
+		const { email, name, totalReservations } = docSnap.data();
 
-		return { email, name };
+		return { email, name, totalReservations };
 	}
 });
 

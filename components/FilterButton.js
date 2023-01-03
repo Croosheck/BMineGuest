@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 const FilterButton = ({ title, onPress, style, titleStyle }) => {
 	return (
