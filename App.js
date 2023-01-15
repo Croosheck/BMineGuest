@@ -142,9 +142,9 @@ export default function App() {
 	return (
 		<Provider store={store}>
 			<StatusBar translucent={false} style="light" />
-			<View style={{ flex: 1, backgroundColor: "#000000" }}>
-				<AppContainer />
-			</View>
+			{/* <View style={{ flex: 1, backgroundColor: "#000000" }}> */}
+			<AppContainer />
+			{/* </View> */}
 		</Provider>
 	);
 }

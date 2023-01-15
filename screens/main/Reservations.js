@@ -1,11 +1,4 @@
-import {
-	Animated,
-	Easing,
-	FlatList,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
+import { Animated, Easing, FlatList, StyleSheet, Text } from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReservationListItem from "../reservations/ReservationListItem";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
@@ -14,14 +7,19 @@ import { LinearGradient } from "expo-linear-gradient";
 import LottieIcon from "../../components/LottieIcon";
 import { SlideInRight, SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
 import { collection, onSnapshot, query } from "firebase/firestore";
+import ReservationsFilters from "../../components/ReservationsFilters";
 
 const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
 	const [extraImages, setExtraImages] = useState({});
 	const [loaded, setLoaded] = useState(false);
+	const [isFirstLoad, setIsFirstLoad] = useState(true);
+	const [filterType, setFilterType] = useState("all");
 
+	// Default state for bottom navbar icons
 	const animationProgress = useRef(new Animated.Value(0.315));
 
+	// Bottom navbar Lottie icons animations
 	useLayoutEffect(() => {
 		// Icon animation on click
 		const unsubscribeFocus = navigation.addListener("focus", () => {
@@ -76,15 +74,44 @@ const Reservations = ({ navigation }) => {
 		};
 	}, []);
 
+	// Reservations fetch function - data and images
+	async function getReservationsHandler() {
+		const listRef = ref(storage, "extras");
+
+		// List all images under the /extras/ path
+		const response = await listAll(listRef);
+
+		// Return, if the number of images inside state object === number of all images under extras/ path
+		// - prevents from overloading
+		if (extraImages.length === response.items.length) return;
+
+		// For each extra item (image) from Storage - get a url and connect with extras
+		response.items.forEach(async (item) => {
+			const extraImgRef = ref(storage, `extras/${item.name}`);
+			const extraImgUri = await getDownloadURL(extraImgRef);
+
+			setExtraImages((prev) => {
+				// Cut the image extension (mostly .png's)
+				const itemName = item.name.slice(0, -4);
+
+				return {
+					...prev,
+					[itemName]: extraImgUri,
+				};
+			});
+		});
+	}
+
 	useEffect(() => {
-		//////////////////////////////////////////////////////////
-		/// Realtime ///
+		/// Realtime data ///
 		const q = query(
 			collection(db, "users", auth.currentUser.uid, "reservations")
 		);
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
 			if (querySnapshot.size === 0) setLoaded(true);
+
 			const reservations = [];
+
 			querySnapshot.forEach((doc) => {
 				if (doc.data) setLoaded(true);
 				reservations.push(doc.data());
@@ -93,38 +120,40 @@ const Reservations = ({ navigation }) => {
 			setLoaded(true);
 			setReservationsData(reservations);
 		});
-		//////////////////////////////////////////////////////////
-
-		// Reservations fetch function - data and images
-		async function getReservationsHandler() {
-			const listRef = ref(storage, "extras");
-
-			// List all images under the /extras/ path
-			const response = await listAll(listRef);
-
-			// Return, if the number of images inside state object === number of all images under extras/ path
-			// - prevents from overloading
-			if (extraImages.length === response.items.length) return;
-
-			// For each extra item (image) from Storage - get a url and connect with extras
-			response.items.forEach(async (item) => {
-				const extraImgRef = ref(storage, `extras/${item.name}`);
-				const extraImgUri = await getDownloadURL(extraImgRef);
-
-				setExtraImages((prev) => {
-					// Cut the image extension (mostly .png's)
-					const itemName = item.name.slice(0, -4);
-
-					return {
-						...prev,
-						[itemName]: extraImgUri,
-					};
-				});
-			});
-		}
 
 		getReservationsHandler();
 	}, []);
+
+	function getReservationStatusHandler(itemData) {
+		if (
+			!itemData.item.confirmed &&
+			!itemData.item.cancelled &&
+			!itemData.item.callRequest
+		)
+			return {
+				status: "Pending",
+				bgColor: "#79B4FDA6",
+			};
+		if (
+			!itemData.item.confirmed &&
+			!itemData.item.cancelled &&
+			itemData.item.callRequest
+		)
+			return {
+				status: "Call Us!",
+				bgColor: "#FFFFFFA6",
+			};
+		if (itemData.item.confirmed)
+			return {
+				status: "Confirmed",
+				bgColor: "#FFFA66A6",
+			};
+		if (itemData.item.cancelled)
+			return {
+				status: "Cancelled",
+				bgColor: "#FF5858A6",
+			};
+	}
 
 	if (!loaded) {
 		return (
@@ -153,43 +182,39 @@ const Reservations = ({ navigation }) => {
 			style={styles.container}
 			colors={["#3B1616", "#010C1C", "#370B0B"]}
 		>
+			<ReservationsFilters
+				left={{
+					onPress: () => setFilterType("all"),
+					title: "All",
+				}}
+				middle={{
+					onPress: () => setFilterType("upcoming"),
+					title: "Upcoming",
+				}}
+				right={{
+					onPress: () => setFilterType("expired"),
+					title: "Expired",
+				}}
+			/>
+
 			<FlatList
 				data={reservationsData}
-				keyExtractor={(item, index) => index}
+				extraData={filterType}
+				keyExtractor={(item, index) => item.filename + index}
 				// numColumns={2}
 				renderItem={(itemData) => {
-					function getReservationStatusHandler() {
-						if (
-							!itemData.item.confirmed &&
-							!itemData.item.cancelled &&
-							!itemData.item.callRequest
-						)
-							return {
-								status: "Pending",
-								bgColor: "#79B4FDA6",
-							};
-						if (
-							!itemData.item.confirmed &&
-							!itemData.item.cancelled &&
-							itemData.item.callRequest
-						)
-							return {
-								status: "Call Us!",
-								bgColor: "#FFFFFFA6",
-							};
-						if (itemData.item.confirmed)
-							return {
-								status: "Confirmed",
-								bgColor: "#FFFA66A6",
-							};
-						if (itemData.item.cancelled)
-							return {
-								status: "Cancelled",
-								bgColor: "#FF5858A6",
-							};
-					}
+					// console.log(itemData.item.filename);
 
-					const reservationStatus = getReservationStatusHandler();
+					const reservationStatus = getReservationStatusHandler(itemData);
+					const currentTimestamp = new Date().valueOf();
+
+					if (
+						(filterType === "upcoming" &&
+							!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
+						(filterType === "expired" &&
+							!(itemData.item.reservationDateTimestamp < currentTimestamp))
+					)
+						return;
 
 					return (
 						<ReservationListItem
@@ -199,15 +224,13 @@ const Reservations = ({ navigation }) => {
 							extras={itemData.item.extras}
 							extraImages={extraImages}
 							restaurantUid={itemData.item.restaurantUid}
+							firstLoad={isFirstLoad}
 							reservationEntering={ZoomInEasyUp.delay(500)
 								.duration(1000)
 								.springify()
 								.mass(0.6)}
 							extraEntering={SlideInUp.delay(800)
 								.duration(1000)
-								.springify()
-								.mass(0.6)}
-							reservationExiting={SlideInRight.duration(800)
 								.springify()
 								.mass(0.6)}
 							statusColor={reservationStatus.bgColor}
@@ -231,10 +254,9 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#FF8181",
+		paddingTop: 20,
 	},
-	text: {
-		color: "#ffffff",
-	},
+
 	emptyListLabel: {
 		justifyContent: "center",
 		alignItems: "center",

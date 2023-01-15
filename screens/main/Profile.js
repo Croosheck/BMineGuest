@@ -165,12 +165,12 @@ const Profile = ({ navigation }) => {
 					style={styles.profileBackgroundContainer}
 					imageStyle={styles.profileBackground}
 					source={{ uri: profileImage }}
-					blurRadius={8}
+					blurRadius={5}
 					resizeMode="cover"
 					resizeMethod="scale"
 				>
 					<LinearGradient
-						colors={["#8E21496D", "#000000D0"]}
+						colors={["#8E21496D", "#231717"]}
 						style={styles.backdropGradient}
 						start={{
 							x: 0,
@@ -208,10 +208,6 @@ const Profile = ({ navigation }) => {
 									Total Reservations
 								</Text>
 							</View>
-							{/* <View style={styles.statContainer}>
-								<Text style={styles.stat}>0</Text>
-								<Text style={styles.statLabel}>Past Reservations</Text>
-							</View> */}
 						</View>
 					</LinearGradient>
 				</ImageBackground>
@@ -243,7 +239,7 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 	},
 	profileBackground: {
-		// opacity: 0.8,
+		opacity: 0.8,
 	},
 	backdropGradient: {
 		flex: 1,
@@ -277,7 +273,6 @@ const styles = StyleSheet.create({
 		textShadowOffset: { height: 2, width: 2 },
 		textShadowRadius: 8,
 		textAlign: "center",
-		// transform: [{ translateY: -15 }],
 	},
 	statsContainer: {
 		width: WIDTH,

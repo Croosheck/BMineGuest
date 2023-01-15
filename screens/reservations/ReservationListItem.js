@@ -36,6 +36,7 @@ const ReservationListItem = ({
 	statusColor,
 	statusText,
 	statusTextColor,
+	firstLoad,
 }) => {
 	const [displayedExtraName, setDisplayedExtraName] = useState();
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
@@ -93,10 +94,7 @@ const ReservationListItem = ({
 	return (
 		<>
 			{reservationBackgroundUri && extraImages && (
-				<Animated.View
-					entering={reservationEntering}
-					exiting={reservationExiting}
-				>
+				<Animated.View entering={firstLoad && reservationEntering}>
 					<LinearGradient
 						colors={["#000000CC", "#FFFFFF", "#020202B7"]}
 						style={styles.gradientBackgroundContainer}
@@ -135,7 +133,7 @@ const ReservationListItem = ({
 													extraImages &&
 													extraImages[itemData.item.xShortFileName]
 												}
-												extraEntering={extraEntering}
+												extraEntering={firstLoad && extraEntering}
 											/>
 										);
 									}}
@@ -158,7 +156,7 @@ const ReservationListItem = ({
 								}}
 							>
 								<Animated.Text
-									entering={statusEntering}
+									entering={firstLoad && statusEntering}
 									style={{
 										textAlign: "center",
 										fontWeight: "bold",
