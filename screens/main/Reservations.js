@@ -14,12 +14,11 @@ const Reservations = ({ navigation }) => {
 	const [extraImages, setExtraImages] = useState({});
 	const [loaded, setLoaded] = useState(false);
 	const [isFirstLoad, setIsFirstLoad] = useState(true);
-	const [filterType, setFilterType] = useState("all");
+	const [filterType, setFilterType] = useState("upcoming");
 
 	// Default state for bottom navbar icons
 	const animationProgress = useRef(new Animated.Value(0.315));
 
-	// Bottom navbar Lottie icons animations
 	useLayoutEffect(() => {
 		// Icon animation on click
 		const unsubscribeFocus = navigation.addListener("focus", () => {
@@ -177,6 +176,13 @@ const Reservations = ({ navigation }) => {
 		);
 	}
 
+	function filterButtonHandler(type) {
+		//Anim-reservations only for the 1st render
+		setIsFirstLoad(false);
+
+		setFilterType(type);
+	}
+
 	return (
 		<LinearGradient
 			style={styles.container}
@@ -184,16 +190,19 @@ const Reservations = ({ navigation }) => {
 		>
 			<ReservationsFilters
 				left={{
-					onPress: () => setFilterType("all"),
+					onPress: () => filterButtonHandler("all"),
 					title: "All",
+					active: filterType === "all",
 				}}
 				middle={{
-					onPress: () => setFilterType("upcoming"),
+					onPress: () => filterButtonHandler("upcoming"),
 					title: "Upcoming",
+					active: filterType === "upcoming",
 				}}
 				right={{
-					onPress: () => setFilterType("expired"),
+					onPress: () => filterButtonHandler("expired"),
 					title: "Expired",
+					active: filterType === "expired",
 				}}
 			/>
 
@@ -203,8 +212,6 @@ const Reservations = ({ navigation }) => {
 				keyExtractor={(item, index) => item.filename + index}
 				// numColumns={2}
 				renderItem={(itemData) => {
-					// console.log(itemData.item.filename);
-
 					const reservationStatus = getReservationStatusHandler(itemData);
 					const currentTimestamp = new Date().valueOf();
 
@@ -254,7 +261,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#FF8181",
-		paddingTop: 20,
 	},
 
 	emptyListLabel: {

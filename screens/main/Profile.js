@@ -42,8 +42,9 @@ const Profile = ({ navigation }) => {
 
 	const [profileImage, setProfileImage] = useState();
 	const [reservationsCounter, setReservationsCounter] = useState({
-		total: 0,
 		active: 0,
+		upcoming: 0,
+		total: 0,
 	});
 	const { currentUser } = useSelector((state) => state.userReducer);
 
@@ -128,6 +129,7 @@ const Profile = ({ navigation }) => {
 	}
 
 	async function getUserData() {
+		let upcomingReservations = 0;
 		dispatch(getUser());
 		const profileImageRef = ref(
 			storage,
@@ -138,14 +140,22 @@ const Profile = ({ navigation }) => {
 		setProfileImage(profileImgUri);
 
 		// const snapshot = await getCountFromServer(userReservationRef);
-		// console.log(userReservationRef);
 		const querySnapshot = await getDocs(userReservationRef);
+
+		const currentTimestamp = new Date().valueOf();
+
+		querySnapshot.forEach((doc) => {
+			if (doc.data().reservationDateTimestamp > currentTimestamp)
+				++upcomingReservations;
+		});
 
 		const unsub = onSnapshot(userProfileRef, (doc) => {
 			// console.log("Current data: ", doc.data());
+
 			setReservationsCounter({
+				// active: querySnapshot.docs.length,
+				upcoming: upcomingReservations,
 				total: doc.data().totalReservations,
-				active: querySnapshot.docs.length,
 			});
 		});
 	}
@@ -198,14 +208,18 @@ const Profile = ({ navigation }) => {
 						/>
 						<Text style={styles.userNameText}>{currentUser.name}</Text>
 						<View style={styles.statsContainer}>
-							<View style={styles.statContainer}>
+							{/* <View style={styles.statContainer}>
 								<Text style={styles.stat}>{reservationsCounter.active}</Text>
 								<Text style={styles.statLabel}>Active Reservations</Text>
+							</View> */}
+							<View style={styles.statContainer}>
+								<Text style={styles.stat}>{reservationsCounter.upcoming}</Text>
+								<Text style={styles.statLabel}>Upcoming Reservations</Text>
 							</View>
 							<View style={styles.statContainer}>
 								<Text style={styles.stat}>{reservationsCounter.total}</Text>
 								<Text style={styles.statLabel} numberOfLines={1}>
-									Total Reservations
+									Ever Submitted
 								</Text>
 							</View>
 						</View>

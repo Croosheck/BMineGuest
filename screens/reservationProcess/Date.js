@@ -6,7 +6,7 @@ import { clearDate } from "../../redux/slices/user";
 
 import Calendar from "../../components/Calendar";
 import AddEvent from "../../components/AddEvent";
-import { formatDate } from "../../util/dateFormat";
+import { formatDate } from "../../util/formatDate";
 import { closestDateReservation } from "../../util/closestDateReservation";
 
 const Date = ({ route }) => {

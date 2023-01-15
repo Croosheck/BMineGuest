@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import {
 	Dimensions,
@@ -14,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { closestDateReservation } from "../../util/closestDateReservation";
 import OutlinedButton from "../../components/OutlinedButton";
 import { getUser } from "../../redux/slices/user";
-import { formatDate } from "../../util/dateFormat";
+import { formatDate } from "../../util/formatDate";
 import { getRestaurantProfileImage } from "../../util/storage";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import { auth, storage } from "../../firebase";

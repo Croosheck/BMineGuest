@@ -1,11 +1,11 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-const FilterButton = ({ title, onPress, style, titleStyle }) => {
+const FilterButton = ({ title, onPress, style, titleStyle, disPressAnim }) => {
 	return (
 		<Pressable
 			style={({ pressed }) => [
 				styles.innerContainer,
-				pressed && styles.pressed,
+				pressed && !disPressAnim && styles.pressed,
 				style,
 			]}
 			onPress={onPress}

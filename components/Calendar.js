@@ -5,7 +5,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { useDispatch } from "react-redux";
 import { pickDate } from "../redux/slices/user";
-import { formatDate } from "../util/dateFormat";
+import { formatDate } from "../util/formatDate";
 import { calendar, reminder } from "../util/permissions";
 
 const MS_PER_HOUR = 3600000;

@@ -9,7 +9,7 @@ import {
 
 import React, { useEffect, useState } from "react";
 
-import { formatDate } from "../../util/dateFormat";
+import { formatDate } from "../../util/formatDate";
 import ExtraItem from "./ExtraItem";
 import { getRestaurantProfileImage } from "../../util/storage";
 
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.5,
 		shadowOffset: { width: 0, height: 2 },
 		shadowRadius: 24,
-		marginVertical: 20,
+		marginBottom: 20,
 	},
 	innerBackgroundContainer: {
 		flex: 1,

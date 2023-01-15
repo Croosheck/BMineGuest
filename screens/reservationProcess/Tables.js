@@ -22,6 +22,7 @@ const Tables = ({ route }) => {
 	const [tables, setTables] = useState([]);
 	const [tableImages, setTableImages] = useState({});
 	const [filteredPlacements, setFilteredPlacements] = useState([]);
+	const [placementType, setPlacementType] = useState("All");
 	const [message, setMessage] = useState("");
 
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
@@ -185,21 +186,39 @@ const Tables = ({ route }) => {
 	// };
 
 	function filterTablesHandler(placement) {
-		findTablesHandler();
+		setPlacementType(placement);
 
-		if (placement === "All") {
-			setTables(filteredTables);
+		if (pickedRestaurant.tablesFiltering) {
+			findTablesHandler();
+
+			if (placement === "All") {
+				setTables(filteredTables);
+				return;
+			}
+
+			const filtered = filteredTables.filter(
+				(table) => table.tPlacement === placement
+			);
+
+			setTables(filtered);
+
+			if (filtered.length === 0) {
+				setMessage(`Nothing on the ${placement} category is available.`);
+			}
 
 			return;
 		}
 
-		const filtered = filteredTables.filter(
+		if (placement === "All") {
+			setTables(pickedRestaurant.tables);
+			return;
+		}
+
+		const filtered = pickedRestaurant.tables.filter(
 			(table) => table.tPlacement === placement
 		);
+
 		setTables(filtered);
-		if (filtered.length === 0) {
-			setMessage(`Nothing on the ${placement} category is available.`);
-		}
 	}
 
 	return (
@@ -217,7 +236,11 @@ const Tables = ({ route }) => {
 							key={i}
 							title={placement}
 							onPress={filterTablesHandler.bind(this, placement)}
-							style={styles.filterButton}
+							style={[
+								styles.filterButton,
+								placementType === placement && styles.filterActive,
+							]}
+							disPressAnim
 						/>
 					);
 				})}
@@ -274,6 +297,9 @@ const styles = StyleSheet.create({
 		marginHorizontal: 10,
 		padding: 10,
 		width: 100,
+	},
+	filterActive: {
+		backgroundColor: "#A08686",
 	},
 	tablesListContainer: {
 		height: "100%",

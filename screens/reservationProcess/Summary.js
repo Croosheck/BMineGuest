@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { auth } from "../../firebase";
-import { formatDate } from "../../util/dateFormat";
+import { formatDate } from "../../util/formatDate";
 import uploadData from "../../util/storage";
 
 const Summary = ({ navigation, route }) => {
