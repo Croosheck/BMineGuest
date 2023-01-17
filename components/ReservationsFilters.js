@@ -9,18 +9,21 @@ const ReservationsFilters = ({ left, middle, right }) => {
 				onPress={left.onPress}
 				style={[styles.button, left.active && styles.filterActive]}
 				disPressAnim
+				titleStyle={styles.filterTitle}
 			/>
 			<FilterButton
 				title={middle.title}
 				onPress={middle.onPress}
 				style={[styles.button, middle.active && styles.filterActive]}
 				disPressAnim
+				titleStyle={styles.filterTitle}
 			/>
 			<FilterButton
 				title={right.title}
 				onPress={right.onPress}
 				style={[styles.button, right.active && styles.filterActive]}
 				disPressAnim
+				titleStyle={styles.filterTitle}
 			/>
 		</View>
 	);
@@ -41,5 +44,10 @@ const styles = StyleSheet.create({
 	},
 	filterActive: {
 		backgroundColor: "#776C81",
+	},
+	filterTitle: {
+		width: "100%",
+		textShadowColor: "#000000",
+		textShadowRadius: 10,
 	},
 });

@@ -7,8 +7,11 @@ import { updateDoc, doc, serverTimestamp } from "firebase/firestore";
 
 const Login = () => {
 	const [credentials, setCredentials] = useState({
-		email: "test@test.com",
-		password: "123123",
+		// email: "test@test.com",
+		// password: "123123",
+
+		email: "111@111.com",
+		password: "111111",
 	});
 
 	function inputHandler(type, text) {

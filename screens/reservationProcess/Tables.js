@@ -25,7 +25,9 @@ const Tables = ({ route }) => {
 	const [placementType, setPlacementType] = useState("All");
 	const [message, setMessage] = useState("");
 
-	const { availableRestaurants } = useSelector((state) => state.userReducer);
+	const { availableRestaurants, reservationData } = useSelector(
+		(state) => state.userReducer
+	);
 
 	const dispatch = useDispatch();
 
@@ -173,21 +175,17 @@ const Tables = ({ route }) => {
 		});
 	}
 
-	// const tableImage = {
-	// 	118427365: require("../../assets/test/118427365.jpg"),
-	// 	1082098712: require("../../assets/test/1082098712.jpg"),
-	// 	1152363266: require("../../assets/test/1152363266.jpg"),
-	// 	1236348563: require("../../assets/test/1236348563.jpg"),
-	// 	3030495495: require("../../assets/test/3030495495.jpg"),
-	// 	5236388674: require("../../assets/test/5236388674.jpg"),
-	// 	6347299673: require("../../assets/test/6347299673.jpg"),
-	// 	8124363672: require("../../assets/test/8124363672.jpg"),
-	// 	9991969801: require("../../assets/test/9991969801.jpg"),
-	// };
-
 	function filterTablesHandler(placement) {
+		// clears the state with every filter change (needs to pick a table again)
+		dispatch(
+			addTable({
+				table: {},
+			})
+		);
+
 		setPlacementType(placement);
 
+		// for saving tables mode
 		if (pickedRestaurant.tablesFiltering) {
 			findTablesHandler();
 
@@ -209,6 +207,7 @@ const Tables = ({ route }) => {
 			return;
 		}
 
+		// with tables saving mode disabled
 		if (placement === "All") {
 			setTables(pickedRestaurant.tables);
 			return;
@@ -238,8 +237,10 @@ const Tables = ({ route }) => {
 							onPress={filterTablesHandler.bind(this, placement)}
 							style={[
 								styles.filterButton,
+								//highlight active
 								placementType === placement && styles.filterActive,
 							]}
+							titleStyle={styles.filterTitle}
 							disPressAnim
 						/>
 					);
@@ -299,7 +300,12 @@ const styles = StyleSheet.create({
 		width: 100,
 	},
 	filterActive: {
-		backgroundColor: "#A08686",
+		backgroundColor: "#D0B8B8",
+	},
+	filterTitle: {
+		width: "100%",
+		textShadowColor: "#000000",
+		textShadowRadius: 10,
 	},
 	tablesListContainer: {
 		height: "100%",

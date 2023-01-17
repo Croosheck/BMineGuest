@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, StyleSheet, Text } from "react-native";
+import { Alert, Dimensions, Pressable, StyleSheet, Text } from "react-native";
 import LoadingScreen from "../../components/LoadingScreen";
 
 import Date from "./Date";
@@ -8,12 +8,13 @@ import Extras from "./Extras";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useEffect, useLayoutEffect } from "react";
 import ImageIcon from "../../components/ImageIcon";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { clearDate, clearReservationData } from "../../redux/slices/user";
 
 const ReserveMain = ({ navigation, route }) => {
 	const TopTab = createMaterialTopTabNavigator();
 	const dispatch = useDispatch();
+
 	const {
 		restaurantKey,
 		name,
@@ -23,6 +24,44 @@ const ReserveMain = ({ navigation, route }) => {
 		howMany,
 		reservationsEnabled,
 	} = route.params;
+
+	const { reservationDate } = useSelector((state) => state.userReducer);
+	const { table } = useSelector((state) => state.userReducer.reservationData);
+
+	function summaryPreventionHandler() {
+		// No table picked prevention
+		if (Object.keys(table).length === 0) {
+			Alert.alert(
+				"Not everything is done yet.",
+				"We have plenty of tables, You can pick out of from!",
+				[
+					{
+						text: "Let's go!",
+						onPress: () => {
+							navigation.navigate("Tables");
+						},
+					},
+				]
+			);
+			return;
+		}
+		// No date picked prevention
+		if (!reservationDate) {
+			Alert.alert(
+				"Not everything is done yet.",
+				"We would love to know, what day You wish to visit us!",
+				[
+					{
+						text: "Let's go!",
+						onPress: () => {
+							navigation.navigate("Date");
+						},
+					},
+				]
+			);
+			return;
+		}
+	}
 
 	useEffect(() => {
 		// Resets all tabs before leaving
@@ -53,6 +92,11 @@ const ReserveMain = ({ navigation, route }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
+						if (Object.keys(table).length === 0 || !reservationDate) {
+							summaryPreventionHandler();
+							return;
+						}
+
 						navigation.navigate("Summary", {
 							restaurantKey: restaurantKey,
 							name: name,

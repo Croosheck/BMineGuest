@@ -1,4 +1,12 @@
-import { Animated, Easing, FlatList, StyleSheet, Text } from "react-native";
+import {
+	Animated,
+	Dimensions,
+	Easing,
+	FlatList,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReservationListItem from "../reservations/ReservationListItem";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
@@ -15,6 +23,7 @@ const Reservations = ({ navigation }) => {
 	const [loaded, setLoaded] = useState(false);
 	const [isFirstLoad, setIsFirstLoad] = useState(true);
 	const [filterType, setFilterType] = useState("upcoming");
+	const [message, setMessage] = useState("");
 
 	// Default state for bottom navbar icons
 	const animationProgress = useRef(new Animated.Value(0.315));
@@ -157,7 +166,7 @@ const Reservations = ({ navigation }) => {
 	if (!loaded) {
 		return (
 			<LinearGradient
-				style={[styles.container, styles.emptyListLabel]}
+				style={[styles.container, styles.emptyListInnerContainer]}
 				colors={["#3B1616", "#010C1C", "#370B0B"]}
 			>
 				<Text style={styles.emptyListLabel}>Loading...</Text>
@@ -168,10 +177,12 @@ const Reservations = ({ navigation }) => {
 	if (reservationsData.length === 0 && loaded) {
 		return (
 			<LinearGradient
-				style={[styles.container, styles.emptyListLabel]}
+				style={[styles.container, styles.emptyListInnerContainer]}
 				colors={["#3B1616", "#010C1C", "#370B0B"]}
 			>
-				<Text style={styles.emptyListLabel}>No active reservations yet.</Text>
+				<Text style={styles.emptyListLabel}>
+					No submitted reservations yet.
+				</Text>
 			</LinearGradient>
 		);
 	}
@@ -260,13 +271,13 @@ export default Reservations;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FF8181",
 	},
-
-	emptyListLabel: {
+	emptyListInnerContainer: {
 		justifyContent: "center",
-		alignItems: "center",
+	},
+	emptyListLabel: {
 		color: "#ffffff",
 		fontSize: 20,
+		textAlign: "center",
 	},
 });
