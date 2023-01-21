@@ -62,6 +62,8 @@ const Summary = ({ navigation, route }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
+						navigation.navigate("Reservations");
+
 						uploadData(null, null, data);
 					}}
 				>

@@ -1,29 +1,29 @@
-import React, { useEffect } from "react";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { db } from "../firebase";
-import { useDispatch } from "react-redux";
-import { realTimeRestaurants } from "../redux/slices/user";
+// import React, { useEffect } from "react";
+// import { collection, onSnapshot, query } from "firebase/firestore";
+// import { db } from "../firebase";
+// import { useDispatch } from "react-redux";
+// import { realTimeRestaurants } from "../redux/slices/user";
 
-const FirestoreListener = () => {
-	const dispatch = useDispatch;
+// const FirestoreListener = () => {
+// 	const dispatch = useDispatch;
 
-	let availableRestaurants;
+// 	let availableRestaurants;
 
-	useEffect(() => {
-		const q = query(collection(db, "restaurants"));
+// 	useEffect(() => {
+// 		const q = query(collection(db, "restaurants"));
 
-		const unsubscribe = onSnapshot(q, (querySnapshot) => {
-			availableRestaurants = [];
+// 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+// 			availableRestaurants = [];
 
-			querySnapshot.forEach((doc) => {
-				availableRestaurants.push(doc.data());
-			});
+// 			querySnapshot.forEach((doc) => {
+// 				availableRestaurants.push(doc.data());
+// 			});
 
-			dispatch(realTimeRestaurants(availableRestaurants));
-		});
-	}, [availableRestaurants]);
+// 			dispatch(realTimeRestaurants(availableRestaurants));
+// 		});
+// 	}, [availableRestaurants]);
 
-	return <></>;
-};
+// 	return <></>;
+// };
 
-export default FirestoreListener;
+// export default FirestoreListener;

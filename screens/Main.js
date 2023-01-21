@@ -36,7 +36,6 @@ const Main = () => {
 
 	return (
 		<>
-			{/* <FirestoreListener /> */}
 			<Tab.Navigator
 				initialRouteName="Reservations"
 				barStyle={{ backgroundColor: "#562323" }}
@@ -58,6 +57,11 @@ const Main = () => {
 							);
 						},
 						tabBarColor: "#310D28",
+						presentation: "modal",
+						transitionSpec: {
+							open: { animation: "timing" },
+							close: { animation: "timing" },
+						},
 					}}
 				/>
 				<Tab.Screen

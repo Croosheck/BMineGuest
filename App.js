@@ -130,7 +130,11 @@ function AppContainer() {
 							borderBottomWidth: 0.5,
 						},
 						headerTintColor: "#ffffff",
-						presentation: "transparentModal",
+						presentation: "modal",
+						transitionSpec: {
+							open: { animation: "timing" },
+							close: { animation: "timing" },
+						},
 					}}
 				/>
 			</Stack.Navigator>

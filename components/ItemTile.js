@@ -6,8 +6,9 @@ import {
 	View,
 	ImageBackground,
 } from "react-native";
-import React from "react";
 import Icon from "./Icon";
+
+const BORDER_RADIUS = 32;
 
 const ItemTile = ({
 	title,
@@ -35,10 +36,7 @@ const ItemTile = ({
 				android_ripple={{ color: "#8C6D6D91" }}
 			>
 				<View
-					style={[
-						styles.labelContainer,
-						picked && { backgroundColor: "#1F07076F" },
-					]}
+					style={[styles.labelContainer, picked && styles.labelContainerPicked]}
 				>
 					<View style={styles.titleContainer}>
 						<Text style={[styles.title, picked && { color: "#FFFFFF" }]}>
@@ -68,16 +66,16 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		overflow: "hidden",
-		borderRadius: 32,
-		borderWidth: 2,
+		borderRadius: BORDER_RADIUS,
+		// borderWidth: 2,
 		borderColor: "#ffffff",
 		margin: 6,
-		backgroundColor: "#3A1A1A",
-		height: Dimensions.get("window").width * 0.43,
+		backgroundColor: "#95818117",
+		height: Dimensions.get("window").width * 0.4,
 	},
 	imageBackground: {
-		width: "100%",
-		height: "100%",
+		height: "80%",
+		aspectRatio: 1,
 		top: undefined,
 		left: undefined,
 		right: undefined,
@@ -88,13 +86,12 @@ const styles = StyleSheet.create({
 		opacity: 1,
 	},
 	itemPicked: {
-		flex: 1,
 		width: "100%",
-		backgroundColor: "#4E4E4E5A",
-		borderWidth: 4,
+		backgroundColor: "#FFFFFF1E",
+		// borderWidth: 1,
 		opacity: 1,
 		borderColor: "#ffffff",
-		borderRadius: 30,
+		borderRadius: BORDER_RADIUS,
 	},
 	innerContainer: {
 		flex: 1,
@@ -108,18 +105,32 @@ const styles = StyleSheet.create({
 		width: "100%",
 		paddingVertical: 5,
 	},
+	labelContainerPicked: {
+		// backgroundColor: "#00000057",
+	},
 	titleContainer: {},
 	title: {
-		fontSize: 18,
-		fontWeight: "500",
+		fontSize: 20,
+		fontWeight: "700",
 		color: "#ffffff",
+		textShadowColor: "#000000",
+		textShadowOffset: { height: 2, width: 2 },
+		textShadowRadius: 7,
+		minWidth: "100%",
+		textAlign: "center",
+		height: 30,
 	},
 	textBelowContainer: {
 		flexDirection: "row",
 	},
 	textBelow: {
-		fontSize: 16,
-		fontWeight: "400",
+		fontSize: 18,
+		fontWeight: "500",
 		color: "#ffffff",
+		textShadowColor: "#000000",
+		textShadowOffset: { height: 2, width: 2 },
+		textShadowRadius: 7,
+		minWidth: "100%",
+		textAlign: "center",
 	},
 });

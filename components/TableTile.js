@@ -5,14 +5,12 @@ import {
 	Text,
 	View,
 	ImageBackground,
-	Modal,
 } from "react-native";
-import React from "react";
 import Icon from "./Icon";
 
 const TableTile = ({
 	title,
-	textBelow,
+	seatsQuantity,
 	onPress,
 	picked,
 	availability,
@@ -27,7 +25,7 @@ const TableTile = ({
 			<Pressable
 				style={[styles.innerContainer, picked && styles.itemPicked]}
 				onPress={onPress}
-				android_ripple={{ color: "#8C6D6D91" }}
+				android_ripple={{ color: "#8C6D6D19" }}
 			>
 				<View style={[styles.labelContainer]}>
 					{/* <View style={styles.titleContainer}>
@@ -39,17 +37,31 @@ const TableTile = ({
 						{iconName && (
 							<Icon name={iconName} size={iconSize} color={iconColor} />
 						)}
-						<Text style={[styles.textBelow, picked && { color: "#FFFFFF" }]}>
-							{" "}
-							{textBelow}
+						<Text
+							style={[
+								styles.seatsQuantity,
+								styles.textShadow,
+								picked && { color: "#FFFFFF" },
+							]}
+						>
+							{seatsQuantity}
 						</Text>
 					</View>
-					<Text style={[styles.textBelow, picked && { color: "#FFFFFF" }]}>
+					<Text
+						style={[
+							styles.textBelow,
+							styles.textShadow,
+							picked && { color: "#FFFFFF" },
+						]}
+					>
 						{tPlacement}
 					</Text>
 				</View>
 				<ImageBackground
-					style={styles.imageBackgroundContainer}
+					style={[
+						styles.imageBackgroundContainer,
+						picked && styles.imageBackgroundContainerPicked,
+					]}
 					source={{ uri: imgUri }}
 					imageStyle={[
 						styles.imageBackground,
@@ -73,18 +85,19 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		overflow: "hidden",
 		borderRadius: 32,
-		borderWidth: 2,
+		// borderWidth: 2,
 		borderColor: "#ffffff",
 		margin: 8,
 		marginVertical: 15,
-		backgroundColor: "#3A1A1A",
+		backgroundColor: "#8080801E",
 		height: Dimensions.get("window").width * 0.43,
 		opacity: 0.8,
 	},
 	containerPicked: {
 		elevation: 8,
 		shadowColor: "#ffffff",
-		opacity: 1,
+		//opacity: 1 crashes the elevation (RN's bug? Or I'm dumb, who knows.)
+		opacity: 0.99,
 	},
 	imageBackgroundContainer: {
 		flex: 1,
@@ -96,9 +109,12 @@ const styles = StyleSheet.create({
 			{ scale: 1.1 },
 			{ translateX: Dimensions.get("window").width * 0.05 },
 		],
-		borderWidth: 3,
-		borderColor: "#000000",
+		borderWidth: 1,
+		borderColor: "#FBFBFB",
 		overflow: "hidden",
+	},
+	imageBackgroundContainerPicked: {
+		borderWidth: 3,
 	},
 	imageBackground: {
 		width: "100%",
@@ -113,15 +129,21 @@ const styles = StyleSheet.create({
 	},
 	imageBackgroundPicked: {
 		opacity: 1,
+		transform: [
+			{ rotate: "-25deg" },
+			{ scale: 1.5 },
+			{ translateX: -Dimensions.get("window").width * 0.04 },
+			{ translateY: -Dimensions.get("window").width * 0.05 },
+		],
 	},
 	itemPicked: {
 		flex: 1,
 		width: "100%",
-		backgroundColor: "#8080803D",
-		borderWidth: 2,
+		backgroundColor: "#AB797933",
+		// borderWidth: 1,
 		opacity: 1,
 		borderColor: "#ffffff",
-		borderRadius: 30,
+		borderRadius: 32,
 	},
 	innerContainer: {
 		flex: 1,
@@ -146,10 +168,28 @@ const styles = StyleSheet.create({
 	},
 	textBelowContainer: {
 		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	seatsQuantity: {
+		fontSize: 18,
+		fontWeight: "500",
+		color: "#ffffff",
+		// backgroundColor: "#cccccc",
+		textAlign: "center",
+		minWidth: "10%",
 	},
 	textBelow: {
 		fontSize: 16,
-		fontWeight: "400",
+		fontWeight: "300",
 		color: "#ffffff",
+		// backgroundColor: "#cccccc",
+		textAlign: "center",
+		minWidth: "10%",
+	},
+	textShadow: {
+		textShadowColor: "#FFFFFF98",
+		textShadowOffset: { height: 2, width: 1 },
+		textShadowRadius: 4,
 	},
 });

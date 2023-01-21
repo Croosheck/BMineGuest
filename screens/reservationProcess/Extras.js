@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ItemTile from "../../components/ItemTile";
 import { storage } from "../../firebase";
 import { addExtra, removeExtra } from "../../redux/slices/user";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Extras = ({ route }) => {
 	const [extraItems, setExtraItems] = useState();
@@ -95,7 +96,7 @@ const Extras = ({ route }) => {
 	}
 
 	return (
-		<View style={styles.container}>
+		<LinearGradient style={styles.container} colors={["#000A2B", "#545351"]}>
 			{extraItems && (
 				<FlatList
 					data={extraItems}
@@ -125,7 +126,7 @@ const Extras = ({ route }) => {
 					}, 0)
 					.toFixed(2) + "$"}
 			</Text>
-		</View>
+		</LinearGradient>
 	);
 };
 
@@ -134,7 +135,6 @@ export default Extras;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#311A1A",
 		padding: 8,
 	},
 	totalPriceContainer: {

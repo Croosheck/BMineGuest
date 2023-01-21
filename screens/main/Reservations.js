@@ -242,7 +242,9 @@ const Reservations = ({ navigation }) => {
 							extras={itemData.item.extras}
 							extraImages={extraImages}
 							restaurantUid={itemData.item.restaurantUid}
-							firstLoad={isFirstLoad}
+							// animation only for the 1st render
+							// firstLoad={isFirstLoad}
+							firstLoad={true}
 							reservationEntering={ZoomInEasyUp.delay(500)
 								.duration(1000)
 								.springify()

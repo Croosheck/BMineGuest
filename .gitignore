@@ -14,3 +14,4 @@ web-build/
 .DS_Store
 
 app.config.js
+eas.json

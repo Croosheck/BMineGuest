@@ -8,6 +8,7 @@ import Calendar from "../../components/Calendar";
 import AddEvent from "../../components/AddEvent";
 import { formatDate } from "../../util/formatDate";
 import { closestDateReservation } from "../../util/closestDateReservation";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Date = ({ route }) => {
 	const [displayTime, setDisplayTime] = useState();
@@ -38,7 +39,7 @@ const Date = ({ route }) => {
 	// console.log(openDays);
 
 	return (
-		<View style={styles.container}>
+		<LinearGradient style={styles.container} colors={["#000A2B", "#545351"]}>
 			<Text
 				style={styles.closestDateText}
 			>{`Closest possible reservation date:\n${formatDate(
@@ -89,7 +90,7 @@ const Date = ({ route }) => {
 				</View>
 				{reservationDate && <AddEvent eventDate={reservationDate} />}
 			</View>
-		</View>
+		</LinearGradient>
 	);
 };
 
@@ -100,7 +101,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#311A1A",
 		padding: 8,
 	},
 	closestDateText: {

@@ -1,14 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-	Button,
-	Dimensions,
-	FlatList,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
-import OutlinedButton from "../../components/OutlinedButton";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
 import { addTable } from "../../redux/slices/user";
@@ -17,6 +8,7 @@ import TableTile from "../../components/TableTile";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import { storage } from "../../firebase";
 import FilterButton from "../../components/FilterButton";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Tables = ({ route }) => {
 	const [tables, setTables] = useState([]);
@@ -152,6 +144,7 @@ const Tables = ({ route }) => {
 		getTablesImages();
 	}, []);
 
+	// data forwarding of the selected table
 	function addDataHandler(itemData) {
 		dispatch(
 			addTable({
@@ -221,7 +214,7 @@ const Tables = ({ route }) => {
 	}
 
 	return (
-		<View style={styles.container}>
+		<LinearGradient style={styles.container} colors={["#000A2B", "#545351"]}>
 			<ScrollView
 				style={styles.placementButtonsContainer}
 				contentContainerStyle={styles.placementContentContainer}
@@ -255,7 +248,7 @@ const Tables = ({ route }) => {
 						return (
 							<TableTile
 								// title={`${itemData.item.tShape}`}
-								textBelow={`${itemData.item.tSeats}`}
+								seatsQuantity={`${itemData.item.tSeats}`}
 								onPress={() => addDataHandler(itemData)}
 								picked={itemData.item.picked}
 								iconName="human-male-female"
@@ -272,7 +265,7 @@ const Tables = ({ route }) => {
 					<Text style={styles.messageContent}>{message}</Text>
 				</View>
 			)}
-		</View>
+		</LinearGradient>
 	);
 };
 
@@ -283,7 +276,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#311A1A",
 	},
 	placementButtonsContainer: {
 		maxHeight: "10%",
