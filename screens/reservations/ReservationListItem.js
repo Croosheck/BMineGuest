@@ -1,4 +1,5 @@
 import {
+	Button,
 	Dimensions,
 	FlatList,
 	ImageBackground,
@@ -16,10 +17,16 @@ import { getRestaurantProfileImage } from "../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 
 import Animated, {
+	useAnimatedGestureHandler,
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
 } from "react-native-reanimated";
+import { PanGestureHandler } from "react-native-gesture-handler";
+import DrawerOptions from "./DrawerOptions";
+
+const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
+const BORDER_RADIUS = 12;
 
 const ReservationListItem = ({
 	restaurantName,
@@ -41,16 +48,50 @@ const ReservationListItem = ({
 	const [displayedExtraName, setDisplayedExtraName] = useState();
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
 	const [animationFinished, setAnimationFinished] = useState(true);
+	const [drawerOptionsButtonAnimation, setDrawerOptionsButtonAnimation] =
+		useState({
+			scale: 0,
+		});
 
 	const formatedReservationDate = formatDate(reservationDateTimestamp);
 	const formatedMadeOnDate = formatDate(madeOnDate);
 
 	const animatedTranslateX = useSharedValue(-1000);
 
-	const reanimatedExtraName = useAnimatedStyle(() => {
-		return {
-			transform: [{ translateX: animatedTranslateX.value }],
-		};
+	const gestureTranslateXDefault = 0;
+	const gestureTranslateXOpened = 100;
+	const gestureHandlerTranslateX = useSharedValue(gestureTranslateXDefault);
+
+	const drawerGestureHandler = useAnimatedGestureHandler({
+		onStart: (event, ctx) => {
+			// pressed.value = true;
+			ctx.startX = gestureHandlerTranslateX.value;
+		},
+		onActive: (event, ctx) => {
+			if (ctx.startX + event.translationX > 0) {
+				gestureHandlerTranslateX.value = 0;
+				return;
+			}
+
+			gestureHandlerTranslateX.value =
+				ctx.startX + event.translationX >= -gestureTranslateXOpened
+					? ctx.startX + event.translationX
+					: -gestureTranslateXOpened;
+		},
+		onEnd: (event, ctx) => {
+			// pressed.value = false;
+			if (gestureHandlerTranslateX.value <= -50) {
+				gestureHandlerTranslateX.value = withSpring(-gestureTranslateXOpened);
+				return;
+			}
+
+			if (gestureHandlerTranslateX.value > -50) {
+				gestureHandlerTranslateX.value = withSpring(0);
+				return;
+			}
+
+			gestureHandlerTranslateX.value = gestureHandlerTranslateX.value;
+		},
 	});
 
 	let backToDefaultTimeout;
@@ -64,6 +105,7 @@ const ReservationListItem = ({
 			setAnimationFinished(false);
 			animatedTranslateX.value = withSpring(WIDTH * 2, { mass: 0.6 });
 
+			//time period between names changing
 			backToDefaultTimeout = setTimeout(() => {
 				animatedTranslateX.value = -WIDTH * 2;
 				setDisplayedExtraName(
@@ -82,6 +124,35 @@ const ReservationListItem = ({
 		animatedTranslateX.value = withSpring(0);
 	}
 
+	//reservation slide gesture
+	const reanimatedDrawerGesture = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: gestureHandlerTranslateX.value }],
+		};
+	});
+
+	//reservation's option buttons appearance on slide gesture
+	const reanimatedDrawerGestureButtonScale = useAnimatedStyle(() => {
+		const gestureOptionsDrawerValue = Math.abs(
+			gestureHandlerTranslateX.value / gestureTranslateXOpened
+		);
+		return {
+			transform: [
+				{
+					scale: gestureOptionsDrawerValue,
+				},
+			],
+			opacity: gestureOptionsDrawerValue,
+		};
+	});
+
+	//reservation extra's name slide animations on image press
+	const reanimatedExtraName = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: animatedTranslateX.value }],
+		};
+	});
+
 	useEffect(() => {
 		async function getRestaurantDataHandler() {
 			const profileImage = await getRestaurantProfileImage(restaurantUid);
@@ -91,84 +162,124 @@ const ReservationListItem = ({
 		getRestaurantDataHandler();
 	}, []);
 
+	const drawerOptionsButtons = [
+		{
+			title: "Button 1",
+			onPress: () => console.log("Button 1"),
+		},
+		{
+			title: "Button 2",
+			onPress: () => console.log("Button 2"),
+		},
+		{
+			title: "Button 3",
+			onPress: () => console.log("Button 3"),
+		},
+		// {
+		// 	title: "Button 4",
+		// 	onPress: () => console.log("Button 4"),
+		// },
+	];
+
 	return (
 		<>
+			{/* <Button
+				title="reset"
+				onPress={() => (gestureHandlerTranslateX.value = 0)}
+			/> */}
 			{reservationBackgroundUri && extraImages && (
-				<Animated.View entering={firstLoad && reservationEntering}>
-					<LinearGradient
-						colors={["#000000CC", "#FFFFFF", "#020202B7"]}
-						style={styles.gradientBackgroundContainer}
-						start={{ x: 1, y: 1 }}
-						end={{ x: 0, y: 0 }}
+				<Animated.View
+					entering={firstLoad && reservationEntering}
+					style={styles.mainContainer}
+				>
+					<DrawerOptions
+						buttonsData={drawerOptionsButtons}
+						width={gestureTranslateXOpened + BORDER_RADIUS}
+						textCenteringMargin={BORDER_RADIUS}
+						buttonCornerRadius={BORDER_RADIUS}
+						animatedScale={reanimatedDrawerGestureButtonScale}
+					/>
+					<Animated.View
+						style={[styles.drawerContainer, reanimatedDrawerGesture]}
 					>
-						<ImageBackground
-							source={{ uri: reservationBackgroundUri }}
-							style={styles.innerBackgroundContainer}
-							imageStyle={styles.imageBackground}
-							resizeMode="stretch"
+						<LinearGradient
+							colors={["#000000CC", "#FFFFFF", "#020202B7"]}
+							style={styles.gradientBackgroundContainer}
+							start={{ x: 1, y: 1 }}
+							end={{ x: 0, y: 0 }}
 						>
-							<View style={styles.dataContainer}>
-								<View style={styles.dataInnerContainer}>
-									<Text style={styles.restaurantName}>{restaurantName}</Text>
-									<Text style={styles.dates}>
-										Reserved on: {formatedMadeOnDate}
-									</Text>
-									<Text style={styles.dates}>
-										Reservation Date: {formatedReservationDate}
-									</Text>
-								</View>
-							</View>
-							<View style={styles.extrasContainer}>
-								<FlatList
-									data={extras}
-									keyExtractor={(item, index) => index}
-									horizontal={true}
-									style={styles.extrasFlatList}
-									contentContainerStyle={styles.extrasFlatListContent}
-									renderItem={(itemData) => {
-										return (
-											<ExtraItem
-												onPress={displayExtraName.bind(this, itemData)}
-												imgUri={
-													extraImages &&
-													extraImages[itemData.item.xShortFileName]
-												}
-												extraEntering={firstLoad && extraEntering}
-											/>
-										);
-									}}
-								/>
-								<Animated.View style={[reanimatedExtraName]}>
-									<Text style={styles.displayedExtraName}>
-										{displayedExtraName}
-									</Text>
-								</Animated.View>
-							</View>
-							<View
-								style={{
-									width: 100,
-									height: 50,
-									backgroundColor: statusColor,
-									position: "absolute",
-									top: "92%",
-									left: "75%",
-									borderTopLeftRadius: 20,
-								}}
+							<ImageBackground
+								source={{ uri: reservationBackgroundUri }}
+								style={styles.innerBackgroundContainer}
+								imageStyle={styles.imageBackground}
+								resizeMode="stretch"
 							>
-								<Animated.Text
-									entering={firstLoad && statusEntering}
-									style={{
-										textAlign: "center",
-										fontWeight: "bold",
-										paddingTop: 1,
-										color: statusTextColor,
-									}}
+								<PanGestureHandler
+									onGestureEvent={drawerGestureHandler}
+									// activateAfterLongPress={70}
+									activeOffsetX={[-25, 25]}
 								>
-									{statusText}
-								</Animated.Text>
-							</View>
-						</ImageBackground>
-					</LinearGradient>
+									<Animated.View style={styles.dataContainer}>
+										<View style={styles.dataInnerContainer}>
+											<Text style={styles.restaurantName}>
+												{restaurantName}
+											</Text>
+											<Text style={styles.dates}>
+												Reserved on: {formatedMadeOnDate}
+											</Text>
+											<Text style={styles.dates}>
+												Reservation Date: {formatedReservationDate}
+											</Text>
+										</View>
+									</Animated.View>
+								</PanGestureHandler>
+
+								<View style={styles.extrasContainer}>
+									<FlatList
+										data={extras}
+										keyExtractor={(item, index) => index}
+										horizontal={true}
+										style={styles.extrasFlatList}
+										contentContainerStyle={styles.extrasFlatListContent}
+										renderItem={(itemData) => {
+											return (
+												<ExtraItem
+													onPress={displayExtraName.bind(this, itemData)}
+													imgUri={
+														extraImages &&
+														extraImages[itemData.item.xShortFileName]
+													}
+													extraEntering={firstLoad && extraEntering}
+												/>
+											);
+										}}
+									/>
+									<Animated.View style={[reanimatedExtraName]}>
+										<Text style={styles.displayedExtraName}>
+											{displayedExtraName}
+										</Text>
+									</Animated.View>
+								</View>
+								<View
+									style={[
+										styles.reservationStatus,
+										{ backgroundColor: statusColor },
+									]}
+								>
+									<Animated.Text
+										entering={firstLoad && statusEntering}
+										style={{
+											textAlign: "center",
+											fontWeight: "bold",
+											color: statusTextColor,
+										}}
+									>
+										{statusText}
+									</Animated.Text>
+								</View>
+							</ImageBackground>
+						</LinearGradient>
+					</Animated.View>
 				</Animated.View>
 			)}
 		</>
@@ -178,20 +289,30 @@ const ReservationListItem = ({
 export default ReservationListItem;
 
 const styles = StyleSheet.create({
+	mainContainer: {
+		// backgroundColor: "#98989817",
+		height: WIDTH * 0.65,
+		margin: WIDTH * 0.03,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 15,
+		// overflow: "hidden",
+
+		// elevation: 8,
+		// shadowColor: "#ffffff",
+		// shadowOpacity: 0.5,
+		// shadowOffset: { width: 0, height: 2 },
+		// shadowRadius: 5,
+	},
+	drawerContainer: {
+		zIndex: 2,
+	},
 	gradientBackgroundContainer: {
 		padding: 3,
 		justifyContent: "center",
 		alignItems: "center",
-		height: Dimensions.get("window").width * 0.65,
-		margin: Dimensions.get("window").width * 0.03,
 		borderRadius: 15,
 		overflow: "hidden",
-		elevation: 10,
-		shadowColor: "#ffffff",
-		shadowOpacity: 0.5,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 24,
-		marginBottom: 20,
 	},
 	innerBackgroundContainer: {
 		flex: 1,
@@ -208,7 +329,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	dataInnerContainer: {
-		flex: 0.6,
+		flex: 0.8,
 		width: "100%",
 		justifyContent: "center",
 		alignItems: "center",
@@ -239,7 +360,7 @@ const styles = StyleSheet.create({
 		borderBottomRightRadius: 15,
 	},
 	extrasFlatList: {
-		maxHeight: Dimensions.get("window").width * 0.16,
+		maxHeight: WIDTH * 0.16,
 		borderBottomWidth: 1.5,
 		borderColor: "#ffffff",
 	},
@@ -249,6 +370,15 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		marginTop: 4,
 		fontWeight: "500",
-		// transform: [{ translateX: -Dimensions.get("window").width }],
+	},
+	reservationStatus: {
+		position: "absolute",
+		bottom: -0.1,
+		right: -0.1,
+		borderTopLeftRadius: 15,
+		borderBottomRightRadius: 12,
+		paddingHorizontal: 10,
+		paddingVertical: 1,
+		minWidth: 90,
 	},
 });

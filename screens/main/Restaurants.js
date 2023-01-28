@@ -108,6 +108,9 @@ const Restaurants = ({ navigation }) => {
 	}, []);
 
 	function pressHandler(itemData) {
+		//temporary
+		if (itemData.item.name !== "Restaurant 3") return;
+
 		navigation.navigate("RestaurantProfile", {
 			name: itemData.item.name,
 			description: itemData.item.description

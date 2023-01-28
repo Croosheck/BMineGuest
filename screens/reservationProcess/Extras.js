@@ -81,6 +81,7 @@ const Extras = ({ route }) => {
 					xPrice: itemData.item.xPrice,
 					xFileName: itemData.item.xFileName,
 					xShortFileName: xShortFilename,
+					xImage: extraImages[itemData.item.xFileName.slice(0, -4)],
 				})
 			);
 		}

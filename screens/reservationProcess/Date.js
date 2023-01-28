@@ -90,6 +90,7 @@ const Date = ({ route }) => {
 				</View>
 				{reservationDate && <AddEvent eventDate={reservationDate} />}
 			</View>
+			<Text>Screen's not finished</Text>
 		</LinearGradient>
 	);
 };

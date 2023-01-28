@@ -16,7 +16,7 @@ import { getUser } from "../../redux/slices/user";
 import { formatDate } from "../../util/formatDate";
 import { getRestaurantProfileImage } from "../../util/storage";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
-import { auth, storage } from "../../firebase";
+import { storage } from "../../firebase";
 
 const MARGIN_LEFT = 20;
 const MARGIN_RIGHT = 20;
@@ -209,12 +209,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 								title="-"
 								onPress={howManyHandler.bind(this, "decrement")}
 								style={{ borderWidth: 1 }}
-								titleStyle={{
-									fontSize: 28,
-									fontWeight: "default",
-									textShadowColor: "white",
-									textShadowRadius: 6,
-								}}
+								titleStyle={styles.setButtonTitle}
 							/>
 						</View>
 						<View style={styles.button}>
@@ -229,12 +224,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 								title="+"
 								onPress={howManyHandler.bind(this, "increment")}
 								style={{ borderWidth: 1 }}
-								titleStyle={{
-									fontSize: 28,
-									fontWeight: "default",
-									textShadowColor: "white",
-									textShadowRadius: 6,
-								}}
+								titleStyle={styles.setButtonTitle}
 							/>
 						</View>
 					</View>
@@ -428,5 +418,11 @@ const styles = StyleSheet.create({
 	setButton: {
 		width: Dimensions.get("window").width * 0.1,
 		height: Dimensions.get("window").width * 0.1,
+	},
+	setButtonTitle: {
+		fontSize: 28,
+		fontWeight: "default",
+		textShadowColor: "white",
+		textShadowRadius: 6,
 	},
 });

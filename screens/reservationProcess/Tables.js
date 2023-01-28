@@ -153,6 +153,7 @@ const Tables = ({ route }) => {
 					tShape: itemData.item.tShape,
 					tSeats: itemData.item.tSeats,
 					tPlacement: itemData.item.tPlacement,
+					tImage: tableImages[itemData.item.tId],
 				},
 			})
 		);

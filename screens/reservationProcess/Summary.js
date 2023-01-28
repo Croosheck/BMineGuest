@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import {
 	Dimensions,
+	Image,
 	Pressable,
 	ScrollView,
 	StyleSheet,
@@ -11,6 +12,10 @@ import { useSelector } from "react-redux";
 import { auth } from "../../firebase";
 import { formatDate } from "../../util/formatDate";
 import uploadData from "../../util/storage";
+import { LinearGradient } from "expo-linear-gradient";
+import Icon from "../../components/Icon";
+
+const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
 const Summary = ({ navigation, route }) => {
 	const [displayTime, setDisplayTime] = useState();
@@ -31,6 +36,8 @@ const Summary = ({ navigation, route }) => {
 		.toFixed(2);
 
 	useLayoutEffect(() => {
+		setDisplayTime(formatDate(reservationDate));
+
 		const data = {
 			restaurantName: name,
 			restaurantKey: restaurantKey,
@@ -73,37 +80,72 @@ const Summary = ({ navigation, route }) => {
 		});
 	});
 
-	useEffect(() => {
-		if (!reservationDate) return;
-		setDisplayTime(formatDate(reservationDate));
-	}, [reservationDate]);
+	const seatsIcon = (
+		<Icon name="seat" size={20} color="#ffffff" style={styles.seatsIcon} />
+	);
 
 	return (
-		<View style={styles.container}>
-			<Text style={styles.text}>{displayTime}</Text>
-			{table && <Text style={styles.text}>Placement: {table.tPlacement}</Text>}
-			{table && <Text style={styles.text}>Seats: {table.tSeats}</Text>}
-			{table && <Text style={styles.text}>ID: {table.tId}</Text>}
+		<LinearGradient
+			style={styles.container}
+			colors={["#1C1616", "#463434"]}
+			start={{ x: 0, y: 0.7 }}
+			end={{ x: 0.7, y: 0 }}
+		>
+			<View style={styles.restaurantNameContainer}>
+				<Text style={[styles.restaurantName, styles.textShadow]}>{name}</Text>
+			</View>
+
+			<View style={styles.tableImageContainer}>
+				<Image
+					style={styles.tableImage}
+					source={{ uri: table.tImage }}
+					resizeMode="cover"
+				/>
+			</View>
+
+			<View style={styles.tableDetailsContainer}>
+				<Text style={[styles.tableDetail, styles.textShadow]}>
+					{table.tPlacement}
+				</Text>
+				<Text style={[styles.tableDetail, styles.textShadow]}>
+					{seatsIcon} {table.tSeats}
+				</Text>
+			</View>
+
+			<View style={styles.detailsContainer}>
+				<Text
+					style={[styles.detailsReservation, styles.textShadow]}
+				>{`Reservation for ${howMany}, on:\n${displayTime}`}</Text>
+			</View>
+
 			{extras && (
-				<ScrollView>
-					<View style={{ flexDirection: "column" }}>
-						{extras.map((item) => {
-							return (
-								<Text
-									key={Math.random() * 1000000}
-									style={{ color: "#ffffff" }}
-								>
-									- {item.xName}
+				<ScrollView
+					horizontal
+					style={styles.extrasScrollContainer}
+					contentContainerStyle={styles.extrasScrollContent}
+				>
+					{extras.map((item, i) => {
+						return (
+							<View style={styles.extraItemContainer} key={i}>
+								<Image
+									style={styles.extraImage}
+									source={{ uri: item.xImage }}
+								/>
+								<Text style={[styles.extraName, styles.textShadow]}>
+									{item.xName}
 								</Text>
-							);
-						})}
-					</View>
-					{extras && (
-						<Text style={styles.text}>Extras total price: {extrasPrice}</Text>
-					)}
+							</View>
+						);
+					})}
 				</ScrollView>
 			)}
-		</View>
+
+			<View style={styles.extrasTotalContainer}>
+				<Text style={[styles.extrasTotalText, styles.textShadow]}>
+					Extras total price: {extras ? extrasPrice : 0}
+				</Text>
+			</View>
+		</LinearGradient>
 	);
 };
 
@@ -114,13 +156,110 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#311A1A",
-		padding: 8,
 	},
-	text: {
+	textShadow: {
+		textShadowColor: "#FFFFFF4C",
+		textShadowOffset: { height: 2, width: 2 },
+		textShadowRadius: 2,
+	},
+	//////////////////////////
+	restaurantNameContainer: {
+		backgroundColor: "#372020",
+		width: WIDTH,
+		paddingVertical: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: "#FFFFFF7E",
+		justifyContent: "center",
+		maxHeight: HEIGHT * 0.07,
+	},
+	restaurantName: {
+		color: "#FFFFFF",
+		fontWeight: "600",
+		fontSize: 24,
+		// textAlign: "center",
+		marginLeft: 10,
+	},
+	//////////////////////////
+	tableImageContainer: {
+		flex: 1.5,
+		width: WIDTH,
+		maxHeight: HEIGHT * 0.5,
+	},
+	tableImage: {
+		flexGrow: 1,
+		width: "100%",
+	},
+	//////////////////////////
+	tableDetailsContainer: {
+		width: WIDTH,
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		borderBottomWidth: 1,
+		borderColor: "#FFFFFF4D",
+		paddingVertical: 4,
+	},
+	tableDetail: {
+		width: WIDTH * 0.5,
 		color: "#ffffff",
-		fontSize: 20,
 		textAlign: "center",
-		marginVertical: Dimensions.get("window").height * 0.02,
+		fontSize: 18,
+		fontWeight: "300",
+	},
+	//////////////////////////
+	detailsContainer: {
+		flex: 1,
+		width: WIDTH,
+		justifyContent: "center",
+		alignItems: "center",
+		// backgroundColor: "#cccccc",
+	},
+	detailsReservation: {
+		color: "#ffffff",
+		fontSize: 22,
+		textAlign: "center",
+	},
+	//////////////////////////
+	extrasScrollContainer: {
+		flex: 0.1,
+		maxHeight: HEIGHT * 0.1,
+		marginVertical: 20,
+	},
+	extrasScrollContent: {
+		// backgroundColor: "#cccccc",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	extraItemContainer: {
+		// backgroundColor: "#cccccc",
+		marginHorizontal: 8,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	extraImage: {
+		height: "70%",
+		aspectRatio: 1,
+	},
+	extraName: {
+		color: "#ffffff",
+		fontSize: 12,
+		marginTop: 2,
+	},
+	//////////////////////////
+	extrasTotalContainer: {
+		width: WIDTH,
+		justifyContent: "center",
+		alignItems: "center",
+		// backgroundColor: "#FFFFFF6B",
+	},
+	extrasTotalText: {
+		width: WIDTH * 0.8,
+		paddingVertical: 2,
+		textAlign: "center",
+		fontSize: 18,
+		fontWeight: "500",
+		color: "#ffffff",
+		borderTopColor: "#FFFFFF6B",
+		borderTopWidth: 0.8,
 	},
 });

@@ -7,6 +7,7 @@ import {
 	ImageBackground,
 } from "react-native";
 import Icon from "./Icon";
+import { LinearGradient } from "expo-linear-gradient";
 
 const TableTile = ({
 	title,
@@ -22,56 +23,56 @@ const TableTile = ({
 }) => {
 	return (
 		<View style={[styles.container, picked && styles.containerPicked]}>
-			<Pressable
-				style={[styles.innerContainer, picked && styles.itemPicked]}
-				onPress={onPress}
-				android_ripple={{ color: "#8C6D6D19" }}
-			>
-				<View style={[styles.labelContainer]}>
-					{/* <View style={styles.titleContainer}>
+			<LinearGradient colors={["#8686862F", "#000000AF"]}>
+				<Pressable
+					style={[styles.innerContainer, picked && styles.itemPicked]}
+					onPress={onPress}
+					android_ripple={{ color: "#8C6D6D19" }}
+				>
+					<View style={[styles.labelContainer]}>
+						{/* <View style={styles.titleContainer}>
 						<Text style={[styles.title, picked && { color: "#FFFFFF" }]}>
 							{title}
 						</Text>
 					</View> */}
-					<View style={styles.textBelowContainer}>
-						{iconName && (
-							<Icon name={iconName} size={iconSize} color={iconColor} />
-						)}
+						<View style={styles.textBelowContainer}>
+							{iconName && (
+								<Icon name={iconName} size={iconSize} color={iconColor} />
+							)}
+							<Text
+								style={[
+									styles.seatsQuantity,
+									styles.textShadow,
+									picked && { color: "#FFFFFF" },
+								]}
+							>
+								{seatsQuantity}
+							</Text>
+						</View>
 						<Text
 							style={[
-								styles.seatsQuantity,
+								styles.textBelow,
 								styles.textShadow,
 								picked && { color: "#FFFFFF" },
 							]}
 						>
-							{seatsQuantity}
+							{tPlacement}
 						</Text>
 					</View>
-					<Text
+					<ImageBackground
 						style={[
-							styles.textBelow,
-							styles.textShadow,
-							picked && { color: "#FFFFFF" },
+							styles.imageBackgroundContainer,
+							picked && styles.imageBackgroundContainerPicked,
 						]}
-					>
-						{tPlacement}
-					</Text>
-				</View>
-				<ImageBackground
-					style={[
-						styles.imageBackgroundContainer,
-						picked && styles.imageBackgroundContainerPicked,
-					]}
-					source={{ uri: imgUri }}
-					imageStyle={[
-						styles.imageBackground,
-						picked && styles.imageBackgroundPicked,
-					]}
-					resizeMode="center"
-				>
-					<View></View>
-				</ImageBackground>
-			</Pressable>
+						source={{ uri: imgUri }}
+						imageStyle={[
+							styles.imageBackground,
+							picked && styles.imageBackgroundPicked,
+						]}
+						resizeMode="center"
+					></ImageBackground>
+				</Pressable>
+			</LinearGradient>
 		</View>
 	);
 };
@@ -95,9 +96,13 @@ const styles = StyleSheet.create({
 	},
 	containerPicked: {
 		elevation: 8,
-		shadowColor: "#ffffff",
+		shadowColor: "#FFFFFF",
 		//opacity: 1 crashes the elevation (RN's bug? Or I'm dumb, who knows.)
 		opacity: 0.99,
+		//ios
+		shadowOffset: { height: 3, width: 3 },
+		shadowRadius: 5,
+		shadowOpacity: 1,
 	},
 	imageBackgroundContainer: {
 		flex: 1,
@@ -109,6 +114,7 @@ const styles = StyleSheet.create({
 			{ scale: 1.1 },
 			{ translateX: Dimensions.get("window").width * 0.05 },
 		],
+		// oblique line
 		borderWidth: 1,
 		borderColor: "#FBFBFB",
 		overflow: "hidden",
@@ -139,7 +145,7 @@ const styles = StyleSheet.create({
 	itemPicked: {
 		flex: 1,
 		width: "100%",
-		backgroundColor: "#AB797933",
+		backgroundColor: "#4400FF20",
 		// borderWidth: 1,
 		opacity: 1,
 		borderColor: "#ffffff",

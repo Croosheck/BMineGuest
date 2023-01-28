@@ -127,7 +127,7 @@ function AppContainer() {
 						headerStyle: {
 							backgroundColor: "#330A0A",
 							borderColor: "#ffffff",
-							borderBottomWidth: 0.5,
+							// borderBottomWidth: 0.5,
 						},
 						headerTintColor: "#ffffff",
 						presentation: "modal",
