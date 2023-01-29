@@ -8,9 +8,8 @@ import { updateDoc, doc, serverTimestamp } from "firebase/firestore";
 const Login = () => {
 	const [credentials, setCredentials] = useState({
 		//Jimmy
-		email: "test@test.com",
-		password: "123123",
-
+		// email: "test@test.com",
+		// password: "123123",
 		//Jessie
 		// email: "111@111.com",
 		// password: "111111",
@@ -54,6 +53,42 @@ const Login = () => {
 
 	return (
 		<View style={styles.maskElement}>
+			<View
+				style={{
+					flexDirection: "row",
+					justifyContent: "space-between",
+					width: "90%",
+					marginBottom: 50,
+				}}
+			>
+				<View>
+					<Button
+						title="jack"
+						onPress={() =>
+							setCredentials({ email: "jack@jack.com", password: "123123" })
+						}
+					/>
+					<Text>0 reservations</Text>
+				</View>
+				<View>
+					<Button
+						title="jimmy"
+						onPress={() =>
+							setCredentials({ email: "test@test.com", password: "123123" })
+						}
+					/>
+					<Text>No expired rsrv</Text>
+				</View>
+				<View>
+					<Button
+						title="jessie"
+						onPress={() =>
+							setCredentials({ email: "111@111.com", password: "111111" })
+						}
+					/>
+					<Text>No upcoming rsrv</Text>
+				</View>
+			</View>
 			<View style={styles.inputContainer}>
 				<TextInput
 					placeholder="email"

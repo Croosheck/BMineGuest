@@ -29,22 +29,6 @@ const ReserveMain = ({ navigation, route }) => {
 	const { table } = useSelector((state) => state.userReducer.reservationData);
 
 	function summaryPreventionHandler() {
-		// No table picked prevention
-		if (Object.keys(table).length === 0) {
-			Alert.alert(
-				"Not everything is done yet.",
-				"We have plenty of tables, You can pick out of from!",
-				[
-					{
-						text: "Let's go!",
-						onPress: () => {
-							navigation.navigate("Tables");
-						},
-					},
-				]
-			);
-			return;
-		}
 		// No date picked prevention
 		if (!reservationDate) {
 			Alert.alert(
@@ -55,6 +39,23 @@ const ReserveMain = ({ navigation, route }) => {
 						text: "Let's go!",
 						onPress: () => {
 							navigation.navigate("Date");
+						},
+					},
+				]
+			);
+			return;
+		}
+
+		// No table picked prevention
+		if (Object.keys(table).length === 0) {
+			Alert.alert(
+				"Not everything is done yet.",
+				"We have plenty of tables, You can pick out of from!",
+				[
+					{
+						text: "Let's go!",
+						onPress: () => {
+							navigation.navigate("Tables");
 						},
 					},
 				]

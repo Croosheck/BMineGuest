@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
 	},
 	buttonPressed: {
 		opacity: 0.85,
+		backgroundColor: "#FFFFFF2A",
 	},
 	buttonTitle: {
 		textTransform: "uppercase",

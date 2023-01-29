@@ -8,12 +8,13 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { auth } from "../../firebase";
 import { formatDate } from "../../util/formatDate";
 import uploadData from "../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../../components/Icon";
+import { clearDate, clearReservationData } from "../../redux/slices/user";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
@@ -28,6 +29,8 @@ const Summary = ({ navigation, route }) => {
 	);
 
 	const { name, restaurantKey, restaurantUid, howMany } = route.params;
+
+	const dispatch = useDispatch();
 
 	const extrasPrice = extras
 		.reduce((acc, item) => {
@@ -69,9 +72,10 @@ const Summary = ({ navigation, route }) => {
 						pressed && { opacity: 0.5 },
 					]}
 					onPress={() => {
-						navigation.navigate("Reservations");
-
 						uploadData(null, null, data);
+						navigation.navigate("Reservations");
+						dispatch(clearReservationData(restaurantKey));
+						dispatch(clearDate());
 					}}
 				>
 					<Text style={{ color: "#ffffff" }}>All Done!</Text>

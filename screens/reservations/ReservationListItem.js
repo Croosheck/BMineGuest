@@ -25,7 +25,7 @@ import { PanGestureHandler } from "react-native-gesture-handler";
 import DrawerOptions from "./DrawerOptions";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
-const BORDER_RADIUS = 12;
+const BORDER_RADIUS = 14;
 
 const ReservationListItem = ({
 	restaurantName,
@@ -175,7 +175,7 @@ const ReservationListItem = ({
 		},
 		{
 			title: "Button 4",
-			onPress: () => console.log(table),
+			onPress: () => console.log("Button 4"),
 		},
 	];
 
@@ -319,7 +319,6 @@ const styles = StyleSheet.create({
 		height: WIDTH * 0.65,
 		margin: HEIGHT * 0.015,
 		justifyContent: "center",
-		alignItems: "center",
 		borderRadius: BORDER_RADIUS,
 	},
 	drawerContainer: {
@@ -327,14 +326,15 @@ const styles = StyleSheet.create({
 	},
 	gradientBackgroundContainer: {
 		justifyContent: "center",
-		alignItems: "center",
 		borderRadius: BORDER_RADIUS,
 		overflow: "hidden",
+		height: "100%",
 	},
 	innerBackgroundContainer: {
+		flex: 1,
 		margin: 2,
 		overflow: "hidden",
-		borderRadius: BORDER_RADIUS - BORDER_RADIUS * 0.1,
+		borderRadius: BORDER_RADIUS - 1.5,
 	},
 	imageBackground: {
 		opacity: 0.9,
@@ -350,6 +350,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#00000060",
 	},
 	restaurantName: {
+		flex: 0.6,
 		color: "#ffffff",
 		fontSize: 26,
 		fontWeight: "800",
@@ -389,7 +390,7 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		bottom: 0,
 		right: -0.1,
-		borderTopLeftRadius: BORDER_RADIUS - BORDER_RADIUS * 0.1,
+		borderTopLeftRadius: BORDER_RADIUS - 1.5,
 		paddingVertical: 1,
 		minWidth: "25%",
 	},

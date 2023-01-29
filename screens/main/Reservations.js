@@ -1,5 +1,6 @@
 import {
 	Animated,
+	Button,
 	Dimensions,
 	Easing,
 	FlatList,
@@ -16,6 +17,9 @@ import LottieIcon from "../../components/LottieIcon";
 import { SlideInRight, SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import ReservationsFilters from "../../components/ReservationsFilters";
+import OutlinedButton from "../../components/OutlinedButton";
+
+const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
 const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
@@ -23,7 +27,9 @@ const Reservations = ({ navigation }) => {
 	const [loaded, setLoaded] = useState(false);
 	const [isFirstLoad, setIsFirstLoad] = useState(true);
 	const [filterType, setFilterType] = useState("upcoming");
-	const [message, setMessage] = useState("");
+	const [emptyListMessage, setEmptyListMessage] = useState(
+		`No ${filterType} reservations yet.`
+	);
 
 	// Default state for bottom navbar icons
 	const animationProgress = useRef(new Animated.Value(0.315));
@@ -76,7 +82,7 @@ const Reservations = ({ navigation }) => {
 		});
 
 		return () => {
-			// Event listeners clearing
+			// Event listeners cleaning
 			unsubscribeFocus();
 			unsubscribeBlur();
 		};
@@ -163,6 +169,10 @@ const Reservations = ({ navigation }) => {
 			};
 	}
 
+	function noReservationsOutlinedButtonHandler() {
+		navigation.navigate("Restaurants");
+	}
+
 	if (!loaded) {
 		return (
 			<LinearGradient
@@ -180,9 +190,21 @@ const Reservations = ({ navigation }) => {
 				style={[styles.container, styles.emptyListInnerContainer]}
 				colors={["#3B1616", "#010C1C", "#370B0B"]}
 			>
-				<Text style={styles.emptyListLabel}>
-					No submitted reservations yet.
-				</Text>
+				<LinearGradient
+					colors={["#A8181846", "#0A163E82"]}
+					style={styles.filteredListEmptyContainer}
+					start={{ x: 0, y: 0.5 }}
+					end={{ x: 0.8, y: 1 }}
+				>
+					<Text style={styles.filteredListEmptyText}>
+						{`No submitted reservations yet.\nDo you wish to look for something?\n`}
+					</Text>
+					<OutlinedButton
+						title="Let's go!"
+						style={styles.noReservationsOutlinedButton}
+						onPress={noReservationsOutlinedButtonHandler}
+					/>
+				</LinearGradient>
 			</LinearGradient>
 		);
 	}
@@ -192,7 +214,10 @@ const Reservations = ({ navigation }) => {
 		setIsFirstLoad(false);
 
 		setFilterType(type);
+		if (type === "upcoming" || type === "expired")
+			setEmptyListMessage(`No ${type} reservations yet.`);
 	}
+	let listCounter;
 
 	return (
 		<LinearGradient
@@ -223,8 +248,38 @@ const Reservations = ({ navigation }) => {
 				keyExtractor={(item, index) => item.filename + index}
 				// numColumns={2}
 				renderItem={(itemData) => {
+					//reset for the 1st item
+					if (itemData.index === 0) {
+						listCounter = 0;
+					}
+
 					const reservationStatus = getReservationStatusHandler(itemData);
 					const currentTimestamp = new Date().valueOf();
+
+					if (
+						((filterType === "upcoming" &&
+							!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
+							(filterType === "expired" &&
+								!(
+									itemData.item.reservationDateTimestamp < currentTimestamp
+								))) &&
+						//check if that's the last item
+						itemData.index === reservationsData.length - 1 &&
+						//check if there weren't any items after filtering
+						listCounter === 0
+					)
+						return (
+							<LinearGradient
+								colors={["#A8181846", "#0A163E82"]}
+								style={styles.filteredListEmptyContainer}
+								start={{ x: 0, y: 0.5 }}
+								end={{ x: 0.8, y: 1 }}
+							>
+								<Text style={styles.filteredListEmptyText}>
+									{emptyListMessage}
+								</Text>
+							</LinearGradient>
+						);
 
 					if (
 						(filterType === "upcoming" &&
@@ -233,6 +288,9 @@ const Reservations = ({ navigation }) => {
 							!(itemData.item.reservationDateTimestamp < currentTimestamp))
 					)
 						return;
+
+					//used for checking if there are any items after filtering (+1)
+					listCounter += 1;
 
 					return (
 						<ReservationListItem
@@ -282,5 +340,25 @@ const styles = StyleSheet.create({
 		color: "#ffffff",
 		fontSize: 20,
 		textAlign: "center",
+	},
+	filteredListEmptyContainer: {
+		justifyContent: "center",
+		alignItems: "center",
+		height: WIDTH * 0.6,
+		marginHorizontal: WIDTH * 0.05,
+		marginVertical: HEIGHT * 0.2,
+		borderRadius: 20,
+	},
+	filteredListEmptyText: {
+		color: "#ffffff",
+		fontSize: 20,
+		textAlign: "center",
+		fontWeight: "500",
+		textShadowColor: "#ffffff",
+		textShadowRadius: 5,
+	},
+	noReservationsOutlinedButton: {
+		maxHeight: 50,
+		minWidth: 100,
 	},
 });

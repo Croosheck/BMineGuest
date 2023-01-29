@@ -109,7 +109,7 @@ const Restaurants = ({ navigation }) => {
 
 	function pressHandler(itemData) {
 		//temporary
-		if (itemData.item.name !== "Restaurant 3") return;
+		if (itemData.item.name !== "Restauracja Pod Sówką") return;
 
 		navigation.navigate("RestaurantProfile", {
 			name: itemData.item.name,

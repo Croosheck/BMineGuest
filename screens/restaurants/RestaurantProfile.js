@@ -17,9 +17,12 @@ import { formatDate } from "../../util/formatDate";
 import { getRestaurantProfileImage } from "../../util/storage";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import { storage } from "../../firebase";
+import { LinearGradient } from "expo-linear-gradient";
 
 const MARGIN_LEFT = 20;
 const MARGIN_RIGHT = 20;
+const TITLE_CONTAINER_HEIGHT = 50;
+const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 // const TEST_IMAGES = [
 // 	{ src: require("../../assets/test/118427365.jpg") },
@@ -111,6 +114,8 @@ const RestaurantProfile = ({ navigation, route }) => {
 		});
 	}
 
+	const restaurantTitleDynamicFontSize = name.length < 22 ? 24 : 20;
+
 	//// Fetching upcoming reservations in this particular restaurant (will be implemented in the near future)
 	// async function getReservationsHandler() {
 	// 	const reservationsData = await getReservations();
@@ -151,14 +156,27 @@ const RestaurantProfile = ({ navigation, route }) => {
 		);
 
 	return (
-		<View style={styles.container}>
+		<LinearGradient
+			style={styles.container}
+			colors={["#2E273D", "#FFFFFF5D"]}
+			start={{ x: 0, y: 0.7 }}
+			end={{ x: 1, y: 0 }}
+		>
 			<View style={styles.imageContainer}>
 				<Image source={{ uri: profileImgUri }} style={styles.image} />
 			</View>
-			<View style={styles.menuContainer}>
+
+			<View style={styles.detailsContainer}>
 				<View style={styles.titleOuterContainer}>
 					<View style={styles.titleContainer}>
-						<Text style={styles.title}>{name}</Text>
+						<Text
+							style={[
+								styles.title,
+								{ fontSize: restaurantTitleDynamicFontSize },
+							]}
+						>
+							{name}
+						</Text>
 					</View>
 					<ImageBackground
 						style={styles.closestDateContainer}
@@ -171,6 +189,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 						{dateContent}
 					</ImageBackground>
 				</View>
+
 				<View style={styles.tagsContainer}>
 					<ScrollView contentContainerStyle={styles.tagsContent} horizontal>
 						{restaurantTags.map((tag, i) => (
@@ -180,11 +199,13 @@ const RestaurantProfile = ({ navigation, route }) => {
 						))}
 					</ScrollView>
 				</View>
+
 				<View style={styles.descriptionContainer}>
-					<View style={styles.descriptionInnerContainer}>
+					<ScrollView style={styles.descriptionInnerContainer}>
 						<Text style={styles.description}>{description}</Text>
-					</View>
+					</ScrollView>
 				</View>
+
 				<View style={styles.restaurantImagesContainer}>
 					<ScrollView
 						style={styles.restaurantImagesScrollViewContainer}
@@ -202,6 +223,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 						})}
 					</ScrollView>
 				</View>
+
 				{reservationsEnabled && isAnyOpen && (
 					<View style={styles.buttonsContainer}>
 						<View style={styles.setButton}>
@@ -230,7 +252,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 					</View>
 				)}
 			</View>
-		</View>
+		</LinearGradient>
 	);
 };
 
@@ -241,7 +263,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#311A1A",
+		backgroundColor: "#505472",
 	},
 	/////////////////
 	imageContainer: {
@@ -257,7 +279,7 @@ const styles = StyleSheet.create({
 		// borderRadius: 20,
 	},
 	////////////////
-	menuContainer: {
+	detailsContainer: {
 		flex: 1,
 		width: Dimensions.get("window").width,
 		// borderWidth: 2,
@@ -271,38 +293,39 @@ const styles = StyleSheet.create({
 	},
 	titleContainer: {
 		width: "100%",
-		height: 50,
+		height: TITLE_CONTAINER_HEIGHT,
 		alignItems: "flex-start",
 		justifyContent: "center",
 
-		backgroundColor: "#6238384B",
+		backgroundColor: "#12243D1E",
 	},
 	title: {
 		color: "#ffffff",
-		fontSize: 22,
 		fontWeight: "900",
 		letterSpacing: 0.7,
 		marginLeft: MARGIN_LEFT,
+		width: "100%",
 
-		textShadowColor: "white",
-		textShadowRadius: 3,
+		textShadowColor: "#000000B1",
+		textShadowRadius: 5,
+		textShadowOffset: { width: 3, height: 2 },
 	},
 	closestDateContainer: {
-		width: 130,
-		height: 130,
+		width: WIDTH * 0.33,
+		height: WIDTH * 0.33,
 		position: "absolute",
 		right: 0,
-		bottom: 0,
-		marginRight: 10,
+		bottom: TITLE_CONTAINER_HEIGHT * 0.7,
+		marginRight: WIDTH * 0.01,
 
 		// borderWidth: 2,
-		// borderColor: "#FFFFFF",
-		// borderRadius: 65,
+		borderColor: "#FFFFFF",
+		borderRadius: WIDTH * 0.33 * 0.5,
 	},
 	closestDatePlateImage: {
 		// borderWidth: 2,
 		borderColor: "#FFFFFF",
-		borderRadius: 65,
+		borderRadius: WIDTH * 0.35 * 0.5,
 	},
 	closestDateInnerContainer: {
 		position: "absolute",
@@ -320,24 +343,23 @@ const styles = StyleSheet.create({
 	},
 	dateStyle: {
 		fontWeight: "900",
-		// color: "#57851A",
 		color: "#00FFAE",
+		// color: "#57851A",
 		marginTop: 5,
 		top: "-5%",
-		fontSize: 18,
+		fontSize: 17,
 	},
 	tagsContainer: {
 		width: "100%",
 	},
 	tagsContent: {
-		marginVertical: 10,
+		marginTop: 15,
 		marginLeft: MARGIN_LEFT,
 		paddingRight: 20,
 	},
 	tag: {
-		height: 25,
-		marginRight: 10,
-		backgroundColor: "#2C60C7",
+		marginRight: 7,
+		backgroundColor: "#171F30",
 		paddingHorizontal: 12,
 		paddingVertical: 1,
 		paddingBottom: 2,
@@ -353,9 +375,9 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		marginLeft: MARGIN_LEFT,
 		marginRight: MARGIN_RIGHT,
-		marginTop: 10,
-		marginBottom: 20,
-		paddingBottom: 20,
+		marginTop: 15,
+		marginBottom: 15,
+		paddingBottom: 15,
 		borderBottomWidth: 0.5,
 		borderColor: "#cccccc",
 
@@ -372,14 +394,16 @@ const styles = StyleSheet.create({
 		fontStyle: "italic",
 		fontSize: 15,
 		letterSpacing: 0.4,
+
+		textShadowColor: "#FFFFFFCD",
+		textShadowRadius: 3,
 	},
 	restaurantImagesContainer: {
-		flex: 0.4,
+		flex: 0.45,
 		height: "100%",
 		justifyContent: "center",
 		alignItems: "center",
 		marginLeft: MARGIN_LEFT,
-		marginTop: 10,
 
 		// borderWidth: 2,
 		// borderColor: "#ffffff",
@@ -390,9 +414,11 @@ const styles = StyleSheet.create({
 	},
 	restaurantImagesScrollViewContent: {
 		// alignItems: "center",
+		borderRadius: 12,
+		overflow: "hidden",
 	},
 	restaurantGalleryImage: {
-		width: Dimensions.get("window").width * 0.5,
+		width: WIDTH * 0.6,
 		height: "100%",
 		marginRight: 15,
 		borderRadius: 12,
