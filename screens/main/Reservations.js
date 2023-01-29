@@ -240,6 +240,7 @@ const Reservations = ({ navigation }) => {
 							reservationDateTimestamp={itemData.item.reservationDateTimestamp}
 							madeOnDate={itemData.item.madeOnTimestamp}
 							extras={itemData.item.extras}
+							table={itemData.item.table}
 							extraImages={extraImages}
 							restaurantUid={itemData.item.restaurantUid}
 							// animation only for the 1st render

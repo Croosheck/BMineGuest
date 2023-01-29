@@ -36,7 +36,6 @@ export default DrawerOptions;
 
 const styles = StyleSheet.create({
 	container: {
-		// backgroundColor: "#B3FF0020",
 		height: "100%",
 		zIndex: 1,
 		position: "absolute",

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import Animated from "react-native-reanimated";
 
 const VERTICAL_MARGIN = 4;
@@ -12,6 +12,8 @@ const ReservationDrawerButton = ({
 	onPress,
 	textCenteringMargin,
 }) => {
+	const buttonTitleFontSize = title.length > 11 ? 13 : 15;
+
 	return (
 		<Animated.View style={[styles.buttonContainer, animatedScale]}>
 			<Pressable
@@ -29,7 +31,12 @@ const ReservationDrawerButton = ({
 				]}
 				onPress={onPress}
 			>
-				<Text style={[styles.buttonTitle, { marginLeft: textCenteringMargin }]}>
+				<Text
+					style={[
+						styles.buttonTitle,
+						{ marginLeft: textCenteringMargin, fontSize: buttonTitleFontSize },
+					]}
+				>
 					{title}
 				</Text>
 			</Pressable>
@@ -43,19 +50,24 @@ const styles = StyleSheet.create({
 	buttonContainer: {
 		flexGrow: 1,
 		marginVertical: VERTICAL_MARGIN,
-		marginRight: 3,
 	},
 	button: {
 		flex: 1,
-		backgroundColor: "#18CBF3",
+		backgroundColor: "#FFFFFF18",
 		justifyContent: "center",
 		alignItems: "center",
 	},
 	buttonPressed: {
-		opacity: 0.8,
+		opacity: 0.85,
 	},
 	buttonTitle: {
 		textTransform: "uppercase",
 		fontWeight: "700",
+		color: "#ffffff",
+		paddingHorizontal: 8,
+		textAlign: "center",
+		textShadowColor: "#000000",
+		textShadowOffset: { height: 2, width: 2 },
+		textShadowRadius: 5,
 	},
 });
