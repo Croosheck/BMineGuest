@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearDate } from "../../redux/slices/user";
 
 import Calendar from "../../components/Calendar";
-import AddEvent from "../../components/AddEvent";
+import AddEvent, { addEvent } from "../../components/AddEvent";
 import { formatDate } from "../../util/formatDate";
 import { closestDateReservation } from "../../util/closestDateReservation";
 import { LinearGradient } from "expo-linear-gradient";
@@ -88,7 +88,12 @@ const Date = ({ route }) => {
 						</View>
 					)}
 				</View>
-				{reservationDate && <AddEvent eventDate={reservationDate} />}
+				{/* {reservationDate && (
+					<Button
+						title="Add to your calendar!"
+						onPress={() => addEvent(reservationDate)}
+					/>
+				)} */}
 			</View>
 			<Text>Screen's not finished</Text>
 		</LinearGradient>

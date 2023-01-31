@@ -28,20 +28,23 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const BORDER_RADIUS = 14;
 
 const ReservationListItem = ({
-	restaurantName,
-	reservationDateTimestamp,
-	madeOnDate,
-	table,
-	extras,
-	extraImages,
-	restaurantUid,
+	restaurantName = String(),
+	reservationDateTimestamp = Number(),
+	madeOnDate = Number(),
+	table = Array(),
+	extras = Array(),
+	extraImages = new Object(),
+	restaurantUid = String(),
 	reservationEntering,
 	extraEntering,
 	statusEntering,
-	statusColor,
-	statusText,
-	statusTextColor,
-	firstLoad,
+	statusColor = String(),
+	statusText = String(),
+	statusTextColor = String(),
+	firstLoad = Boolean(),
+	drawerOptionsButtons = Array(),
+	slideMenu = Boolean(),
+	reservationDateCategory = String(),
 }) => {
 	const [displayedExtraName, setDisplayedExtraName] = useState();
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
@@ -160,25 +163,6 @@ const ReservationListItem = ({
 		getRestaurantDataHandler();
 	}, []);
 
-	const drawerOptionsButtons = [
-		{
-			title: "Request cancellation",
-			onPress: () => console.log("Request Cancellation"),
-		},
-		{
-			title: "Navigate",
-			onPress: () => console.log("Navigate"),
-		},
-		{
-			title: "Call",
-			onPress: () => console.log("Call"),
-		},
-		{
-			title: "Button 4",
-			onPress: () => console.log("Button 4"),
-		},
-	];
-
 	return (
 		<>
 			{reservationBackgroundUri && extraImages && (
@@ -186,13 +170,15 @@ const ReservationListItem = ({
 					entering={firstLoad && reservationEntering}
 					style={styles.mainContainer}
 				>
-					<DrawerOptions
-						buttonsData={drawerOptionsButtons}
-						width={gestureTranslateXOpened + BORDER_RADIUS}
-						textCenteringMargin={BORDER_RADIUS}
-						buttonCornerRadius={BORDER_RADIUS}
-						animatedScale={reanimatedDrawerGestureButtonScale}
-					/>
+					{slideMenu && (
+						<DrawerOptions
+							buttonsData={drawerOptionsButtons}
+							width={gestureTranslateXOpened + BORDER_RADIUS}
+							textCenteringMargin={BORDER_RADIUS}
+							buttonCornerRadius={BORDER_RADIUS}
+							animatedScale={reanimatedDrawerGestureButtonScale}
+						/>
+					)}
 					<Animated.View
 						style={[styles.drawerContainer, reanimatedDrawerGesture]}
 					>
@@ -207,37 +193,52 @@ const ReservationListItem = ({
 								style={styles.innerBackgroundContainer}
 								imageStyle={styles.imageBackground}
 								resizeMode="stretch"
+								blurRadius={3}
 							>
 								<PanGestureHandler
-									onGestureEvent={drawerGestureHandler}
+									onGestureEvent={slideMenu && drawerGestureHandler}
 									activeOffsetX={[-25, 25]}
 								>
 									<Animated.View style={styles.dataContainer}>
 										<View style={styles.dataInnerContainer}>
-											<Text style={[styles.restaurantName, styles.textShadow]}>
+											<Text
+												style={[styles.restaurantName, styles.textShadow]}
+												numberOfLines={1}
+											>
 												{restaurantName}
 											</Text>
+											<View style={styles.datesDataContainer}>
+												<View style={styles.reservedOnContainer}>
+													<Text
+														style={[
+															styles.reservationDetailText,
+															styles.textShadow,
+														]}
+													>
+														{formatedMadeOnDate}
+													</Text>
+													<Text style={[styles.dateLabel, styles.textShadow]}>
+														Reserved on
+													</Text>
+												</View>
+
+												<View style={styles.reservationDateContainer}>
+													<Text
+														style={[
+															styles.reservationDetailText,
+															styles.textShadow,
+														]}
+													>
+														{formatedReservationDate}
+													</Text>
+													<Text style={[styles.dateLabel, styles.textShadow]}>
+														Reservation date
+													</Text>
+												</View>
+											</View>
 											<Text
-												style={[
-													styles.reservationDetailText,
-													styles.textShadow,
-												]}
-											>
-												Reserved on: {formatedMadeOnDate}
-											</Text>
-											<Text
-												style={[
-													styles.reservationDetailText,
-													styles.textShadow,
-												]}
-											>
-												Reservation Date: {formatedReservationDate}
-											</Text>
-											<Text
-												style={[
-													styles.reservationDetailText,
-													styles.textShadow,
-												]}
+												style={[styles.tablePlacement, styles.textShadow]}
+												numberOfLines={1}
 											>
 												Table placement: {table.tPlacement}
 											</Text>
@@ -310,8 +311,8 @@ export default ReservationListItem;
 
 const styles = StyleSheet.create({
 	textShadow: {
-		textShadowColor: "#00000070",
-		textShadowOffset: { height: 2, width: 2 },
+		textShadowColor: "#000000A4",
+		textShadowOffset: { height: 3, width: 0 },
 		textShadowRadius: 5,
 	},
 
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
 		borderRadius: BORDER_RADIUS - 1.5,
 	},
 	imageBackground: {
-		opacity: 0.9,
+		opacity: 0.8,
 	},
 	dataContainer: {
 		flex: 0.7,
@@ -350,15 +351,41 @@ const styles = StyleSheet.create({
 		backgroundColor: "#00000060",
 	},
 	restaurantName: {
-		flex: 0.6,
+		flex: 0.8,
 		color: "#ffffff",
 		fontSize: 26,
 		fontWeight: "800",
 	},
+	datesDataContainer: {
+		width: "100%",
+		flexDirection: "row",
+		justifyContent: "space-around",
+		marginBottom: 20,
+	},
+	reservedOnContainer: {
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	reservationDateContainer: {
+		justifyContent: "center",
+		alignItems: "center",
+	},
 	reservationDetailText: {
 		color: "#ffffff",
+		fontSize: 18,
+		fontWeight: "600",
+	},
+	dateLabel: {
+		color: "#ffffff",
+		fontSize: 11,
+		textTransform: "uppercase",
+	},
+	tablePlacement: {
+		width: "100%",
+		textAlign: "center",
+		color: "#ffffff",
 		fontSize: 16,
-		fontWeight: "500",
+		fontWeight: "600",
 	},
 	extrasContainer: {
 		flex: 0.5,

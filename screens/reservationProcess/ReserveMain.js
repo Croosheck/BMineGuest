@@ -1,4 +1,4 @@
-import { Alert, Pressable, Text } from "react-native";
+import { Alert } from "react-native";
 import LoadingScreen from "../../components/LoadingScreen";
 
 import Date from "./Date";
@@ -10,6 +10,7 @@ import { useEffect, useLayoutEffect } from "react";
 import ImageIcon from "../../components/ImageIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { clearDate, clearReservationData } from "../../redux/slices/user";
+import HeaderRightButton from "../../components/HeaderRightButton";
 
 const ReserveMain = ({ navigation, route }) => {
 	const TopTab = createMaterialTopTabNavigator();
@@ -23,6 +24,7 @@ const ReserveMain = ({ navigation, route }) => {
 		openDays,
 		howMany,
 		reservationsEnabled,
+		phone,
 	} = route.params;
 
 	const { reservationDate } = useSelector((state) => state.userReducer);
@@ -79,35 +81,23 @@ const ReserveMain = ({ navigation, route }) => {
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<Pressable
-					style={({ pressed }) => [
-						{
-							color: "#ffffff",
-							marginRight: 8,
-							borderWidth: 2,
-							borderColor: "#ffffff",
-							borderRadius: 18,
-							paddingHorizontal: 8,
-							paddingVertical: 4,
-						},
-						pressed && { opacity: 0.5 },
-					]}
+				<HeaderRightButton
 					onPress={() => {
+						//'all done' checker
 						if (Object.keys(table).length === 0 || !reservationDate) {
 							summaryPreventionHandler();
 							return;
 						}
-
 						navigation.navigate("Summary", {
 							restaurantKey: restaurantKey,
 							name: name,
 							restaurantUid: restaurantUid,
 							howMany: howMany,
+							phone: phone,
 						});
 					}}
-				>
-					<Text style={{ color: "#ffffff" }}>Summary</Text>
-				</Pressable>
+					title="Summary"
+				/>
 			),
 		});
 	});

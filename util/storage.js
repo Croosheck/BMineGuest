@@ -58,14 +58,12 @@ export default async function uploadData(image, type, data) {
 
 		setDoc(userReservationRef, {
 			filename: fileName,
-			reservationDate: data.reservationDate ? data.reservationDate : null,
-			reservationDateTimestamp: data.reservationDateTimestamp
-				? data.reservationDateTimestamp
-				: null,
+			reservationDate: data.reservationDate || null,
+			reservationDateTimestamp: data.reservationDateTimestamp || null,
 			madeOnTimestamp: Date.now(),
-			restaurantName: data.restaurantName ? data.restaurantName : null,
-			restaurantKey: data.restaurantKey ? data.restaurantKey : null,
-			restaurantUid: data.restaurantUid ? data.restaurantUid : null,
+			restaurantName: data.restaurantName || null,
+			restaurantKey: data.restaurantKey || null,
+			restaurantUid: data.restaurantUid || null,
 
 			////// Not ready //////
 			/* coords: data.coords
@@ -73,12 +71,13 @@ export default async function uploadData(image, type, data) {
 				: null, */
 			//////////////////////
 
-			table: data.table ? data.table : null,
-			extras: data.extras ? data.extras : null,
-			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
+			table: data.table || null,
+			extras: data.extras || null,
+			extrasTotalPrice: data.extrasTotalPrice || 0,
 			confirmed: false,
 			cancelled: false,
 			howMany: data.howMany,
+			phone: data.phone || "000000000",
 		});
 
 		await updateDoc(userProfileRef, {
@@ -87,17 +86,15 @@ export default async function uploadData(image, type, data) {
 
 		setDoc(restaurantReservationRef, {
 			filename: fileName,
-			reservationDate: data.reservationDate ? data.reservationDate : null,
-			reservationDateTimestamp: data.reservationDateTimestamp
-				? data.reservationDateTimestamp
-				: null,
+			reservationDate: data.reservationDate || null,
+			reservationDateTimestamp: data.reservationDateTimestamp || null,
 			madeOnTimestamp: Date.now(),
-			clientsName: data.clientsName ? data.clientsName : null,
-			clientsEmail: data.clientsEmail ? data.clientsEmail : null,
-			clientsUid: data.clientsUid ? data.clientsUid : null,
-			table: data.table ? data.table : null,
-			extras: data.extras ? data.extras : null,
-			extrasTotalPrice: data.extrasTotalPrice ? data.extrasTotalPrice : 0,
+			clientsName: data.clientsName || null,
+			clientsEmail: data.clientsEmail || null,
+			clientsUid: data.clientsUid || null,
+			table: data.table || null,
+			extras: data.extras || null,
+			extrasTotalPrice: data.extrasTotalPrice || 0,
 			confirmed: false,
 			cancelled: false,
 			howMany: data.howMany,

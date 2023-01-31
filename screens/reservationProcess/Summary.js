@@ -2,7 +2,6 @@ import { useLayoutEffect, useState } from "react";
 import {
 	Dimensions,
 	Image,
-	Pressable,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -15,6 +14,7 @@ import uploadData from "../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../../components/Icon";
 import { clearDate, clearReservationData } from "../../redux/slices/user";
+import HeaderRightButton from "../../components/HeaderRightButton";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
@@ -28,7 +28,7 @@ const Summary = ({ navigation, route }) => {
 		(state) => state.userReducer
 	);
 
-	const { name, restaurantKey, restaurantUid, howMany } = route.params;
+	const { name, restaurantKey, restaurantUid, howMany, phone } = route.params;
 
 	const dispatch = useDispatch();
 
@@ -54,37 +54,26 @@ const Summary = ({ navigation, route }) => {
 			clientsEmail: currentUser.email,
 			clientsUid: auth.currentUser.uid,
 			howMany: howMany,
+			phone: phone,
 		};
 
 		navigation.setOptions({
 			headerRight: () => (
-				<Pressable
-					style={({ pressed }) => [
-						{
-							color: "#ffffff",
-							marginRight: 8,
-							borderWidth: 2,
-							borderColor: "#ffffff",
-							borderRadius: 18,
-							paddingHorizontal: 8,
-							paddingVertical: 4,
-						},
-						pressed && { opacity: 0.5 },
-					]}
+				<HeaderRightButton
 					onPress={() => {
 						uploadData(null, null, data);
 						navigation.navigate("Reservations");
 						dispatch(clearReservationData(restaurantKey));
 						dispatch(clearDate());
 					}}
-				>
-					<Text style={{ color: "#ffffff" }}>All Done!</Text>
-				</Pressable>
+					title="Submit now!"
+					backgroundColor="#A1A65D"
+				/>
 			),
 		});
 	});
 
-	const seatsIcon = (
+	const seatIcon = (
 		<Icon name="seat" size={20} color="#ffffff" style={styles.seatsIcon} />
 	);
 
@@ -112,7 +101,7 @@ const Summary = ({ navigation, route }) => {
 					{table.tPlacement}
 				</Text>
 				<Text style={[styles.tableDetail, styles.textShadow]}>
-					{seatsIcon} {table.tSeats}
+					{seatIcon} {table.tSeats}
 				</Text>
 			</View>
 

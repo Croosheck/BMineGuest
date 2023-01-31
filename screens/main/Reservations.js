@@ -18,8 +18,14 @@ import { SlideInRight, SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import ReservationsFilters from "../../components/ReservationsFilters";
 import OutlinedButton from "../../components/OutlinedButton";
+import { drawerOptionsType } from "../../util/drawerOptionsType";
+import AddEvent, { addEvent } from "../../components/AddEvent";
+import { mapsRedirect } from "../../util/mapsRedirect";
+import { callingRedirect } from "../../util/callingRedirect";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
+const EXAMPLE_URL =
+	"https://www.google.com/maps/place/POLONICA+RESTAURANT/@40.6254807,-74.029996,15z/data=!4m5!3m4!1s0x0:0x6fe0eebfd46532f6!8m2!3d40.6254807!4d-74.029996";
 
 const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
@@ -88,8 +94,8 @@ const Reservations = ({ navigation }) => {
 		};
 	}, []);
 
-	// Reservations fetch function - data and images
-	async function getReservationsHandler() {
+	// Extras fetch function - data and images
+	async function getExtrasHandler() {
 		const listRef = ref(storage, "extras");
 
 		// List all images under the /extras/ path
@@ -135,7 +141,7 @@ const Reservations = ({ navigation }) => {
 			setReservationsData(reservations);
 		});
 
-		getReservationsHandler();
+		getExtrasHandler();
 	}, []);
 
 	function getReservationStatusHandler(itemData) {
@@ -147,6 +153,7 @@ const Reservations = ({ navigation }) => {
 			return {
 				status: "Pending",
 				bgColor: "#79B4FDA6",
+				type: "pending",
 			};
 		if (
 			!itemData.item.confirmed &&
@@ -156,16 +163,19 @@ const Reservations = ({ navigation }) => {
 			return {
 				status: "Call Us!",
 				bgColor: "#FFFFFFA6",
+				type: "call",
 			};
 		if (itemData.item.confirmed)
 			return {
 				status: "Confirmed",
 				bgColor: "#FFFA66A6",
+				type: "confirmed",
 			};
 		if (itemData.item.cancelled)
 			return {
 				status: "Cancelled",
 				bgColor: "#FF5858A6",
+				type: "cancelled",
 			};
 	}
 
@@ -217,7 +227,9 @@ const Reservations = ({ navigation }) => {
 		if (type === "upcoming" || type === "expired")
 			setEmptyListMessage(`No ${type} reservations yet.`);
 	}
+
 	let listCounter;
+	let reservationDateCategory;
 
 	return (
 		<LinearGradient
@@ -256,6 +268,7 @@ const Reservations = ({ navigation }) => {
 					const reservationStatus = getReservationStatusHandler(itemData);
 					const currentTimestamp = new Date().valueOf();
 
+					//check if the list is empty, upon filtering
 					if (
 						((filterType === "upcoming" &&
 							!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
@@ -281,6 +294,11 @@ const Reservations = ({ navigation }) => {
 							</LinearGradient>
 						);
 
+					if (itemData.item.reservationDateTimestamp > currentTimestamp)
+						reservationDateCategory = "upcoming";
+					if (itemData.item.reservationDateTimestamp < currentTimestamp)
+						reservationDateCategory = "expired";
+
 					if (
 						(filterType === "upcoming" &&
 							!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
@@ -292,18 +310,41 @@ const Reservations = ({ navigation }) => {
 					//used for checking if there are any items after filtering (+1)
 					listCounter += 1;
 
+					const drawerOptionsButtons = drawerOptionsType({
+						reservationDateCategory: reservationDateCategory,
+						status: reservationStatus.type,
+						general: {
+							navigate: () => mapsRedirect({ url: EXAMPLE_URL }),
+							call: () => callingRedirect({ phoneNumber: itemData.item.phone }),
+						},
+						expired: {
+							delete: () => console.log("delete"), //4
+							rate: () => console.log("rate"), //5
+						},
+						upcoming: {
+							addCalendar: () =>
+								addEvent(
+									itemData.item.reservationDateTimestamp,
+									itemData.item.restaurantName
+								),
+							cancel: () => console.log("cancel"), //6
+						},
+					});
+
 					return (
 						<ReservationListItem
 							restaurantName={itemData.item.restaurantName}
 							reservationDateTimestamp={itemData.item.reservationDateTimestamp}
 							madeOnDate={itemData.item.madeOnTimestamp}
 							extras={itemData.item.extras}
-							table={itemData.item.table}
 							extraImages={extraImages}
+							table={itemData.item.table}
 							restaurantUid={itemData.item.restaurantUid}
+							drawerOptionsButtons={drawerOptionsButtons}
+							slideMenu
 							// animation only for the 1st render
-							// firstLoad={isFirstLoad}
-							firstLoad={true}
+							firstLoad={isFirstLoad}
+							// firstLoad={true}
 							reservationEntering={ZoomInEasyUp.delay(500)
 								.duration(1000)
 								.springify()

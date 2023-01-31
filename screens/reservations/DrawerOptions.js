@@ -8,17 +8,35 @@ const DrawerOptions = ({
 	animatedScale,
 	buttonAnimatedScale,
 	textCenteringMargin,
+	buttonsQuantity = 3,
 }) => {
+	const emptyArr = [];
+
+	if (!buttonsData) {
+		function newArray(arr) {
+			for (let i = 0; i < buttonsQuantity; i++) {
+				arr.push({
+					title: `Button ${i + 1}`,
+					onPress: () => console.log("Pressed"),
+				});
+			}
+		}
+
+		newArray(emptyArr);
+	}
+
+	const data = !!buttonsData ? buttonsData : emptyArr;
+
 	return (
 		<View style={[styles.container, { width: width }]}>
 			<View style={styles.innerContainer}>
-				{buttonsData.map((button, i) => {
+				{data.map((button, i) => {
 					return (
 						<ReservationDrawerButton
 							key={i}
 							title={button.title}
 							isFirst={i === 0 ? true : false}
-							isLast={i === buttonsData.length - 1 ? true : false}
+							isLast={i === data.length - 1 ? true : false}
 							cornerRadius={buttonCornerRadius}
 							animatedScale={animatedScale}
 							buttonAnimatedScale={buttonAnimatedScale}

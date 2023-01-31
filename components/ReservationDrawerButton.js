@@ -12,7 +12,7 @@ const ReservationDrawerButton = ({
 	onPress,
 	textCenteringMargin,
 }) => {
-	const buttonTitleFontSize = title.length > 11 ? 13 : 15;
+	const buttonTitleFontSize = title.length < 12 ? 15 : 13;
 
 	return (
 		<Animated.View style={[styles.buttonContainer, animatedScale]}>

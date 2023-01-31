@@ -115,7 +115,7 @@ const Restaurants = ({ navigation }) => {
 			name: itemData.item.name,
 			description: itemData.item.description
 				? itemData.item.description
-				: "Test Description",
+				: "No description.",
 			imageUri: itemData.item.imageUri,
 			restaurantKey: itemData.item.key,
 			restaurantUid: itemData.item.uid,
@@ -124,6 +124,7 @@ const Restaurants = ({ navigation }) => {
 			reservationLimit: itemData.item.reservationLimit,
 			reservationsEnabled: itemData.item.reservationsEnabled,
 			restaurantTags: itemData.item.restaurantTags,
+			phone: itemData.item.phone,
 		});
 	}
 

@@ -50,6 +50,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 		reservationLimit,
 		reservationsEnabled,
 		restaurantTags,
+		phone,
 	} = route.params;
 
 	const dispatch = useDispatch();
@@ -111,6 +112,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 			openDays: openDays,
 			howMany: howMany,
 			reservationsEnabled: reservationsEnabled,
+			phone: phone,
 		});
 	}
 
@@ -140,13 +142,14 @@ const RestaurantProfile = ({ navigation, route }) => {
 		) : (
 			<View style={styles.closestDateInnerContainer}>
 				<Text
+					numberOfLines={3}
 					style={[
 						styles.closestDate,
 						styles.dateStyle,
 						{
 							top: "9%",
-							fontSize: 16.5,
-							textShadowRadius: 2,
+							fontSize: WIDTH * 0.04,
+							textShadowRadius: 3,
 						},
 					]}
 				>
@@ -329,7 +332,7 @@ const styles = StyleSheet.create({
 	},
 	closestDateInnerContainer: {
 		position: "absolute",
-		bottom: "30%",
+		top: "20%",
 		left: 0,
 		right: 0,
 	},
@@ -346,20 +349,21 @@ const styles = StyleSheet.create({
 		color: "#00FFAE",
 		// color: "#57851A",
 		marginTop: 5,
-		top: "-5%",
+		top: -5,
 		fontSize: 17,
 	},
 	tagsContainer: {
 		width: "100%",
 	},
 	tagsContent: {
-		marginTop: 15,
+		marginVertical: 15,
 		marginLeft: MARGIN_LEFT,
 		paddingRight: 20,
 	},
 	tag: {
 		marginRight: 7,
-		backgroundColor: "#171F30",
+		// backgroundColor: "#171F30",
+		backgroundColor: "#4F8BA4",
 		paddingHorizontal: 12,
 		paddingVertical: 1,
 		paddingBottom: 2,
@@ -367,15 +371,14 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 		color: "#ffffff",
 
-		textShadowColor: "white",
-		textShadowRadius: 4,
+		textShadowColor: "#000000AF",
+		textShadowRadius: 3,
 	},
 	descriptionContainer: {
 		flex: 0.3,
 		justifyContent: "center",
 		marginLeft: MARGIN_LEFT,
 		marginRight: MARGIN_RIGHT,
-		marginTop: 15,
 		marginBottom: 15,
 		paddingBottom: 15,
 		borderBottomWidth: 0.5,

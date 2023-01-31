@@ -209,15 +209,19 @@ const Profile = ({ navigation }) => {
 						<Text style={styles.userNameText}>{currentUser.name}</Text>
 						<View style={styles.statsContainer}>
 							{/* <View style={styles.statContainer}>
-								<Text style={styles.stat}>{reservationsCounter.active}</Text>
+								<Text style={styles.stat}>{reservationsCounter.active ?? 0}</Text>
 								<Text style={styles.statLabel}>Active Reservations</Text>
 							</View> */}
 							<View style={styles.statContainer}>
-								<Text style={styles.stat}>{reservationsCounter.upcoming}</Text>
+								<Text style={styles.stat}>
+									{reservationsCounter.upcoming ?? 0}
+								</Text>
 								<Text style={styles.statLabel}>Upcoming Reservations</Text>
 							</View>
 							<View style={styles.statContainer}>
-								<Text style={styles.stat}>{reservationsCounter.total}</Text>
+								<Text style={styles.stat}>
+									{reservationsCounter.total ?? 0}
+								</Text>
 								<Text style={styles.statLabel} numberOfLines={1}>
 									Ever Submitted
 								</Text>

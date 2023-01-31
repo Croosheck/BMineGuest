@@ -1,25 +1,18 @@
-import { StyleSheet, View, Button, Alert, Platform } from "react-native";
-
-import { useDispatch } from "react-redux";
-import { clearDate } from "../redux/slices/user";
+import { Alert, Platform } from "react-native";
 
 import * as SystemCalendar from "expo-calendar";
-import { useEffect } from "react";
+import { reminder } from "../util/permissions";
 
-const AddEvent = ({ eventDate }) => {
-	const dispatch = useDispatch();
-
+export const addEvent = (eventDate, restaurantName) => {
 	let permissionReminderStatus;
 
-	useEffect(() => {
-		async function permissionsStatus() {
-			//only ios
-			permissionReminderStatus = await reminder();
-		}
-		if (Platform.OS === "ios") {
-			permissionsStatus();
-		}
-	});
+	async function permissionsStatus() {
+		//only ios
+		permissionReminderStatus = await reminder();
+	}
+	if (Platform.OS === "ios") {
+		permissionsStatus();
+	}
 
 	async function getDefaultCalendarSource() {
 		const defaultCalendar = await SystemCalendar.getDefaultCalendarAsync();
@@ -78,36 +71,25 @@ const AddEvent = ({ eventDate }) => {
 			const res = await SystemCalendar.createEventAsync(calendarId, {
 				endDate: new Date(eventDate),
 				startDate: new Date(eventDate),
-				title: `Restaurant Reservation`,
+				title: `Restaurant reservation in ${restaurantName}`,
+				creationDate: new Date(Date.now()),
 				alarms: [
 					{
 						// Reminder offset (in minutes)
-						relativeOffset: -120,
+						relativeOffset: -180,
 						method: SystemCalendar.AlarmMethod.ALERT,
 					},
 				],
 			});
+
 			Alert.alert(
 				"Success!",
-				"Your reservation has been added to Your phone calendar."
+				"Your reservation has been added to the phone calendar."
 			);
-			dispatch(clearDate());
 		} catch (e) {
 			console.log(e);
 		}
 	};
 
-	return (
-		<View style={styles.container}>
-			<Button title="Add to Your calendar!" onPress={addNewEvent} />
-		</View>
-	);
+	addNewEvent();
 };
-
-export default AddEvent;
-
-const styles = StyleSheet.create({
-	container: {
-		marginVertical: 10,
-	},
-});

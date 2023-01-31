@@ -77,7 +77,7 @@ const Login = () => {
 							setCredentials({ email: "test@test.com", password: "123123" })
 						}
 					/>
-					<Text>No expired rsrv</Text>
+					<Text>Only upcoming</Text>
 				</View>
 				<View>
 					<Button
@@ -86,7 +86,7 @@ const Login = () => {
 							setCredentials({ email: "111@111.com", password: "111111" })
 						}
 					/>
-					<Text>No upcoming rsrv</Text>
+					<Text>Only expired</Text>
 				</View>
 			</View>
 			<View style={styles.inputContainer}>
