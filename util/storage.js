@@ -8,6 +8,7 @@ import {
 	query,
 	updateDoc,
 	increment,
+	deleteDoc,
 } from "firebase/firestore";
 
 export default async function uploadData(image, type, data) {
@@ -140,4 +141,16 @@ export async function getRestaurantProfileImage(restaurantUid) {
 	const profileImage = await getDownloadURL(restaurantProfileRef);
 
 	return profileImage;
+}
+
+export async function deleteUserReservation(reservationId) {
+	const reservationRef = doc(
+		db,
+		"users",
+		auth.currentUser.uid,
+		"reservations",
+		reservationId
+	);
+
+	await deleteDoc(reservationRef);
 }

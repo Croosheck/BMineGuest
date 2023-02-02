@@ -7,7 +7,7 @@ export function drawerOptionsType({
 	},
 	expired = {
 		delete: () => {},
-		rate: () => {},
+		rating: () => {},
 	},
 	upcoming = {
 		cancel: () => {},
@@ -42,7 +42,7 @@ export function drawerOptionsType({
 		return [
 			{
 				title: "Rate us!",
-				onPress: expired.rate,
+				onPress: expired.rating,
 			},
 			{
 				title: "Delete From History",

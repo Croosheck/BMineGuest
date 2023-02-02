@@ -1,12 +1,10 @@
 import {
 	Animated,
-	Button,
 	Dimensions,
 	Easing,
 	FlatList,
 	StyleSheet,
 	Text,
-	View,
 } from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReservationListItem from "../reservations/ReservationListItem";
@@ -19,11 +17,14 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import ReservationsFilters from "../../components/ReservationsFilters";
 import OutlinedButton from "../../components/OutlinedButton";
 import { drawerOptionsType } from "../../util/drawerOptionsType";
-import AddEvent, { addEvent } from "../../components/AddEvent";
+import { addEvent } from "../../components/AddEvent";
 import { mapsRedirect } from "../../util/mapsRedirect";
 import { callingRedirect } from "../../util/callingRedirect";
+import { deleteUserReservation } from "../../util/storage";
+import RatingModal from "../../components/ratingModal/RatingModal";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
+
 const EXAMPLE_URL =
 	"https://www.google.com/maps/place/POLONICA+RESTAURANT/@40.6254807,-74.029996,15z/data=!4m5!3m4!1s0x0:0x6fe0eebfd46532f6!8m2!3d40.6254807!4d-74.029996";
 
@@ -36,6 +37,11 @@ const Reservations = ({ navigation }) => {
 	const [emptyListMessage, setEmptyListMessage] = useState(
 		`No ${filterType} reservations yet.`
 	);
+	const [ratingModalOpened, setRatingModalOpened] = useState({
+		isOpened: false,
+		restaurantData: {},
+	});
+	const [rating, setRating] = useState(3);
 
 	// Default state for bottom navbar icons
 	const animationProgress = useRef(new Animated.Value(0.315));
@@ -231,140 +237,168 @@ const Reservations = ({ navigation }) => {
 	let listCounter;
 	let reservationDateCategory;
 
+	function ratingModalButtonHandler(itemData) {
+		setRatingModalOpened({ isOpened: true, restaurantData: itemData.item });
+	}
+
 	return (
-		<LinearGradient
-			style={styles.container}
-			colors={["#3B1616", "#010C1C", "#370B0B"]}
-		>
-			<ReservationsFilters
-				left={{
-					onPress: () => filterButtonHandler("all"),
-					title: "All",
-					active: filterType === "all",
-				}}
-				middle={{
-					onPress: () => filterButtonHandler("upcoming"),
-					title: "Upcoming",
-					active: filterType === "upcoming",
-				}}
-				right={{
-					onPress: () => filterButtonHandler("expired"),
-					title: "Expired",
-					active: filterType === "expired",
-				}}
+		<>
+			<RatingModal
+				visible={ratingModalOpened.isOpened}
+				onCloseModal={() =>
+					setRatingModalOpened((prev) => ({
+						isOpened: !prev.isOpened,
+						restaurantData: {},
+					}))
+				}
+				restaurantName={ratingModalOpened.restaurantData?.restaurantName}
+				rating={rating}
+				onChangeRating={(number) => setRating(number)}
+				onSubmit={() => console.log(rating)}
 			/>
 
-			<FlatList
-				data={reservationsData}
-				extraData={filterType}
-				keyExtractor={(item, index) => item.filename + index}
-				// numColumns={2}
-				renderItem={(itemData) => {
-					//reset for the 1st item
-					if (itemData.index === 0) {
-						listCounter = 0;
-					}
+			<LinearGradient
+				style={styles.container}
+				colors={["#3B1616", "#010C1C", "#370B0B"]}
+			>
+				<ReservationsFilters
+					left={{
+						onPress: () => filterButtonHandler("all"),
+						title: "All",
+						active: filterType === "all",
+					}}
+					middle={{
+						onPress: () => filterButtonHandler("upcoming"),
+						title: "Upcoming",
+						active: filterType === "upcoming",
+					}}
+					right={{
+						onPress: () => filterButtonHandler("expired"),
+						title: "Expired",
+						active: filterType === "expired",
+					}}
+				/>
 
-					const reservationStatus = getReservationStatusHandler(itemData);
-					const currentTimestamp = new Date().valueOf();
+				<FlatList
+					data={reservationsData}
+					extraData={filterType}
+					keyExtractor={(item, index) => item.filename + index}
+					// numColumns={2}
+					renderItem={(itemData) => {
+						//reset for the 1st item
+						if (itemData.index === 0) {
+							listCounter = 0;
+						}
 
-					//check if the list is empty, upon filtering
-					if (
-						((filterType === "upcoming" &&
-							!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
+						const reservationStatus = getReservationStatusHandler(itemData);
+						const currentTimestamp = new Date().valueOf();
+
+						//check if the list is empty, upon filtering
+						if (
+							((filterType === "upcoming" &&
+								!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
+								(filterType === "expired" &&
+									!(
+										itemData.item.reservationDateTimestamp < currentTimestamp
+									))) &&
+							//check if that's the last item
+							itemData.index === reservationsData.length - 1 &&
+							//check if there weren't any items after filtering
+							listCounter === 0
+						)
+							return (
+								<LinearGradient
+									colors={["#A8181846", "#0A163E82"]}
+									style={styles.filteredListEmptyContainer}
+									start={{ x: 0, y: 0.5 }}
+									end={{ x: 0.8, y: 1 }}
+								>
+									<Text style={styles.filteredListEmptyText}>
+										{emptyListMessage}
+									</Text>
+								</LinearGradient>
+							);
+
+						if (itemData.item.reservationDateTimestamp > currentTimestamp)
+							reservationDateCategory = "upcoming";
+						if (itemData.item.reservationDateTimestamp < currentTimestamp)
+							reservationDateCategory = "expired";
+
+						if (
+							(filterType === "upcoming" &&
+								!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
 							(filterType === "expired" &&
-								!(
-									itemData.item.reservationDateTimestamp < currentTimestamp
-								))) &&
-						//check if that's the last item
-						itemData.index === reservationsData.length - 1 &&
-						//check if there weren't any items after filtering
-						listCounter === 0
-					)
+								!(itemData.item.reservationDateTimestamp < currentTimestamp))
+						)
+							return;
+
+						//used for checking if there are any items after filtering (+1)
+						listCounter += 1;
+
+						const drawerOptionsButtons = drawerOptionsType({
+							reservationDateCategory: reservationDateCategory,
+							status: reservationStatus.type,
+
+							//general: for all kinds
+							general: {
+								navigate: () => mapsRedirect({ url: EXAMPLE_URL }),
+								call: () =>
+									callingRedirect({ phoneNumber: itemData.item.phone }),
+							},
+							expired: {
+								//deletion is active, either for expired or cancelled reservations
+								delete: () => deleteUserReservation(itemData.item.filename), //4
+								//rating functionality only for expired and confirmed reservations
+								rating: () => ratingModalButtonHandler(itemData), //5
+							},
+							upcoming: {
+								addCalendar: () =>
+									addEvent(
+										itemData.item.reservationDateTimestamp,
+										itemData.item.restaurantName
+									),
+								//cancellation request: only upcoming, either pending, call or confirmed statuses
+								cancel: () => console.log("cancel"), //6
+							},
+						});
+
 						return (
-							<LinearGradient
-								colors={["#A8181846", "#0A163E82"]}
-								style={styles.filteredListEmptyContainer}
-								start={{ x: 0, y: 0.5 }}
-								end={{ x: 0.8, y: 1 }}
-							>
-								<Text style={styles.filteredListEmptyText}>
-									{emptyListMessage}
-								</Text>
-							</LinearGradient>
+							<ReservationListItem
+								restaurantName={itemData.item.restaurantName}
+								reservationDateTimestamp={
+									itemData.item.reservationDateTimestamp
+								}
+								madeOnDate={itemData.item.madeOnTimestamp}
+								extras={itemData.item.extras}
+								extraImages={extraImages}
+								table={itemData.item.table}
+								restaurantUid={itemData.item.restaurantUid}
+								drawerOptionsButtons={drawerOptionsButtons}
+								slideMenu
+								// animation only for the 1st render
+								firstLoad={isFirstLoad}
+								// firstLoad={true}
+								reservationEntering={ZoomInEasyUp.delay(500)
+									.duration(1000)
+									.springify()
+									.mass(0.6)}
+								extraEntering={SlideInUp.delay(800)
+									.duration(1000)
+									.springify()
+									.mass(0.6)}
+								statusColor={reservationStatus.bgColor}
+								statusText={reservationStatus.status}
+								statusTextColor="#ffffff"
+								statusEntering={SlideInRight.delay(1600)
+									.duration(500)
+									.springify()
+									.mass(0.65)}
+							/>
 						);
-
-					if (itemData.item.reservationDateTimestamp > currentTimestamp)
-						reservationDateCategory = "upcoming";
-					if (itemData.item.reservationDateTimestamp < currentTimestamp)
-						reservationDateCategory = "expired";
-
-					if (
-						(filterType === "upcoming" &&
-							!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
-						(filterType === "expired" &&
-							!(itemData.item.reservationDateTimestamp < currentTimestamp))
-					)
-						return;
-
-					//used for checking if there are any items after filtering (+1)
-					listCounter += 1;
-
-					const drawerOptionsButtons = drawerOptionsType({
-						reservationDateCategory: reservationDateCategory,
-						status: reservationStatus.type,
-						general: {
-							navigate: () => mapsRedirect({ url: EXAMPLE_URL }),
-							call: () => callingRedirect({ phoneNumber: itemData.item.phone }),
-						},
-						expired: {
-							delete: () => console.log("delete"), //4
-							rate: () => console.log("rate"), //5
-						},
-						upcoming: {
-							addCalendar: () =>
-								addEvent(
-									itemData.item.reservationDateTimestamp,
-									itemData.item.restaurantName
-								),
-							cancel: () => console.log("cancel"), //6
-						},
-					});
-
-					return (
-						<ReservationListItem
-							restaurantName={itemData.item.restaurantName}
-							reservationDateTimestamp={itemData.item.reservationDateTimestamp}
-							madeOnDate={itemData.item.madeOnTimestamp}
-							extras={itemData.item.extras}
-							extraImages={extraImages}
-							table={itemData.item.table}
-							restaurantUid={itemData.item.restaurantUid}
-							drawerOptionsButtons={drawerOptionsButtons}
-							slideMenu
-							// animation only for the 1st render
-							firstLoad={isFirstLoad}
-							// firstLoad={true}
-							reservationEntering={ZoomInEasyUp.delay(500)
-								.duration(1000)
-								.springify()
-								.mass(0.6)}
-							extraEntering={SlideInUp.delay(800)
-								.duration(1000)
-								.springify()
-								.mass(0.6)}
-							statusColor={reservationStatus.bgColor}
-							statusText={reservationStatus.status}
-							statusTextColor="#ffffff"
-							statusEntering={SlideInRight.delay(1600)
-								.duration(500)
-								.springify()
-								.mass(0.65)}
-						/>
-					);
-				}}
-			/>
-		</LinearGradient>
+					}}
+				/>
+			</LinearGradient>
+		</>
 	);
 };
 

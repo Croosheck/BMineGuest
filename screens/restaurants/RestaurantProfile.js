@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#505472",
+		backgroundColor: "#A13C61",
 	},
 	/////////////////
 	imageContainer: {
