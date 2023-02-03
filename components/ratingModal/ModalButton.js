@@ -1,9 +1,13 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-const ModalButton = ({ onPress, title }) => {
+const ModalButton = ({ onPress, title, buttonWidth }) => {
 	return (
 		<Pressable
-			style={({ pressed }) => [styles.modalButton, pressed && styles.pressed]}
+			style={({ pressed }) => [
+				styles.modalButton,
+				{ minWidth: buttonWidth },
+				pressed && styles.pressed,
+			]}
 			onPress={onPress}
 		>
 			<Text style={styles.modalButtonTitle}>{title}</Text>
@@ -15,7 +19,6 @@ export default ModalButton;
 
 const styles = StyleSheet.create({
 	modalButton: {
-		minWidth: 100,
 		justifyContent: "center",
 		alignItems: "center",
 		paddingHorizontal: 5,

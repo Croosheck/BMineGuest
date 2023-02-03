@@ -1,21 +1,59 @@
 import { Dimensions, Modal, StyleSheet, Text, View } from "react-native";
 import ModalButton from "./ModalButton";
 import StarRating from "react-native-star-rating-widget";
+import LottieIcon from "../LottieIcon";
+import Animated, {
+	runOnJS,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+	withTiming,
+} from "react-native-reanimated";
+import { useState } from "react";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 const modalSize = {
-	x: WIDTH * 0.7,
-	y: HEIGHT * 0.3,
+	x: WIDTH * 0.75,
+	y: HEIGHT * 0.33,
 };
+const CONTAINER_PADDING = {
+	HORIZONTAL: 10,
+	BOTTOM: 25,
+	TOP: 5,
+};
+const BUTTON_WIDTH = 100;
 
 const RatingModal = ({
 	onCloseModal = () => {},
 	restaurantName,
 	onSubmit = () => {},
-	visible,
-	rating,
-	onChangeRating,
+	visible = Boolean(),
+	rating = Number(),
+	onChangeRating = (number) => {},
+	submitted = Boolean(),
 }) => {
+	const [animationFinished, setAnimationFinished] = useState(false);
+
+	const starsAnimatedScaleOpacity = useSharedValue(1);
+
+	const cancelAnimatedTranslate = useSharedValue(modalSize.x * 0.08);
+	const cancelAnimatedRotate = useSharedValue(0);
+
+	const submitAnimatedTranslate = useSharedValue(0);
+
+	const reanimatedStarsStyle = useAnimatedStyle(() => ({
+		opacity: starsAnimatedScaleOpacity.value,
+		transform: [{ scale: starsAnimatedScaleOpacity.value }],
+	}));
+
+	const reanimatedCancelStyle = useAnimatedStyle(() => ({
+		left: cancelAnimatedTranslate.value,
+		transform: [{ rotate: cancelAnimatedRotate.value + "deg" }],
+	}));
+	const reanimatedSubmitStyle = useAnimatedStyle(() => ({
+		transform: [{ translateY: submitAnimatedTranslate.value }],
+	}));
+
 	return (
 		<Modal
 			visible={visible}
@@ -29,19 +67,84 @@ const RatingModal = ({
 						{`How would you rate the service, regarding your reservation details, in ${restaurantName} ?`}
 					</Text>
 					<View style={styles.modalRatingStarsContainer}>
-						<StarRating
-							rating={rating}
-							onChange={(number) => onChangeRating(number)}
-							animationConfig={{
-								delay: 0,
-								duration: 700,
-								scale: 1.3,
-							}}
-						/>
+						{!submitted ? (
+							<Animated.View style={[reanimatedStarsStyle]}>
+								<StarRating
+									rating={rating}
+									onChange={(number) => onChangeRating(number)}
+									animationConfig={{
+										delay: 0,
+										duration: 700,
+										scale: 1.3,
+									}}
+									minRating={2}
+									color="#3dbdff"
+								/>
+							</Animated.View>
+						) : (
+							<LottieIcon
+								source={require("../../assets/lottie/lottieSuccess1.json")}
+								height={"100%"}
+								autoPlay
+								loop={false}
+							/>
+						)}
 					</View>
 					<View style={styles.modalButtonsContainer}>
-						<ModalButton title="CANCEL" onPress={onCloseModal} />
-						<ModalButton title="SUBMIT" onPress={onSubmit} />
+						<Animated.View style={[styles.buttonCancel, reanimatedCancelStyle]}>
+							<ModalButton
+								title={!submitted ? "CANCEL" : "CLOSE"}
+								onPress={() => {
+									if (!animationFinished) return;
+
+									onCloseModal();
+									setTimeout(() => {
+										starsAnimatedScaleOpacity.value = 1;
+										submitAnimatedTranslate.value = 0;
+										cancelAnimatedTranslate.value = modalSize.x * 0.08;
+										cancelAnimatedRotate.value = 0;
+									}, 800);
+								}}
+								buttonWidth={BUTTON_WIDTH}
+							/>
+						</Animated.View>
+						<Animated.View style={[styles.buttonSubmit, reanimatedSubmitStyle]}>
+							<ModalButton
+								title="SUBMIT"
+								onPress={() => {
+									starsAnimatedScaleOpacity.value = withTiming(
+										0,
+										{ duration: 600 },
+										() => {
+											cancelAnimatedRotate.value = withSpring(360, {
+												mass: 1,
+											});
+											//changes the "submitted" boolean state
+											runOnJS(onSubmit)();
+
+											//moving the submit button down
+											submitAnimatedTranslate.value = withTiming(
+												modalSize.y,
+												{ duration: 500 },
+												() => {
+													//centering the cancel button
+													cancelAnimatedTranslate.value = withSpring(
+														modalSize.x * 0.5 -
+															CONTAINER_PADDING.HORIZONTAL * 0.5 -
+															BUTTON_WIDTH * 0.5 -
+															//button's horizontal padding
+															2.5,
+														{ mass: 0.8 },
+														() => runOnJS(setAnimationFinished)(true)
+													);
+												}
+											);
+										}
+									);
+								}}
+								buttonWidth={BUTTON_WIDTH}
+							/>
+						</Animated.View>
 					</View>
 				</View>
 			</View>
@@ -65,9 +168,9 @@ const styles = StyleSheet.create({
 	},
 	innerModalContainer: {
 		flex: 1,
-		paddingHorizontal: 10,
-		paddingBottom: 15,
-		paddingTop: 5,
+		paddingHorizontal: CONTAINER_PADDING.HORIZONTAL,
+		paddingBottom: CONTAINER_PADDING.BOTTOM,
+		paddingTop: CONTAINER_PADDING.TOP,
 	},
 	modalRatingTitle: {
 		textAlign: "center",
@@ -82,7 +185,17 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	modalButtonsContainer: {
+		flex: 0.4,
 		flexDirection: "row",
 		justifyContent: "space-around",
+	},
+	buttonCancel: {
+		position: "absolute",
+		bottom: 0,
+	},
+	buttonSubmit: {
+		position: "absolute",
+		bottom: 0,
+		right: modalSize.x * 0.08,
 	},
 });

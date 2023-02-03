@@ -41,7 +41,10 @@ const Reservations = ({ navigation }) => {
 		isOpened: false,
 		restaurantData: {},
 	});
-	const [rating, setRating] = useState(3);
+	const [rating, setRating] = useState({
+		rating: 3.5,
+		submitted: false,
+	});
 
 	// Default state for bottom navbar icons
 	const animationProgress = useRef(new Animated.Value(0.315));
@@ -245,16 +248,27 @@ const Reservations = ({ navigation }) => {
 		<>
 			<RatingModal
 				visible={ratingModalOpened.isOpened}
-				onCloseModal={() =>
+				onCloseModal={() => {
 					setRatingModalOpened((prev) => ({
 						isOpened: !prev.isOpened,
 						restaurantData: {},
-					}))
-				}
+					}));
+					setRating((prev) => ({
+						rating: prev.submitted ? prev.rating : 3.5,
+						// submitted: prev.submitted,
+						submitted: false,
+
+						//to do...
+						////fetch the data and disable the button, if the restaurant has already been rated
+					}));
+				}}
 				restaurantName={ratingModalOpened.restaurantData?.restaurantName}
-				rating={rating}
-				onChangeRating={(number) => setRating(number)}
-				onSubmit={() => console.log(rating)}
+				rating={rating.rating}
+				onChangeRating={(number) => setRating({ rating: number })}
+				onSubmit={() =>
+					setRating((prev) => ({ rating: prev.rating, submitted: true }))
+				}
+				submitted={rating.submitted}
 			/>
 
 			<LinearGradient
