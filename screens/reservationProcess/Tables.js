@@ -195,7 +195,7 @@ const Tables = ({ route }) => {
 			setTables(filtered);
 
 			if (filtered.length === 0) {
-				setMessage(`Nothing on the ${placement} category is available.`);
+				setMessage(`Nothing in the ${placement} category is available.`);
 			}
 
 			return;
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	placementButtonsContainer: {
-		maxHeight: "10%",
+		// maxHeight: "10%",
 	},
 	placementContentContainer: {
 		alignItems: "center",

@@ -3,7 +3,7 @@ import RestaurantListItem from "../restaurants/RestaurantListItem";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getRestaurants } from "../../redux/slices/user";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
 import LottieIcon from "../../components/LottieIcon";
@@ -13,7 +13,12 @@ import {
 	ZoomInEasyDown,
 } from "react-native-reanimated";
 
+import { collection, onSnapshot, query } from "firebase/firestore";
+import { db } from "../../firebase";
+
 const Restaurants = ({ navigation }) => {
+	const [ratings, setRatings] = useState({});
+
 	const dispatch = useDispatch();
 	const { availableRestaurants } = useSelector((state) => state.userReducer);
 
@@ -109,7 +114,7 @@ const Restaurants = ({ navigation }) => {
 
 	function pressHandler(itemData) {
 		//temporary
-		if (itemData.item.name !== "Restauracja Pod Sówką") return;
+		if (itemData.item.uid !== "XigLnIKHcWUXdHtHlcXnDLehMa83") return;
 
 		navigation.navigate("RestaurantProfile", {
 			name: itemData.item.name,
@@ -125,8 +130,21 @@ const Restaurants = ({ navigation }) => {
 			reservationsEnabled: itemData.item.reservationsEnabled,
 			restaurantTags: itemData.item.restaurantTags,
 			phone: itemData.item.phone,
+			rating: itemData.item.restaurantRating,
 		});
 	}
+
+	useEffect(() => {
+		const ratingsQuery = query(collection(db, "restaurantRatings"));
+
+		const unsubscribeRatings = onSnapshot(ratingsQuery, (ratingsSnapshot) => {
+			setRatings({});
+			ratingsSnapshot.forEach((doc) => {
+				setRatings((prev) => ({ ...prev, [doc.id]: doc.data() }));
+			});
+			// console.log(ratings["XigLnIKHcWUXdHtHlcXnDLehMa83"].ratings);
+		});
+	}, []);
 
 	return (
 		<LinearGradient
@@ -138,6 +156,10 @@ const Restaurants = ({ navigation }) => {
 				renderItem={(itemData) => {
 					return (
 						<RestaurantListItem
+							rating={{
+								sum: ratings[itemData.item.uid]?.ratingsSum,
+								total: ratings[itemData.item.uid]?.ratingsTotal,
+							}}
 							name={itemData.item.name}
 							onPress={() => pressHandler(itemData)}
 							restaurantUid={itemData.item.uid}

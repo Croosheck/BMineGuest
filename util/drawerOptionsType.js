@@ -7,10 +7,16 @@ export function drawerOptionsType({
 	},
 	expired = {
 		delete: () => {},
-		rating: () => {},
+		rating: {
+			onPress: () => {},
+			title: String(),
+		},
 	},
 	upcoming = {
-		cancel: () => {},
+		cancel: {
+			onPress: () => {},
+			title: String(),
+		},
 		addCalendar: () => {},
 	},
 }) {
@@ -20,8 +26,8 @@ export function drawerOptionsType({
 	) {
 		return [
 			{
-				title: "Request cancellation",
-				onPress: upcoming.cancel,
+				title: upcoming.cancel.title,
+				onPress: upcoming.cancel.onPress,
 			},
 			{
 				title: "Navigate",
@@ -41,8 +47,8 @@ export function drawerOptionsType({
 	if (reservationDateCategory === "expired" && status === "confirmed") {
 		return [
 			{
-				title: "Rate us!",
-				onPress: expired.rating,
+				title: expired.rating.title,
+				onPress: expired.rating.onPress,
 			},
 			{
 				title: "Delete From History",

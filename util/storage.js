@@ -9,7 +9,11 @@ import {
 	updateDoc,
 	increment,
 	deleteDoc,
+	arrayUnion,
+	serverTimestamp,
+	getDoc,
 } from "firebase/firestore";
+import { Alert } from "react-native";
 
 export default async function uploadData(image, type, data) {
 	const getDate = new Date();
@@ -153,4 +157,101 @@ export async function deleteUserReservation(reservationId) {
 	);
 
 	await deleteDoc(reservationRef);
+}
+
+export async function updateUsersRatingStatus(reservationId, rating) {
+	const reservationRef = doc(
+		db,
+		"users",
+		auth.currentUser.uid,
+		"reservations",
+		reservationId
+	);
+
+	const ratingData = {
+		isRated: true,
+		rating: rating,
+	};
+
+	await updateDoc(reservationRef, { ratingData });
+}
+
+export async function updateRestaurantRating(
+	restaurantId = String(),
+	rating = Number(),
+	reservationId = String(),
+	clientsId = auth.currentUser.uid
+) {
+	const restaurantRatingRef = doc(db, "restaurantRatings", restaurantId);
+
+	await updateDoc(restaurantRatingRef, {
+		ratings: arrayUnion({
+			rating: rating,
+			reservationId: reservationId,
+			clientsId: clientsId,
+			timestamp: new Date().valueOf(),
+		}),
+		ratingsSum: increment(rating),
+		ratingsTotal: increment(1),
+	});
+}
+
+export async function cancellationRequest(
+	data = {},
+	requestData = { requestType: String(), requestMessage: String() },
+	callUsCallback = () => {}
+) {
+	const { reservationDateTimestamp, restaurantUid, filename } = data;
+
+	const restaurantRef = doc(db, "restaurants", restaurantUid);
+
+	const restaurantReservationRef = doc(
+		db,
+		"restaurants",
+		restaurantUid,
+		"reservations",
+		filename
+	);
+
+	const userReservationRef = doc(
+		db,
+		"users",
+		auth.currentUser.uid,
+		"reservations",
+		filename
+	);
+
+	const restaurantSnap = await getDoc(restaurantRef);
+
+	const MS_PER_HOUR = 3600000;
+	const MS_PER_DAY = 86400000;
+	const dateNow = new Date().getTime();
+
+	if (
+		reservationDateTimestamp - dateNow >
+		restaurantSnap.data().cancellationAdvance
+	) {
+		//update for restaurant's database
+		updateDoc(restaurantReservationRef, {
+			requestData: {
+				requestType: requestData.requestType,
+				requestMessage: requestData.requestMessage,
+			},
+		});
+
+		//update for user's database
+		updateDoc(userReservationRef, {
+			requestData: {
+				requestType: requestData.requestType,
+				requestMessage: requestData.requestMessage,
+			},
+		});
+	} else {
+		Alert.alert("We are not able to process your request.", "Please call us!", [
+			{ text: "Back", style: "cancel" },
+			{ text: "Call now!", style: "default", onPress: () => callUsCallback() },
+		]);
+	}
+
+	// console.log(reservationDateTimestamp - dateNow);
 }

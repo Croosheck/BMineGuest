@@ -30,6 +30,7 @@ const BORDER_RADIUS = 14;
 const ReservationListItem = ({
 	restaurantName = String(),
 	reservationDateTimestamp = Number(),
+	reservationDate = String(),
 	madeOnDate = Number(),
 	table = Array(),
 	extras = Array(),
@@ -220,6 +221,15 @@ const ReservationListItem = ({
 													<Text style={[styles.dateLabel, styles.textShadow]}>
 														Reserved on
 													</Text>
+													<Text
+														style={[
+															styles.dateLabel,
+															styles.textShadow,
+															{ fontSize: 8 },
+														]}
+													>
+														(User's Local Time)
+													</Text>
 												</View>
 
 												<View style={styles.reservationDateContainer}>
@@ -229,10 +239,20 @@ const ReservationListItem = ({
 															styles.textShadow,
 														]}
 													>
-														{formatedReservationDate}
+														{/* {formatedReservationDate} */}
+														{reservationDate}
 													</Text>
 													<Text style={[styles.dateLabel, styles.textShadow]}>
 														Reservation date
+													</Text>
+													<Text
+														style={[
+															styles.dateLabel,
+															styles.textShadow,
+															{ fontSize: 8 },
+														]}
+													>
+														(Restaurant's Local Time)
 													</Text>
 												</View>
 											</View>

@@ -12,26 +12,34 @@ import { getRestaurants, realTimeRestaurants } from "../redux/slices/user";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../firebase";
 import FirestoreListener from "../components/FirestoreListener";
+import { useState } from "react";
 
 const Main = () => {
 	const Tab = createMaterialBottomTabNavigator();
 	const dispatch = useDispatch();
 
 	let availableRestaurants;
+	// let ratings;
 
 	useEffect(() => {
 		//Realtime
-		// const q = query(collection(db, "restaurants"));
-		// const unsubscribe = onSnapshot(q, (querySnapshot) => {
-		// 	availableRestaurants = [];
-		// 	querySnapshot.forEach((doc) => {
-		// 		availableRestaurants.push(doc.data());
-		// 	});
-		// 	dispatch(realTimeRestaurants(availableRestaurants));
-		// });
+		const restaurantsQuery = query(collection(db, "restaurants"));
+
+		const unsubscribeRestaurants = onSnapshot(
+			restaurantsQuery,
+			(querySnapshot) => {
+				availableRestaurants = [];
+
+				querySnapshot.forEach((doc) => {
+					availableRestaurants.push(doc.data());
+				});
+				dispatch(realTimeRestaurants(availableRestaurants));
+				// console.log(availableRestaurants[1].restaurantRating);
+			}
+		);
 		//////////////////////////
 		// Every refresh
-		dispatch(getRestaurants());
+		// dispatch(getRestaurants());
 	}, []);
 
 	return (

@@ -1,4 +1,5 @@
 import {
+	Alert,
 	Animated,
 	Dimensions,
 	Easing,
@@ -20,8 +21,14 @@ import { drawerOptionsType } from "../../util/drawerOptionsType";
 import { addEvent } from "../../components/AddEvent";
 import { mapsRedirect } from "../../util/mapsRedirect";
 import { callingRedirect } from "../../util/callingRedirect";
-import { deleteUserReservation } from "../../util/storage";
+import {
+	cancellationRequest,
+	deleteUserReservation,
+	updateRestaurantRating,
+	updateUsersRatingStatus,
+} from "../../util/storage";
 import RatingModal from "../../components/ratingModal/RatingModal";
+import RequestModal from "../../components/requestModal/RequestModal";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
@@ -39,11 +46,15 @@ const Reservations = ({ navigation }) => {
 	);
 	const [ratingModalOpened, setRatingModalOpened] = useState({
 		isOpened: false,
-		restaurantData: {},
+		reservationData: {},
 	});
 	const [rating, setRating] = useState({
 		rating: 3.5,
 		submitted: false,
+	});
+	const [requestModalOpened, setRequestModalOpened] = useState({
+		isOpened: false,
+		reservationData: {},
 	});
 
 	// Default state for bottom navbar icons
@@ -241,7 +252,7 @@ const Reservations = ({ navigation }) => {
 	let reservationDateCategory;
 
 	function ratingModalButtonHandler(itemData) {
-		setRatingModalOpened({ isOpened: true, restaurantData: itemData.item });
+		setRatingModalOpened({ isOpened: true, reservationData: itemData.item });
 	}
 
 	return (
@@ -251,24 +262,57 @@ const Reservations = ({ navigation }) => {
 				onCloseModal={() => {
 					setRatingModalOpened((prev) => ({
 						isOpened: !prev.isOpened,
-						restaurantData: {},
+						reservationData: {},
 					}));
 					setRating((prev) => ({
 						rating: prev.submitted ? prev.rating : 3.5,
 						// submitted: prev.submitted,
 						submitted: false,
-
-						//to do...
-						////fetch the data and disable the button, if the restaurant has already been rated
 					}));
 				}}
-				restaurantName={ratingModalOpened.restaurantData?.restaurantName}
+				restaurantName={ratingModalOpened.reservationData?.restaurantName}
 				rating={rating.rating}
 				onChangeRating={(number) => setRating({ rating: number })}
-				onSubmit={() =>
-					setRating((prev) => ({ rating: prev.rating, submitted: true }))
-				}
+				onSubmit={() => {
+					setRating((prev) => ({ rating: prev.rating, submitted: true }));
+
+					//saves the rating for the particular reservation in the database
+					//and disables the rating button
+					// updateUsersRatingStatus(
+					// 	ratingModalOpened.reservationData.filename,
+					// 	rating.rating
+					// );
+
+					//saves the rating for the particular restaurant in the database
+					updateRestaurantRating(
+						ratingModalOpened.reservationData?.restaurantUid,
+						rating.rating,
+						ratingModalOpened.reservationData?.filename
+					);
+				}}
 				submitted={rating.submitted}
+			/>
+
+			<RequestModal
+				visible={requestModalOpened.isOpened}
+				onCloseModal={() =>
+					setRequestModalOpened({ isOpened: false, reservationData: {} })
+				}
+				onSubmit={({ requestMessage, request }) => {
+					cancellationRequest(
+						requestModalOpened.reservationData,
+						{
+							requestType: request,
+							requestMessage: requestMessage,
+						},
+						() =>
+							callingRedirect({
+								phoneNumber: requestModalOpened.reservationData.phone,
+							})
+					);
+
+					setRequestModalOpened({ isOpened: false, reservationData: {} });
+				}}
 			/>
 
 			<LinearGradient
@@ -296,8 +340,7 @@ const Reservations = ({ navigation }) => {
 				<FlatList
 					data={reservationsData}
 					extraData={filterType}
-					keyExtractor={(item, index) => item.filename + index}
-					// numColumns={2}
+					keyExtractor={(item, index) => `${item.filename}-${index}`}
 					renderItem={(itemData) => {
 						//reset for the 1st item
 						if (itemData.index === 0) {
@@ -361,9 +404,23 @@ const Reservations = ({ navigation }) => {
 							},
 							expired: {
 								//deletion is active, either for expired or cancelled reservations
-								delete: () => deleteUserReservation(itemData.item.filename), //4
+								delete: () => deleteUserReservation(itemData.item.filename),
+
 								//rating functionality only for expired and confirmed reservations
-								rating: () => ratingModalButtonHandler(itemData), //5
+								rating: {
+									onPress: () => {
+										//check on user's database, if submitted
+										if (itemData.item.ratingData?.isRated) return;
+
+										ratingModalButtonHandler(itemData);
+										//forward the data, to
+										//change state on user's database,
+										//if not submitted
+									},
+									title: itemData.item.ratingData?.isRated
+										? `Your rating:\n${itemData.item.ratingData.rating} / 5`
+										: "Rate us!",
+								},
 							},
 							upcoming: {
 								addCalendar: () =>
@@ -372,7 +429,28 @@ const Reservations = ({ navigation }) => {
 										itemData.item.restaurantName
 									),
 								//cancellation request: only upcoming, either pending, call or confirmed statuses
-								cancel: () => console.log("cancel"), //6
+								cancel: {
+									onPress: () => {
+										////temporary disabled for development
+										// if (itemData.item.requestData) {
+										// 	Alert.alert(
+										// 		`Your ${itemData.item.requestData.requestType} request has been submitted.`,
+										// 		"Please call us for any further information!",
+										// 		[{ text: "Thanks!", style: "cancel" }]
+										// 	);
+
+										// 	return;
+										// }
+
+										setRequestModalOpened({
+											isOpened: true,
+											reservationData: itemData.item,
+										});
+									},
+									title: itemData.item.requestData
+										? `${itemData.item.requestData.requestType} requested!`
+										: "Request cancellation",
+								},
 							},
 						});
 
@@ -382,6 +460,7 @@ const Reservations = ({ navigation }) => {
 								reservationDateTimestamp={
 									itemData.item.reservationDateTimestamp
 								}
+								reservationDate={itemData.item.reservationDate}
 								madeOnDate={itemData.item.madeOnTimestamp}
 								extras={itemData.item.extras}
 								extraImages={extraImages}

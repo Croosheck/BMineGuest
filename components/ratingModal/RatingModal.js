@@ -1,4 +1,4 @@
-import { Dimensions, Modal, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Modal, StyleSheet, View } from "react-native";
 import ModalButton from "./ModalButton";
 import StarRating from "react-native-star-rating-widget";
 import LottieIcon from "../LottieIcon";
@@ -18,10 +18,16 @@ const modalSize = {
 };
 const CONTAINER_PADDING = {
 	HORIZONTAL: 10,
-	BOTTOM: 25,
+	BOTTOM: 15,
 	TOP: 5,
 };
 const BUTTON_WIDTH = 100;
+const BUTTON_CENTERED =
+	modalSize.x * 0.5 -
+	CONTAINER_PADDING.HORIZONTAL * 0.5 -
+	BUTTON_WIDTH * 0.5 -
+	//button's horizontal padding
+	2.5;
 
 const RatingModal = ({
 	onCloseModal = () => {},
@@ -32,15 +38,20 @@ const RatingModal = ({
 	onChangeRating = (number) => {},
 	submitted = Boolean(),
 }) => {
-	const [animationFinished, setAnimationFinished] = useState(false);
+	const [animationFinished, setAnimationFinished] = useState(true);
 
+	//////// ANIMATED SHARED VALUES ////////
+	const titleAnimatedScaleOpacity = useSharedValue(1);
 	const starsAnimatedScaleOpacity = useSharedValue(1);
 
 	const cancelAnimatedTranslate = useSharedValue(modalSize.x * 0.08);
 	const cancelAnimatedRotate = useSharedValue(0);
 
 	const submitAnimatedTranslate = useSharedValue(0);
-
+	//////// ANIMATED STYLES ////////
+	const reanimatedTitleStyle = useAnimatedStyle(() => ({
+		opacity: titleAnimatedScaleOpacity.value,
+	}));
 	const reanimatedStarsStyle = useAnimatedStyle(() => ({
 		opacity: starsAnimatedScaleOpacity.value,
 		transform: [{ scale: starsAnimatedScaleOpacity.value }],
@@ -48,7 +59,7 @@ const RatingModal = ({
 
 	const reanimatedCancelStyle = useAnimatedStyle(() => ({
 		left: cancelAnimatedTranslate.value,
-		transform: [{ rotate: cancelAnimatedRotate.value + "deg" }],
+		transform: [{ rotate: `${cancelAnimatedRotate.value}deg` }],
 	}));
 	const reanimatedSubmitStyle = useAnimatedStyle(() => ({
 		transform: [{ translateY: submitAnimatedTranslate.value }],
@@ -63,9 +74,11 @@ const RatingModal = ({
 		>
 			<View style={styles.modalContainer}>
 				<View style={styles.innerModalContainer}>
-					<Text style={styles.modalRatingTitle}>
+					<Animated.Text
+						style={[styles.modalRatingTitle, reanimatedTitleStyle]}
+					>
 						{`How would you rate the service, regarding your reservation details, in ${restaurantName} ?`}
-					</Text>
+					</Animated.Text>
 					<View style={styles.modalRatingStarsContainer}>
 						{!submitted ? (
 							<Animated.View style={[reanimatedStarsStyle]}>
@@ -99,6 +112,7 @@ const RatingModal = ({
 
 									onCloseModal();
 									setTimeout(() => {
+										titleAnimatedScaleOpacity.value = 1;
 										starsAnimatedScaleOpacity.value = 1;
 										submitAnimatedTranslate.value = 0;
 										cancelAnimatedTranslate.value = modalSize.x * 0.08;
@@ -112,6 +126,10 @@ const RatingModal = ({
 							<ModalButton
 								title="SUBMIT"
 								onPress={() => {
+									setAnimationFinished(false);
+									titleAnimatedScaleOpacity.value = withTiming(0, {
+										duration: 600,
+									});
 									starsAnimatedScaleOpacity.value = withTiming(
 										0,
 										{ duration: 600 },
@@ -129,11 +147,7 @@ const RatingModal = ({
 												() => {
 													//centering the cancel button
 													cancelAnimatedTranslate.value = withSpring(
-														modalSize.x * 0.5 -
-															CONTAINER_PADDING.HORIZONTAL * 0.5 -
-															BUTTON_WIDTH * 0.5 -
-															//button's horizontal padding
-															2.5,
+														BUTTON_CENTERED,
 														{ mass: 0.8 },
 														() => runOnJS(setAnimationFinished)(true)
 													);

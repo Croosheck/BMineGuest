@@ -11,15 +11,21 @@ import { getRestaurantProfileImage } from "../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated from "react-native-reanimated";
 
+const BORDER_RADIUS = 8;
+
 const RestaurantListItem = ({
-	name,
+	name = String(),
 	category,
 	reservationsStatus,
-	onPress,
-	restaurantUid,
-	restaurantEntering,
-	titleEntering,
-	restaurantNameEntering,
+	onPress = () => {},
+	restaurantUid = String(),
+	restaurantEntering = () => {},
+	titleEntering = () => {},
+	restaurantNameEntering = () => {},
+	rating = {
+		sum: Number(),
+		total: Number(),
+	},
 }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
 
@@ -31,6 +37,8 @@ const RestaurantListItem = ({
 
 		getRestaurantDataHandler();
 	}, []);
+
+	const ratingAvg = ((rating.sum ?? 0) / (rating.total ?? 0)).toFixed(1);
 
 	return (
 		<>
@@ -62,6 +70,30 @@ const RestaurantListItem = ({
 										{name}
 									</Animated.Text>
 								</Animated.View>
+								<View
+									style={{
+										position: "absolute",
+										bottom: 0,
+										right: 0,
+										backgroundColor: "#96C2FFB9",
+										minWidth: "25%",
+										paddingVertical: 3,
+										paddingHorizontal: 6,
+										justifyContent: "center",
+										alignItems: "center",
+										borderTopLeftRadius: BORDER_RADIUS * 0.5,
+									}}
+								>
+									<Text
+										style={{
+											fontWeight: "600",
+											textShadowColor: "#ffffff",
+											textShadowRadius: 3,
+										}}
+									>{`${
+										isNaN(ratingAvg) ? "No ratings" : ratingAvg + " / 5"
+									}`}</Text>
+								</View>
 							</Pressable>
 						</ImageBackground>
 					</LinearGradient>
@@ -76,7 +108,7 @@ export default RestaurantListItem;
 const styles = StyleSheet.create({
 	outerContainer: {
 		padding: 3,
-		borderRadius: 24,
+		borderRadius: BORDER_RADIUS,
 		marginHorizontal: Dimensions.get("window").width * 0.03,
 		marginVertical: Dimensions.get("window").height * 0.02,
 		backgroundColor: "#B6B6B6",
@@ -92,14 +124,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		width: "100%",
 		height: "100%",
-		borderRadius: 20,
+		borderRadius: BORDER_RADIUS - 2,
 		overflow: "hidden",
 	},
 	pressableContainer: {
 		justifyContent: "center",
 		alignItems: "center",
 		height: Dimensions.get("window").width * 0.65,
-		borderRadius: 20,
+		borderRadius: BORDER_RADIUS - 2,
 	},
 	nameContainer: {
 		backgroundColor: "#CCCCCC6E",
