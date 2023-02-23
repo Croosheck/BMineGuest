@@ -166,8 +166,6 @@ const Profile = ({ navigation }) => {
 		// console.log(currentUser);
 	}, []);
 
-	async function testHandler() {}
-
 	return (
 		<View style={styles.container}>
 			{profileImage && (

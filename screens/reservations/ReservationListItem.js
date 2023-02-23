@@ -31,6 +31,7 @@ const ReservationListItem = ({
 	restaurantName = String(),
 	reservationDateTimestamp = Number(),
 	reservationDate = String(),
+	reservationDateParameters = Object(),
 	madeOnDate = Number(),
 	table = Array(),
 	extras = Array(),
@@ -51,7 +52,12 @@ const ReservationListItem = ({
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
 	const [animationFinished, setAnimationFinished] = useState(true);
 
-	const formatedReservationDate = formatDate(reservationDateTimestamp);
+	const formatedReservationDate = formatDate(
+		null,
+		null,
+		reservationDateParameters
+	);
+
 	const formatedMadeOnDate = formatDate(madeOnDate);
 
 	const animatedTranslateX = useSharedValue(-1000);
@@ -239,8 +245,10 @@ const ReservationListItem = ({
 															styles.textShadow,
 														]}
 													>
-														{/* {formatedReservationDate} */}
-														{reservationDate}
+														{formatedReservationDate.isData
+															? formatedReservationDate.dateResult
+															: reservationDate}
+														{/* {reservationDate} */}
 													</Text>
 													<Text style={[styles.dateLabel, styles.textShadow]}>
 														Reservation date

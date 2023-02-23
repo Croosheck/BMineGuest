@@ -38,6 +38,14 @@ export const userSlice = createSlice({
 			table: {},
 		},
 		reservationDate: "",
+		reservationDateParameters: {
+			year: Number(),
+			month: Number(),
+			day: Number(),
+			hours: Number(),
+			minutes: Number(),
+			weekdayNumber: Number(),
+		},
 		availableRestaurants: [],
 		reservationsList: [],
 	},
@@ -85,6 +93,9 @@ export const userSlice = createSlice({
 		pickDate: (state, { payload }) => {
 			state.reservationDate = payload;
 		},
+		pickDateParameters: (state, { payload }) => {
+			state.reservationDateParameters = payload;
+		},
 		clearDate: (state) => {
 			state.reservationDate = "";
 		},
@@ -112,6 +123,7 @@ export const {
 	removeExtra,
 	clearReservationData,
 	pickDate,
+	pickDateParameters,
 	clearDate,
 	logoutUser,
 	addFetchedReservations,

@@ -24,9 +24,8 @@ const Summary = ({ navigation, route }) => {
 	const { table, extras } = useSelector(
 		(state) => state.userReducer.reservationData
 	);
-	const { reservationDate, currentUser } = useSelector(
-		(state) => state.userReducer
-	);
+	const { reservationDate, currentUser, reservationDateParameters } =
+		useSelector((state) => state.userReducer);
 
 	const { name, restaurantKey, restaurantUid, howMany, phone } = route.params;
 
@@ -47,6 +46,7 @@ const Summary = ({ navigation, route }) => {
 			restaurantUid: restaurantUid,
 			reservationDate: formatDate(reservationDate),
 			reservationDateTimestamp: reservationDate,
+			reservationDateParameters: reservationDateParameters,
 			table: table,
 			extras: extras,
 			extrasTotalPrice: extrasPrice,

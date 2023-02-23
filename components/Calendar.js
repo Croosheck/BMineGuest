@@ -4,7 +4,7 @@ import { Alert, Button, View, Text, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { useDispatch } from "react-redux";
-import { pickDate } from "../redux/slices/user";
+import { pickDate, pickDateParameters } from "../redux/slices/user";
 import { formatDate } from "../util/formatDate";
 import { calendar, reminder } from "../util/permissions";
 
@@ -99,7 +99,7 @@ const Calendar = ({
 				`Not able to place reservation for ${pickedDayHours}:${String(
 					pickedDayMinutes
 				).padStart(2, "0")}.`,
-				`Every ${upperCaseDay}, You can pick Your reservation time between ${String(
+				`Every ${upperCaseDay}, you can pick your reservation time between ${String(
 					pickedDay.hours.reservationsOpen
 				).padStart(2, "0")}:00-${String(
 					pickedDay.hours.reservationsClose
@@ -111,13 +111,23 @@ const Calendar = ({
 		}
 
 		if (hoursCheck) {
+			const dateParams = {
+				year: new Date(timestamp).getFullYear(),
+				month: new Date(timestamp).getMonth(),
+				day: new Date(timestamp).getDate(),
+				hours: new Date(timestamp).getHours(),
+				minutes: new Date(timestamp).getMinutes(),
+				weekdayNumber: new Date(timestamp).getDay(),
+			};
+
 			Alert.alert(
 				"Good choice!",
-				"Switch tabs and tell us more about Your reservation!",
+				"Switch tabs and tell us more about your reservation!",
 				alertButtons
 			);
 			hideDatePicker();
 			dispatch(pickDate(timestamp));
+			dispatch(pickDateParameters(dateParams));
 			return;
 		}
 		hideDatePicker();

@@ -425,7 +425,7 @@ const Reservations = ({ navigation }) => {
 							upcoming: {
 								addCalendar: () =>
 									addEvent(
-										itemData.item.reservationDateTimestamp,
+										itemData.item.reservationDateParameters,
 										itemData.item.restaurantName
 									),
 								//cancellation request: only upcoming, either pending, call or confirmed statuses
@@ -461,6 +461,9 @@ const Reservations = ({ navigation }) => {
 									itemData.item.reservationDateTimestamp
 								}
 								reservationDate={itemData.item.reservationDate}
+								reservationDateParameters={
+									itemData.item.reservationDateParameters
+								}
 								madeOnDate={itemData.item.madeOnTimestamp}
 								extras={itemData.item.extras}
 								extraImages={extraImages}

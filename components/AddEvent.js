@@ -64,13 +64,16 @@ export const addEvent = (eventDate, restaurantName) => {
 	}
 
 	const addNewEvent = async () => {
+		const { year, month, day, hours, minutes } = eventDate;
+
 		try {
 			const calendarId = await createCalendar();
 
 			// Adds new event to phone calendar
 			const res = await SystemCalendar.createEventAsync(calendarId, {
-				endDate: new Date(eventDate),
-				startDate: new Date(eventDate),
+				//need to fix time zones issue
+				startDate: new Date(year, month, day, hours, minutes),
+				endDate: new Date(year, month, day, hours, minutes),
 				title: `Restaurant reservation in ${restaurantName}`,
 				creationDate: new Date(Date.now()),
 				alarms: [
