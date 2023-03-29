@@ -24,9 +24,8 @@ export function formatDate(date, part = String(), params) {
 
 		let isData = true;
 
-		if ([yr, mo, dd, hr, min, weekdayNumber].some((i) => i === undefined)) {
+		if ([yr, mo, dd, hr, min, weekdayNumber].some((i) => i === undefined))
 			return (isData = false);
-		}
 
 		const yrDisp = yr?.toString();
 		const moDisp = (mo + 1)?.toString().padStart(2, 0);
