@@ -53,7 +53,7 @@ const Extras = ({ route }) => {
 
 				setExtraImages((prev) => {
 					// Cut the image extension (mostly .png's)
-					const itemName = item.name.slice(0, -4);
+					const itemName = item.name.match(/^.*(?=(\.))/g).join("");
 
 					return {
 						...prev,
@@ -69,9 +69,9 @@ const Extras = ({ route }) => {
 		// Highlight picked extra
 		itemData.item.picked = !itemData.item.picked;
 
-		const xShortFilename = itemData.item.xFileName.includes(".")
-			? itemData.item.xFileName.slice(0, -4)
-			: itemData.item.xFileName;
+		const xShortFilename = itemData.item.xFileName
+			.match(/^.*(?=(\.))/g)
+			.join("");
 
 		// Add picked extra to data object
 		if (itemData.item.picked) {
@@ -81,7 +81,7 @@ const Extras = ({ route }) => {
 					xPrice: itemData.item.xPrice,
 					xFileName: itemData.item.xFileName,
 					xShortFileName: xShortFilename,
-					xImage: extraImages[itemData.item.xFileName.slice(0, -4)],
+					xImage: extraImages[xShortFilename],
 				})
 			);
 		}
@@ -103,6 +103,12 @@ const Extras = ({ route }) => {
 					data={extraItems}
 					numColumns={2}
 					renderItem={(itemData) => {
+						let itemName = itemData.item.xFileName;
+
+						if (itemData.item.xFileName.includes(".")) {
+							itemName = itemData.item.xFileName.match(/^.*(?=(\.))/g).join("");
+						}
+
 						return (
 							<ItemTile
 								title={`${itemData.item.xName}`}
@@ -113,7 +119,7 @@ const Extras = ({ route }) => {
 								}`}
 								onPress={() => manageExtra(itemData)}
 								picked={itemData.item.picked}
-								imgUri={extraImages[itemData.item.xFileName.slice(0, -4)]}
+								imgUri={extraImages[itemName]}
 							/>
 						);
 					}}

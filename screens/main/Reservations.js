@@ -49,7 +49,7 @@ const Reservations = ({ navigation }) => {
 		reservationData: {},
 	});
 	const [rating, setRating] = useState({
-		rating: 3.5,
+		rating: 3,
 		submitted: false,
 	});
 	const [requestModalOpened, setRequestModalOpened] = useState({
@@ -131,8 +131,8 @@ const Reservations = ({ navigation }) => {
 			const extraImgUri = await getDownloadURL(extraImgRef);
 
 			setExtraImages((prev) => {
-				// Cut the image extension (mostly .png's)
-				const itemName = item.name.slice(0, -4);
+				// Cut the image extension
+				const itemName = item.name.match(/^.*(?=(\.))/g).join("");
 
 				return {
 					...prev,
@@ -264,11 +264,10 @@ const Reservations = ({ navigation }) => {
 						isOpened: !prev.isOpened,
 						reservationData: {},
 					}));
-					setRating((prev) => ({
-						rating: prev.submitted ? prev.rating : 3.5,
-						// submitted: prev.submitted,
+					setRating({
+						rating: 3,
 						submitted: false,
-					}));
+					});
 				}}
 				restaurantName={ratingModalOpened.reservationData?.restaurantName}
 				rating={rating.rating}
