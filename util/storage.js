@@ -1,5 +1,11 @@
 import { auth, db, storage } from "../firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import {
+	getDownloadURL,
+	list,
+	listAll,
+	ref,
+	uploadBytes,
+} from "firebase/storage";
 import {
 	doc,
 	collection,
@@ -139,9 +145,19 @@ export async function getReservations() {
 }
 
 export async function getRestaurantProfileImage(restaurantUid) {
+	let itemName;
+
+	const imageFolderRef = ref(
+		storage,
+		`restaurants/${restaurantUid}/restaurantPicture`
+	);
+
+	const list = await listAll(imageFolderRef);
+	list.items.forEach((item) => (itemName = item.name));
+
 	const restaurantProfileRef = ref(
 		storage,
-		`restaurants/${restaurantUid}/restaurantPicture/defaultProfile.jpg`
+		`restaurants/${restaurantUid}/restaurantPicture/${itemName}`
 	);
 
 	const profileImage = await getDownloadURL(restaurantProfileRef);
@@ -238,6 +254,7 @@ export async function cancellationRequest(
 			requestData: {
 				requestType: requestData.requestType,
 				requestMessage: requestData.requestMessage,
+				timestamp: dateNow,
 			},
 		});
 
@@ -246,6 +263,7 @@ export async function cancellationRequest(
 			requestData: {
 				requestType: requestData.requestType,
 				requestMessage: requestData.requestMessage,
+				timestamp: dateNow,
 			},
 		});
 	} else {

@@ -24,7 +24,7 @@ import {
 	query,
 } from "firebase/firestore";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getDownloadURL, ref } from "firebase/storage";
+import { getDownloadURL, listAll, ref } from "firebase/storage";
 import LottieIcon from "../../components/LottieIcon";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../../components/Icon";
@@ -129,12 +129,23 @@ const Profile = ({ navigation }) => {
 	}
 
 	async function getUserData() {
+		let imageItemName;
+
+		const imageFolderRef = ref(
+			storage,
+			`users/${auth.currentUser.uid}/profilePic`
+		);
+
+		const list = await listAll(imageFolderRef);
+		list.items.forEach((item) => (imageItemName = item.name));
+
 		let upcomingReservations = 0;
 		dispatch(getUser());
 		const profileImageRef = ref(
 			storage,
-			`users/${auth.currentUser.uid}/profilePic/defaultProfile.jpg`
+			`users/${auth.currentUser.uid}/profilePic/${imageItemName}`
 		);
+
 		const profileImgUri = await getDownloadURL(profileImageRef);
 
 		setProfileImage(profileImgUri);

@@ -24,17 +24,6 @@ const MARGIN_RIGHT = 20;
 const TITLE_CONTAINER_HEIGHT = 50;
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
-// const TEST_IMAGES = [
-// 	{ src: require("../../assets/test/118427365.jpg") },
-// 	{ src: require("../../assets/test/1082098712.jpg") },
-// 	{ src: require("../../assets/test/1152363266.jpg") },
-// 	{ src: require("../../assets/test/1236348563.jpg") },
-// 	{ src: require("../../assets/test/3030495495.jpg") },
-// 	{ src: require("../../assets/test/5236388674.jpg") },
-// 	{ src: require("../../assets/test/6347299673.jpg") },
-// 	{ src: require("../../assets/test/8124363672.jpg") },
-// 	{ src: require("../../assets/test/9991969801.jpg") },
-// ];
 const RestaurantProfile = ({ navigation, route }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
 	const [howMany, setHowMany] = useState(1);
