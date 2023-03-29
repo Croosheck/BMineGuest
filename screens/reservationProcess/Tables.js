@@ -79,10 +79,20 @@ const Tables = ({ route }) => {
 	useEffect(() => {
 		filteredTables = [];
 
-		allPlacementsButtons = pickedRestaurant.tables.map(
-			(table) => table.tPlacement
+		const filteredPlacementsButtons = pickedRestaurant.tables.filter(
+			(table) => table.tAvailability
 		);
-		setFilteredPlacements(["All", ...new Set(allPlacementsButtons)]);
+
+		//Array with tables list filtering buttons
+		allPlacementsButtons = filteredPlacementsButtons.map((table) => {
+			if (table.tAvailability) {
+				return table.tPlacement;
+			}
+		});
+
+		if (allPlacementsButtons.length > 0) {
+			setFilteredPlacements(["All", ...new Set(allPlacementsButtons)]);
+		}
 
 		async function getTablesImages() {
 			const listRef = ref(
@@ -103,8 +113,12 @@ const Tables = ({ route }) => {
 				const tableImgUri = await getDownloadURL(tableImgRef);
 
 				setTableImages((prev) => {
-					// Cut the image extension (mostly .jpg's)
-					const itemName = item.name.slice(0, -4);
+					let itemName = item.name;
+
+					// Cut the image extension
+					if (item.name.includes(".")) {
+						itemName = item.name.match(/^.*(?=(\.))/g).join("");
+					}
 
 					return {
 						...prev,
@@ -246,6 +260,7 @@ const Tables = ({ route }) => {
 					style={styles.tablesListContainer}
 					numColumns={1}
 					renderItem={(itemData) => {
+						if (!itemData.item.tAvailability) return;
 						return (
 							<TableTile
 								// title={`${itemData.item.tShape}`}

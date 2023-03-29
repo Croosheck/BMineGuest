@@ -5,22 +5,45 @@ import {
 	Text,
 	View,
 	ImageBackground,
+	Image,
 } from "react-native";
 import Icon from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
+import defaultImg from "../assets/imagePlaceholders/default.jpg";
+
+const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const TableTile = ({
-	title,
 	seatsQuantity,
 	onPress,
 	picked,
-	availability,
 	iconName,
 	iconSize,
 	iconColor,
 	imgUri,
 	tPlacement,
 }) => {
+	const [imageSize, setImageSize] = useState({
+		width: 0,
+		height: 0,
+	});
+
+	function getImageSizeHandler() {
+		Image.getSize(
+			imgUri,
+			(width, height) =>
+				setImageSize({
+					width,
+					height,
+				}),
+			(error) => console.log(error)
+		);
+	}
+
+	const imgRatio = imageSize.width / imageSize.height;
+	const imageScale = imgRatio > 1.55 ? imgRatio : 1.45;
+
 	return (
 		<View style={[styles.container, picked && styles.containerPicked]}>
 			<LinearGradient colors={["#8686862F", "#000000AF"]}>
@@ -30,11 +53,6 @@ const TableTile = ({
 					android_ripple={{ color: "#8C6D6D19" }}
 				>
 					<View style={[styles.labelContainer]}>
-						{/* <View style={styles.titleContainer}>
-						<Text style={[styles.title, picked && { color: "#FFFFFF" }]}>
-							{title}
-						</Text>
-					</View> */}
 						<View style={styles.textBelowContainer}>
 							{iconName && (
 								<Icon name={iconName} size={iconSize} color={iconColor} />
@@ -49,6 +67,7 @@ const TableTile = ({
 								{seatsQuantity}
 							</Text>
 						</View>
+
 						<Text
 							style={[
 								styles.textBelow,
@@ -64,10 +83,31 @@ const TableTile = ({
 							styles.imageBackgroundContainer,
 							picked && styles.imageBackgroundContainerPicked,
 						]}
-						source={{ uri: imgUri }}
+						source={
+							imgUri
+								? { uri: imgUri }
+								: require("../assets/imagePlaceholders/default.jpg")
+						}
+						onLoadEnd={() => getImageSizeHandler()}
 						imageStyle={[
 							styles.imageBackground,
-							picked && styles.imageBackgroundPicked,
+							{
+								transform: [
+									{ rotate: "-25deg" },
+									{ scale: imageScale },
+									{ translateX: -WIDTH * 0.02 },
+									{ translateY: -WIDTH * 0.05 },
+								],
+							},
+							picked && {
+								opacity: 1,
+								transform: [
+									{ rotate: "-25deg" },
+									{ scale: imageScale + 0.2 },
+									{ translateX: -WIDTH * 0.04 },
+									{ translateY: -WIDTH * 0.05 },
+								],
+							},
 						]}
 						resizeMode="center"
 					></ImageBackground>
@@ -86,12 +126,10 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		overflow: "hidden",
 		borderRadius: 32,
-		// borderWidth: 2,
-		borderColor: "#ffffff",
 		margin: 8,
 		marginVertical: 15,
 		backgroundColor: "#8080801E",
-		height: Dimensions.get("window").width * 0.43,
+		height: HEIGHT * 0.22,
 		opacity: 0.8,
 	},
 	containerPicked: {
@@ -112,11 +150,12 @@ const styles = StyleSheet.create({
 		transform: [
 			{ rotate: "25deg" },
 			{ scale: 1.1 },
-			{ translateX: Dimensions.get("window").width * 0.05 },
+			{ translateX: WIDTH * 0.05 },
 		],
 		// oblique line
 		borderWidth: 1,
 		borderColor: "#FBFBFB",
+
 		overflow: "hidden",
 	},
 	imageBackgroundContainerPicked: {
@@ -126,21 +165,6 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "110%",
 		opacity: 0.5,
-		transform: [
-			{ rotate: "-25deg" },
-			{ scale: 1.3 },
-			{ translateX: -Dimensions.get("window").width * 0.02 },
-			{ translateY: -Dimensions.get("window").width * 0.05 },
-		],
-	},
-	imageBackgroundPicked: {
-		opacity: 1,
-		transform: [
-			{ rotate: "-25deg" },
-			{ scale: 1.5 },
-			{ translateX: -Dimensions.get("window").width * 0.04 },
-			{ translateY: -Dimensions.get("window").width * 0.05 },
-		],
 	},
 	itemPicked: {
 		flex: 1,
@@ -166,12 +190,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 		paddingVertical: 5,
 	},
-	titleContainer: {},
-	title: {
-		fontSize: 18,
-		fontWeight: "500",
-		color: "#ffffff",
-	},
+
 	textBelowContainer: {
 		flexDirection: "row",
 		justifyContent: "center",
@@ -181,7 +200,6 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: "500",
 		color: "#ffffff",
-		// backgroundColor: "#cccccc",
 		textAlign: "center",
 		minWidth: "10%",
 	},
@@ -189,7 +207,6 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontWeight: "300",
 		color: "#ffffff",
-		// backgroundColor: "#cccccc",
 		textAlign: "center",
 		minWidth: "10%",
 	},
