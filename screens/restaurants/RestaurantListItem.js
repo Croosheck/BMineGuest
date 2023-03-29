@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { getRestaurantProfileImage } from "../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated from "react-native-reanimated";
+import { useFonts } from "expo-font";
 
 const BORDER_RADIUS = 8;
 
@@ -26,8 +27,20 @@ const RestaurantListItem = ({
 		sum: Number(),
 		total: Number(),
 	},
+	ratingStyle = {
+		bg: String(),
+		text: String(),
+		textShadow: String(),
+	},
 }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
+	const [fontsLoaded] = useFonts({
+		"PTS-Reg": require("../../assets/fonts/PTSans-Regular.ttf"),
+		"PTS-Bold": require("../../assets/fonts/PTSans-Bold.ttf"),
+		"TiltNeon-Reg": require("../../assets/fonts/TiltNeon-Regular.ttf"),
+		"Anton-Reg": require("../../assets/fonts/Anton-Regular.ttf"),
+		"SourceCodePro-SB": require("../../assets/fonts/SourceCodePro-SemiBold.ttf"),
+	});
 
 	useEffect(() => {
 		async function getRestaurantDataHandler() {
@@ -71,25 +84,19 @@ const RestaurantListItem = ({
 									</Animated.Text>
 								</Animated.View>
 								<View
-									style={{
-										position: "absolute",
-										bottom: 0,
-										right: 0,
-										backgroundColor: "#96C2FFB9",
-										minWidth: "25%",
-										paddingVertical: 3,
-										paddingHorizontal: 6,
-										justifyContent: "center",
-										alignItems: "center",
-										borderTopLeftRadius: BORDER_RADIUS * 0.5,
-									}}
+									style={[
+										styles.ratingContainer,
+										{ backgroundColor: ratingStyle.bg },
+									]}
 								>
 									<Text
-										style={{
-											fontWeight: "600",
-											textShadowColor: "#ffffff",
-											textShadowRadius: 3,
-										}}
+										style={[
+											styles.ratingText,
+											{
+												color: ratingStyle.text,
+												textShadowColor: ratingStyle.textShadow,
+											},
+										]}
 									>{`${
 										isNaN(ratingAvg) ? "No ratings" : ratingAvg + " / 5"
 									}`}</Text>
@@ -142,8 +149,24 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 	},
 	name: {
+		color: "#000000",
 		fontSize: 24,
 		fontWeight: "bold",
-		color: "#000000",
+	},
+	ratingContainer: {
+		position: "absolute",
+		bottom: 0,
+		right: 0,
+		minWidth: "25%",
+		paddingVertical: 2,
+		paddingHorizontal: 6,
+		justifyContent: "center",
+		alignItems: "center",
+		borderTopLeftRadius: BORDER_RADIUS * 0.5,
+	},
+	ratingText: {
+		textShadowRadius: 6,
+		fontFamily: "PTS-Bold",
+		fontSize: 16,
 	},
 });

@@ -1,3 +1,5 @@
+import { useFonts } from "expo-font";
+
 import {
 	Dimensions,
 	FlatList,
@@ -46,11 +48,18 @@ const ReservationListItem = ({
 	firstLoad = Boolean(),
 	drawerOptionsButtons = Array(),
 	slideMenu = Boolean(),
-	reservationDateCategory = String(),
 }) => {
 	const [displayedExtraName, setDisplayedExtraName] = useState();
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
 	const [animationFinished, setAnimationFinished] = useState(true);
+
+	const [fontsLoaded] = useFonts({
+		"PTS-Reg": require("../../assets/fonts/PTSans-Regular.ttf"),
+		"PTS-Bold": require("../../assets/fonts/PTSans-Bold.ttf"),
+		"TiltNeon-Reg": require("../../assets/fonts/TiltNeon-Regular.ttf"),
+		"Anton-Reg": require("../../assets/fonts/Anton-Regular.ttf"),
+		"SourceCodePro-SB": require("../../assets/fonts/SourceCodePro-SemiBold.ttf"),
+	});
 
 	const formatedReservationDate = formatDate(
 		null,
@@ -231,10 +240,10 @@ const ReservationListItem = ({
 														style={[
 															styles.dateLabel,
 															styles.textShadow,
-															{ fontSize: 8 },
+															styles.dateLabelTextBelow,
 														]}
 													>
-														(User's Local Time)
+														(Current Location Time)
 													</Text>
 												</View>
 
@@ -248,7 +257,6 @@ const ReservationListItem = ({
 														{formatedReservationDate.isData
 															? formatedReservationDate.dateResult
 															: reservationDate}
-														{/* {reservationDate} */}
 													</Text>
 													<Text style={[styles.dateLabel, styles.textShadow]}>
 														Reservation date
@@ -257,7 +265,7 @@ const ReservationListItem = ({
 														style={[
 															styles.dateLabel,
 															styles.textShadow,
-															{ fontSize: 8 },
+															styles.dateLabelTextBelow,
 														]}
 													>
 														(Restaurant's Local Time)
@@ -387,8 +395,9 @@ const styles = StyleSheet.create({
 	datesDataContainer: {
 		width: "100%",
 		flexDirection: "row",
-		justifyContent: "space-around",
-		marginBottom: 20,
+		justifyContent: "space-between",
+		paddingHorizontal: WIDTH * 0.03,
+		marginBottom: 15,
 	},
 	reservedOnContainer: {
 		justifyContent: "center",
@@ -400,20 +409,26 @@ const styles = StyleSheet.create({
 	},
 	reservationDetailText: {
 		color: "#ffffff",
-		fontSize: 18,
-		fontWeight: "600",
+		fontSize: 20,
+		fontFamily: "SourceCodePro-SB",
+		letterSpacing: -2.5,
 	},
 	dateLabel: {
 		color: "#ffffff",
-		fontSize: 11,
+		fontSize: 12,
 		textTransform: "uppercase",
+		fontFamily: "PTS-Bold",
+	},
+	dateLabelTextBelow: {
+		fontSize: 9,
+		fontFamily: null,
 	},
 	tablePlacement: {
 		width: "100%",
 		textAlign: "center",
 		color: "#ffffff",
-		fontSize: 16,
-		fontWeight: "600",
+		fontSize: 18,
+		fontFamily: "PTS-Bold",
 	},
 	extrasContainer: {
 		flex: 0.5,
