@@ -146,6 +146,19 @@ const Restaurants = ({ navigation }) => {
 		});
 	}, []);
 
+	function ratingBgColorHandler(rating = Number()) {
+		if (0 < rating && rating <= 2)
+			return { bg: "#FF4444CF", text: "#ffffff", textShadow: "#000000" };
+		if (2 < rating && rating < 4)
+			return { bg: "#FFAB44CF", text: "#ffffff", textShadow: "#000000" };
+		if (rating >= 4)
+			return { bg: "#ABFF3ECF", text: "#000000", textShadow: "#FFFFFF" };
+		if (isNaN(rating))
+			return { bg: "#30B7FFCF", text: "#ffffff", textShadow: "#000000" };
+
+		return { bg: "#30B7FFCF", text: "#ffffff", textShadow: "#000000" };
+	}
+
 	return (
 		<LinearGradient
 			style={styles.container}
@@ -154,6 +167,11 @@ const Restaurants = ({ navigation }) => {
 			<FlatList
 				data={availableRestaurants}
 				renderItem={(itemData) => {
+					const rating = (
+						ratings[itemData.item.uid]?.ratingsSum /
+						ratings[itemData.item.uid]?.ratingsTotal
+					).toFixed(1);
+
 					return (
 						<RestaurantListItem
 							rating={{
@@ -171,6 +189,7 @@ const Restaurants = ({ navigation }) => {
 							restaurantNameEntering={SlideInRight.delay(2000)
 								.springify()
 								.mass(0.7)}
+							ratingStyle={ratingBgColorHandler(rating)}
 						/>
 					);
 				}}

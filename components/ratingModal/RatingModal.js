@@ -83,14 +83,13 @@ const RatingModal = ({
 						{!submitted ? (
 							<Animated.View style={[reanimatedStarsStyle]}>
 								<StarRating
-									rating={rating}
+									rating={rating <= 1 ? 1 : rating}
 									onChange={(number) => onChangeRating(number)}
 									animationConfig={{
 										delay: 0,
 										duration: 700,
 										scale: 1.3,
 									}}
-									minRating={2}
 									color="#3dbdff"
 								/>
 							</Animated.View>
