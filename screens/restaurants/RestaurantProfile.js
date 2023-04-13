@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
 	},
 	setButtonTitle: {
 		fontSize: 28,
-		fontWeight: "default",
+		fontWeight: "normal",
 		textShadowColor: "white",
 		textShadowRadius: 6,
 	},
