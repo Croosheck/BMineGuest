@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearDate } from "../../redux/slices/user";
 
 import Calendar from "../../components/Calendar";
-import AddEvent, { addEvent } from "../../components/AddEvent";
+import { addEvent } from "../../components/AddEvent";
 import { formatDate } from "../../util/formatDate";
 import { closestDateReservation } from "../../util/closestDateReservation";
 import { LinearGradient } from "expo-linear-gradient";
