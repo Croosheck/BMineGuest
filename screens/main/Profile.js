@@ -1,9 +1,7 @@
 import {
 	Animated,
-	Button,
 	Dimensions,
 	Easing,
-	Image,
 	ImageBackground,
 	Pressable,
 	StyleSheet,
@@ -16,13 +14,7 @@ import { getUser, logoutUser } from "../../redux/slices/user";
 
 import { signOut } from "firebase/auth";
 import { auth, db, storage } from "../../firebase";
-import {
-	collection,
-	doc,
-	getDocs,
-	onSnapshot,
-	query,
-} from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 import LottieIcon from "../../components/LottieIcon";
@@ -30,6 +22,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../../components/Icon";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
+const BACKGROUND_COLOR = "#1F1616";
 
 const Profile = ({ navigation }) => {
 	const userProfileRef = doc(db, "users", auth.currentUser.uid);
@@ -124,7 +117,7 @@ const Profile = ({ navigation }) => {
 	}, []);
 
 	function logoutHandler() {
-		dispatch(logoutUser);
+		dispatch(logoutUser());
 		signOut(auth);
 	}
 
@@ -189,7 +182,7 @@ const Profile = ({ navigation }) => {
 					resizeMethod="scale"
 				>
 					<LinearGradient
-						colors={["#8E21496D", "#231717"]}
+						colors={["#8E21496D", BACKGROUND_COLOR]}
 						style={styles.backdropGradient}
 						start={{
 							x: 0,
@@ -251,6 +244,7 @@ export default Profile;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		backgroundColor: BACKGROUND_COLOR,
 	},
 	/////////// Upper Half
 	profileBackgroundContainer: {
@@ -327,7 +321,7 @@ const styles = StyleSheet.create({
 	/////////// Bottom Half
 	menuContainer: {
 		flex: 0.5,
-		backgroundColor: "#231717",
+		backgroundColor: BACKGROUND_COLOR,
 		width: WIDTH,
 		justifyContent: "center",
 		alignItems: "center",
