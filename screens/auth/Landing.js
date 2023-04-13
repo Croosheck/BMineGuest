@@ -1,5 +1,8 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, ImageBackground, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import OutlinedButton from "../../components/OutlinedButton";
+import { Image } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Landing = ({ navigation }) => {
 	function registerPageHandler() {
@@ -10,16 +13,30 @@ const Landing = ({ navigation }) => {
 	}
 
 	return (
-		<View style={styles.container}>
+		<ImageBackground
+			style={styles.container}
+			imageStyle={styles.backgroundImage}
+			source={require("../../assets/background/Landing/background.jpg")}
+		>
+			<Image
+				style={styles.image}
+				source={require("../../assets/background/Landing/1.png")}
+			/>
 			<View style={styles.buttons}>
-				<View style={styles.button}>
-					<Button title="Register" onPress={registerPageHandler} />
-				</View>
-				<View style={styles.button}>
-					<Button title="Login" onPress={loginPageHandler} />
-				</View>
+				<OutlinedButton
+					title="Register"
+					onPress={registerPageHandler}
+					style={styles.button}
+					titleStyle={{ fontSize: 18 }}
+				/>
+				<OutlinedButton
+					title="Login"
+					onPress={loginPageHandler}
+					style={styles.button}
+					titleStyle={{ fontSize: 18 }}
+				/>
 			</View>
-		</View>
+		</ImageBackground>
 	);
 };
 
@@ -28,16 +45,30 @@ export default Landing;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
+		backgroundColor: "#232323",
+	},
+	backgroundImage: {
+		opacity: 0.7,
+	},
+	image: {
+		width: "100%",
+		height: 500,
+		transform: [{ translateY: 100 }],
+		// borderWidth: 2,
+		// borderColor: "#ffffff",
 	},
 	buttons: {
 		flexDirection: "row",
-		width: "55%",
-		justifyContent: "space-between",
+		width: "100%",
+		justifyContent: "space-around",
+		alignItems: "center",
+		position: "absolute",
+		bottom: 0,
+		height: "20%",
 		// borderWidth: 1,
 	},
 	button: {
-		minWidth: "25%",
+		maxWidth: "40%",
+		maxHeight: "30%",
 	},
 });
