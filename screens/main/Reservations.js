@@ -143,25 +143,26 @@ const Reservations = ({ navigation }) => {
 	}
 
 	useEffect(() => {
-		/// Realtime data ///
-		const q = query(
-			collection(db, "users", auth.currentUser.uid, "reservations")
-		);
-		const unsubscribe = onSnapshot(q, (querySnapshot) => {
-			if (querySnapshot.size === 0) setLoaded(true);
-
-			const reservations = [];
-
-			querySnapshot.forEach((doc) => {
-				if (doc.data) setLoaded(true);
-				reservations.push(doc.data());
+		if (auth.currentUser) {
+			// Check if user is signed in before using currentUser.uid
+			const q = query(
+				collection(db, "users", auth.currentUser.uid, "reservations")
+			);
+			const unsubscribe = onSnapshot(q, (querySnapshot) => {
+				if (querySnapshot.size === 0) {
+					setLoaded(true);
+				} else {
+					const reservations = [];
+					querySnapshot.forEach((doc) => {
+						reservations.push(doc.data());
+					});
+					setReservationsData(reservations);
+					setLoaded(true);
+				}
 			});
 
-			setLoaded(true);
-			setReservationsData(reservations);
-		});
-
-		getExtrasHandler();
+			getExtrasHandler();
+		}
 	}, []);
 
 	function getReservationStatusHandler(itemData) {
