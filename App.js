@@ -2,7 +2,7 @@ import "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { StatusBar, StyleSheet, Text, View } from "react-native";
 
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { store } from "./redux/store";
 
 import Landing from "./screens/auth/Landing";
@@ -26,18 +26,40 @@ function AppContainer() {
 		loaded: false,
 		loggedIn: null,
 	});
+	const [areCredentialsValid, setAreCredentialsValid] = useState(false);
+
+	const { loaded, loggedIn } = isLoggedIn;
+	let isFreshStart = true;
+
+	function onLoginPressHandler() {}
+
+	function onLoginHandler(duration, isFreshStart) {
+		if (isFreshStart) {
+			setIsLoggedIn({ loaded: true, loggedIn: true });
+			return;
+		}
+
+		setTimeout(() => {
+			setIsLoggedIn({ loaded: true, loggedIn: true });
+		}, duration);
+	}
 
 	useEffect(() => {
 		getAuth().onAuthStateChanged((user) => {
 			if (!user) {
 				setIsLoggedIn({ loaded: true, loggedIn: false });
-			} else {
-				setIsLoggedIn({ loaded: true, loggedIn: true });
+				setAreCredentialsValid(false);
+				isFreshStart = false;
+			}
+			if (user) {
+				//acivates a lottie animation and logs the user
+				setAreCredentialsValid(true);
+			}
+			if (isFreshStart && user) {
+				onLoginHandler(null, isFreshStart);
 			}
 		});
 	}, []);
-
-	const { loaded, loggedIn } = isLoggedIn;
 
 	if (!loaded) {
 		return (
@@ -73,12 +95,19 @@ function AppContainer() {
 					/>
 					<Stack.Screen
 						name="Login"
-						component={Login}
 						options={{
 							headerShown: false,
 							presentation: "modal",
 						}}
-					/>
+					>
+						{() => (
+							<Login
+								areCredentialsValid={areCredentialsValid}
+								onLogin={onLoginHandler}
+								onButtonPress={onLoginPressHandler}
+							/>
+						)}
+					</Stack.Screen>
 				</Stack.Navigator>
 			</NavigationContainer>
 		);

@@ -1,19 +1,51 @@
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+	Animated as Anim,
+	Button,
+	Easing,
+	Pressable,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+} from "react-native";
 import React, { useState } from "react";
 
 import { auth, db } from "../../firebase";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { updateDoc, doc, serverTimestamp } from "firebase/firestore";
 
-const Login = () => {
-	const [credentials, setCredentials] = useState({
-		//Jimmy
-		// email: "test@test.com",
-		// password: "123123",
-		//Jessie
-		// email: "111@111.com",
-		// password: "111111",
+import LottieView from "lottie-react-native";
+import { useRef } from "react";
+import { useEffect } from "react";
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withSequence,
+	withTiming,
+} from "react-native-reanimated";
+import IconButton from "../../components/IconButton";
+
+const ANIM_DURATION = 1000;
+
+const Login = ({
+	areCredentialsValid = Boolean(),
+	onLogin = () => {},
+	onButtonPress = () => {},
+}) => {
+	const [credentials, setCredentials] = useState({});
+	const [error, setError] = useState({
+		isError: false,
+		errorMessage: "",
 	});
+	const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+
+	const animationProgress = useRef(new Anim.Value(0.35));
+
+	const buttonAnimatedTranslateX = useSharedValue(0);
+
+	const reanimatedButtonStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: buttonAnimatedTranslateX.value }],
+	}));
 
 	function inputHandler(type, text) {
 		type === "name" &&
@@ -24,7 +56,25 @@ const Login = () => {
 			setCredentials((current) => ({ ...current, password: text }));
 	}
 
+	function showPasswordHandler() {
+		setIsPasswordHidden((prev) => !prev);
+	}
+
+	useEffect(() => {
+		if (areCredentialsValid) {
+			Anim.timing(animationProgress.current, {
+				toValue: 0.5,
+				duration: ANIM_DURATION,
+				easing: Easing.linear,
+				useNativeDriver: false,
+			}).start();
+		}
+	}, [areCredentialsValid]);
+
 	async function signUpHandler() {
+		if (error.isError) return;
+
+		onButtonPress();
 		// Logging it with email/password
 		const { email, password } = credentials;
 		const response = await signInWithEmailAndPassword(
@@ -32,63 +82,85 @@ const Login = () => {
 			email,
 			password
 		).catch((error) => {
-			Alert.alert(`${error.message}`, "Check Your credentials and try again.");
+			setError({
+				isError: true,
+				errorMessage: "Check your credentials and try again.",
+			});
+
+			buttonAnimatedTranslateX.value = withSequence(
+				withTiming(20, { duration: 120 }),
+				withTiming(-15, { duration: 140 }),
+				withTiming(10, { duration: 160 }),
+				withTiming(-5, { duration: 190 }),
+				withTiming(0, { duration: 220 })
+			);
+
+			setTimeout(() => {
+				setError({
+					isError: false,
+					errorMessage: "",
+				});
+			}, 2000);
+
 			return;
 		});
 
-		// Before updating a doc, check if user successfully logged in
-		getAuth().onAuthStateChanged((user) => {
-			if (!user) return;
-		});
+		getAuth().onAuthStateChanged(async (user) => {
+			// Before updating a doc, check if user successfully logged in
+			if (user) {
+				onLogin(ANIM_DURATION);
 
-		// Updates (or creates, if 1st time logging in) log in timestamp field in firestore doc
-		await updateDoc(doc(db, "users", auth.currentUser.uid), {
-			lastTimeLoggedIn: serverTimestamp(),
-		}).catch((error) => {
-			console.log(error.message);
+				// Updates (or creates, if 1st time logging in) log in timestamp field in firestore doc
+				await updateDoc(doc(db, "users", auth.currentUser.uid), {
+					lastTimeLoggedIn: serverTimestamp(),
+				}).catch((error) => {
+					// console.log(error.message);
+				});
+			}
 		});
-
-		// console.log(response);
 	}
 
 	return (
-		<View style={styles.maskElement}>
-			<View
-				style={{
-					flexDirection: "row",
-					justifyContent: "space-between",
-					width: "90%",
-					marginBottom: 50,
-				}}
-			>
-				<View>
-					<Button
-						title="jack"
-						onPress={() =>
-							setCredentials({ email: "jack@jack.com", password: "123123" })
-						}
-					/>
-					<Text>0 reservations</Text>
+		<View style={styles.container}>
+			{!"" && (
+				<View
+					style={{
+						flexDirection: "row",
+						justifyContent: "space-between",
+						width: "90%",
+						marginBottom: 50,
+					}}
+				>
+					<View>
+						<Button
+							title="jack"
+							onPress={() =>
+								setCredentials({ email: "jack@jack.com", password: "123123" })
+							}
+						/>
+						<Text>0 reservations</Text>
+					</View>
+					<View>
+						<Button
+							title="jimmy"
+							onPress={() =>
+								setCredentials({ email: "test@test.com", password: "123123" })
+							}
+						/>
+						<Text>Only upcoming</Text>
+					</View>
+					<View>
+						<Button
+							title="jessie"
+							onPress={() =>
+								setCredentials({ email: "111@111.com", password: "111111" })
+							}
+						/>
+						<Text>Only expired</Text>
+					</View>
 				</View>
-				<View>
-					<Button
-						title="jimmy"
-						onPress={() =>
-							setCredentials({ email: "test@test.com", password: "123123" })
-						}
-					/>
-					<Text>Only upcoming</Text>
-				</View>
-				<View>
-					<Button
-						title="jessie"
-						onPress={() =>
-							setCredentials({ email: "111@111.com", password: "111111" })
-						}
-					/>
-					<Text>Only expired</Text>
-				</View>
-			</View>
+			)}
+
 			<View style={styles.inputContainer}>
 				<TextInput
 					placeholder="email"
@@ -103,13 +175,40 @@ const Login = () => {
 					onChangeText={inputHandler.bind(this, "password")}
 					value={credentials.password}
 					style={styles.input}
-					secureTextEntry={true}
+					secureTextEntry={isPasswordHidden}
+				/>
+				<IconButton
+					icon="ios-eye-outline"
+					color="#000000"
+					size={22}
+					onPress={showPasswordHandler}
 				/>
 			</View>
+			<Text>{error.errorMessage}</Text>
 
-			<View style={styles.buttonContainer}>
-				<Button title="Log In" onPress={signUpHandler} />
-			</View>
+			<Animated.View
+				style={[
+					styles.lottieButtonContainer,
+					reanimatedButtonStyle,
+					error.isError && styles.lottieError,
+					areCredentialsValid && styles.lottieSuccess,
+				]}
+			>
+				<Pressable
+					onPress={signUpHandler}
+					android_ripple={{ color: "#cccccc" }}
+					style={{
+						padding: 5,
+					}}
+				>
+					<LottieView
+						source={require("../../assets/lottie/lottieLogin2.json")}
+						progress={animationProgress.current}
+						style={styles.lottieButton}
+						resizeMode="cover"
+					/>
+				</Pressable>
+			</Animated.View>
 		</View>
 	);
 };
@@ -122,29 +221,48 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	maskElement: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
 	inputContainer: {
-		paddingHorizontal: 8,
-		paddingVertical: 4,
+		flexDirection: "row",
+		justifyContent: "center",
+		paddingHorizontal: 10,
 		marginVertical: 8,
 		height: 40,
 		width: "60%",
-		borderWidth: 1,
-		borderRadius: 14,
-		backgroundColor: "#DFDFDF",
-		borderWidth: 1,
+		borderRadius: 8,
+		backgroundColor: "#FFFFFF",
+		height: 40,
+		width: 300,
+		elevation: 6,
+		shadowColor: "#00000085",
+		shadowRadius: 10,
+		shadowOffset: { height: 2, width: 2 },
 	},
 	input: {
+		flex: 1,
 		color: "#000000",
 		fontSize: 16,
-		fontWeight: "bold",
 	},
 	buttonContainer: {
 		marginTop: 16,
 		width: "30%",
+	},
+	lottieButtonContainer: {
+		backgroundColor: "#E9E9E9",
+		borderRadius: 15,
+		overflow: "hidden",
+		marginTop: 10,
+	},
+	lottieError: {
+		backgroundColor: "#FFAAAA",
+	},
+	lottieSuccess: {
+		backgroundColor: "#D9FFEF",
+	},
+
+	lottieButton: {
+		width: 50,
+		height: 50,
+		justifyContent: "center",
+		alignItems: "center",
 	},
 });
