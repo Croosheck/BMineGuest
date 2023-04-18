@@ -24,14 +24,11 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import IconButton from "../../components/IconButton";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ANIM_DURATION = 1000;
 
-const Login = ({
-	areCredentialsValid = Boolean(),
-	onLogin = () => {},
-	onButtonPress = () => {},
-}) => {
+const Login = ({ areCredentialsValid = Boolean(), onLogin = () => {} }) => {
 	const [credentials, setCredentials] = useState({});
 	const [error, setError] = useState({
 		isError: false,
@@ -42,9 +39,13 @@ const Login = ({
 	const animationProgress = useRef(new Anim.Value(0.35));
 
 	const buttonAnimatedTranslateX = useSharedValue(0);
+	const lottieAnimatedRotateZ = useSharedValue(0);
 
 	const reanimatedButtonStyle = useAnimatedStyle(() => ({
 		transform: [{ translateX: buttonAnimatedTranslateX.value }],
+	}));
+	const reanimatedLottieStyle = useAnimatedStyle(() => ({
+		transform: [{ rotateZ: `${lottieAnimatedRotateZ.value}deg` }],
 	}));
 
 	function inputHandler(type, text) {
@@ -74,7 +75,6 @@ const Login = ({
 	async function signUpHandler() {
 		if (error.isError) return;
 
-		onButtonPress();
 		// Logging it with email/password
 		const { email, password } = credentials;
 		const response = await signInWithEmailAndPassword(
@@ -88,6 +88,13 @@ const Login = ({
 			});
 
 			buttonAnimatedTranslateX.value = withSequence(
+				withTiming(10, { duration: 120 }),
+				withTiming(-8, { duration: 140 }),
+				withTiming(5, { duration: 160 }),
+				withTiming(-3, { duration: 190 }),
+				withTiming(0, { duration: 220 })
+			);
+			lottieAnimatedRotateZ.value = withSequence(
 				withTiming(20, { duration: 120 }),
 				withTiming(-15, { duration: 140 }),
 				withTiming(10, { duration: 160 }),
@@ -108,20 +115,38 @@ const Login = ({
 		getAuth().onAuthStateChanged(async (user) => {
 			// Before updating a doc, check if user successfully logged in
 			if (user) {
+				lottieAnimatedRotateZ.value = withTiming(-20, { duration: 200 });
+
 				onLogin(ANIM_DURATION);
 
 				// Updates (or creates, if 1st time logging in) log in timestamp field in firestore doc
 				await updateDoc(doc(db, "users", auth.currentUser.uid), {
 					lastTimeLoggedIn: serverTimestamp(),
-				}).catch((error) => {
-					// console.log(error.message);
-				});
+				}).catch((error) => {});
 			}
 		});
 	}
 
+	function buttonStatusGradient() {
+		if (error.isError) return ["#FFFFFF", "#FF9898"];
+		if (areCredentialsValid) return ["#FFFFFF", "#FFD66F"];
+
+		return ["#FFFFFF", "#CCCCCC"];
+	}
+
 	return (
-		<View style={styles.container}>
+		<LinearGradient
+			style={styles.container}
+			colors={["#00000018", "#ffffff", "#00000063"]}
+			start={{
+				x: 0.1,
+				y: 0.1,
+			}}
+			end={{
+				x: 1,
+				y: 1,
+			}}
+		>
 			{!"" && (
 				<View
 					style={{
@@ -167,6 +192,7 @@ const Login = ({
 					onChangeText={inputHandler.bind(this, "email")}
 					value={credentials.email}
 					style={styles.input}
+					textContentType="username"
 				/>
 			</View>
 			<View style={styles.inputContainer}>
@@ -175,6 +201,7 @@ const Login = ({
 					onChangeText={inputHandler.bind(this, "password")}
 					value={credentials.password}
 					style={styles.input}
+					textContentType="password"
 					secureTextEntry={isPasswordHidden}
 				/>
 				<IconButton
@@ -194,22 +221,26 @@ const Login = ({
 					areCredentialsValid && styles.lottieSuccess,
 				]}
 			>
-				<Pressable
-					onPress={signUpHandler}
-					android_ripple={{ color: "#cccccc" }}
-					style={{
-						padding: 5,
-					}}
-				>
-					<LottieView
-						source={require("../../assets/lottie/lottieLogin2.json")}
-						progress={animationProgress.current}
-						style={styles.lottieButton}
-						resizeMode="cover"
-					/>
-				</Pressable>
+				<LinearGradient colors={buttonStatusGradient()}>
+					<Pressable
+						onPress={signUpHandler}
+						android_ripple={{ color: "#CCCCCC6B" }}
+						style={{
+							padding: 4,
+						}}
+					>
+						<Animated.View style={reanimatedLottieStyle}>
+							<LottieView
+								source={require("../../assets/lottie/lottieLogin2.json")}
+								progress={animationProgress.current}
+								style={styles.lottieButton}
+								resizeMode="cover"
+							/>
+						</Animated.View>
+					</Pressable>
+				</LinearGradient>
 			</Animated.View>
-		</View>
+		</LinearGradient>
 	);
 };
 
@@ -251,6 +282,8 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 		overflow: "hidden",
 		marginTop: 10,
+		borderWidth: 1,
+		borderColor: "#D4D4D4",
 	},
 	lottieError: {
 		backgroundColor: "#FFAAAA",
