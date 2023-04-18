@@ -76,13 +76,6 @@ export default async function uploadData(image, type, data) {
 			restaurantName: data.restaurantName || null,
 			restaurantKey: data.restaurantKey || null,
 			restaurantUid: data.restaurantUid || null,
-
-			////// Not ready //////
-			/* coords: data.coords
-				? { lat: data.coords.lat, lng: data.coords.lng }
-				: null, */
-			//////////////////////
-
 			table: data.table || null,
 			extras: data.extras || null,
 			extrasTotalPrice: data.extrasTotalPrice || 0,
@@ -90,6 +83,8 @@ export default async function uploadData(image, type, data) {
 			cancelled: false,
 			howMany: data.howMany,
 			phone: data.phone || "000000000",
+			url: data.url,
+			note: data.note,
 		});
 
 		await updateDoc(userProfileRef, {
@@ -111,6 +106,8 @@ export default async function uploadData(image, type, data) {
 			confirmed: false,
 			cancelled: false,
 			howMany: data.howMany,
+			url: data.url,
+			note: data.note,
 		});
 	}
 

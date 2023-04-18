@@ -40,6 +40,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 		reservationsEnabled,
 		restaurantTags,
 		phone,
+		url,
 	} = route.params;
 
 	const dispatch = useDispatch();
@@ -102,6 +103,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 			howMany: howMany,
 			reservationsEnabled: reservationsEnabled,
 			phone: phone,
+			url: url,
 		});
 	}
 

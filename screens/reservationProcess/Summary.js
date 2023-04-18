@@ -5,6 +5,7 @@ import {
 	ScrollView,
 	StyleSheet,
 	Text,
+	TextInput,
 	View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,8 +19,14 @@ import HeaderRightButton from "../../components/HeaderRightButton";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
+const MESSAGE_MAX_LENGTH = 150;
+
 const Summary = ({ navigation, route }) => {
 	const [displayTime, setDisplayTime] = useState();
+	const [message, setMessage] = useState({
+		content: "",
+		length: 0,
+	});
 
 	const { table, extras } = useSelector(
 		(state) => state.userReducer.reservationData
@@ -27,7 +34,8 @@ const Summary = ({ navigation, route }) => {
 	const { reservationDate, currentUser, reservationDateParameters } =
 		useSelector((state) => state.userReducer);
 
-	const { name, restaurantKey, restaurantUid, howMany, phone } = route.params;
+	const { name, restaurantKey, restaurantUid, howMany, phone, url } =
+		route.params;
 
 	const dispatch = useDispatch();
 
@@ -55,6 +63,8 @@ const Summary = ({ navigation, route }) => {
 			clientsUid: auth.currentUser.uid,
 			howMany: howMany,
 			phone: phone,
+			url: url,
+			note: message.content || "",
 		};
 
 		navigation.setOptions({
@@ -103,6 +113,22 @@ const Summary = ({ navigation, route }) => {
 				<Text style={[styles.tableDetail, styles.textShadow]}>
 					{seatIcon} {table.tSeats}
 				</Text>
+			</View>
+
+			<View style={styles.messageContainer}>
+				<TextInput
+					style={styles.messageInput}
+					multiline
+					placeholder="Message... (optional)"
+					maxLength={MESSAGE_MAX_LENGTH}
+					onChangeText={(value) => {
+						setMessage({ content: value, length: value.length });
+					}}
+					value={message.content}
+				/>
+				<Text
+					style={styles.messageInputLimit}
+				>{`${message.length}/${MESSAGE_MAX_LENGTH}`}</Text>
 			</View>
 
 			<View style={styles.detailsContainer}>
@@ -200,8 +226,39 @@ const styles = StyleSheet.create({
 		fontWeight: "300",
 	},
 	//////////////////////////
+	messageContainer: {
+		// borderWidth: 2,
+		// borderColor: "#ffffff",
+
+		width: "90%",
+		marginTop: 20,
+		paddingBottom: 20,
+		borderRadius: 10,
+		overflow: "hidden",
+		padding: 5,
+		minHeight: 40,
+		maxHeight: 80,
+		backgroundColor: "#ffffff",
+	},
+	messageInput: {
+		fontSize: 18,
+	},
+	messageInputLimit: {
+		position: "absolute",
+		bottom: 0,
+		right: 0,
+		color: "#ffffff",
+		backgroundColor: "#646464",
+		borderTopLeftRadius: 10,
+		paddingHorizontal: 7,
+		paddingVertical: 2,
+		lineHeight: 16,
+		letterSpacing: 0.5,
+		textAlign: "center",
+	},
+	//////////////////////////
 	detailsContainer: {
-		flex: 1,
+		flex: 0.4,
 		width: WIDTH,
 		justifyContent: "center",
 		alignItems: "center",
@@ -209,7 +266,7 @@ const styles = StyleSheet.create({
 	},
 	detailsReservation: {
 		color: "#ffffff",
-		fontSize: 22,
+		fontSize: 20,
 		textAlign: "center",
 	},
 	//////////////////////////

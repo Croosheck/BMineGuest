@@ -32,9 +32,6 @@ import RequestModal from "../../components/requestModal/RequestModal";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
-const EXAMPLE_URL =
-	"https://www.google.com/maps/place/POLONICA+RESTAURANT/@40.6254807,-74.029996,15z/data=!4m5!3m4!1s0x0:0x6fe0eebfd46532f6!8m2!3d40.6254807!4d-74.029996";
-
 const Reservations = ({ navigation }) => {
 	const [reservationsData, setReservationsData] = useState([]);
 	const [extraImages, setExtraImages] = useState({});
@@ -276,14 +273,15 @@ const Reservations = ({ navigation }) => {
 				onSubmit={() => {
 					setRating((prev) => ({ rating: prev.rating, submitted: true }));
 
-					//saves the rating for the particular reservation in the database
+					//saves rating for a particular reservation in database
 					//and disables the rating button
+
 					// updateUsersRatingStatus(
 					// 	ratingModalOpened.reservationData.filename,
 					// 	rating.rating
 					// );
 
-					//saves the rating for the particular restaurant in the database
+					//saves rating for a particular restaurant in database
 					updateRestaurantRating(
 						ratingModalOpened.reservationData?.restaurantUid,
 						rating.rating,
@@ -398,7 +396,7 @@ const Reservations = ({ navigation }) => {
 
 							//general: for all kinds
 							general: {
-								navigate: () => mapsRedirect({ url: EXAMPLE_URL }),
+								navigate: () => mapsRedirect({ url: itemData.item.url }),
 								call: () =>
 									callingRedirect({ phoneNumber: itemData.item.phone }),
 							},
@@ -424,11 +422,13 @@ const Reservations = ({ navigation }) => {
 							},
 							upcoming: {
 								addCalendar: () =>
-									addEvent(
-										itemData.item.reservationDateParameters,
-										itemData.item.restaurantName
-									),
-								//cancellation request: only upcoming, either pending, call or confirmed statuses
+									addEvent({
+										eventDate: itemData.item.reservationDateParameters,
+										restaurantName: itemData.item.restaurantName,
+										url: itemData.item.url,
+										note: itemData.item.note,
+									}),
+								//cancellation request: only upcoming (either pending, call or confirmed statuses)
 								cancel: {
 									onPress: () => {
 										////temporary disabled for development

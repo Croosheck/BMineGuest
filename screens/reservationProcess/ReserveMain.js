@@ -25,6 +25,7 @@ const ReserveMain = ({ navigation, route }) => {
 		howMany,
 		reservationsEnabled,
 		phone,
+		url,
 	} = route.params;
 
 	const { reservationDate } = useSelector((state) => state.userReducer);
@@ -94,6 +95,7 @@ const ReserveMain = ({ navigation, route }) => {
 							restaurantUid: restaurantUid,
 							howMany: howMany,
 							phone: phone,
+							url: url,
 						});
 					}}
 					title="Summary"

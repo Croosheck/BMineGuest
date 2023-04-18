@@ -131,6 +131,7 @@ const Restaurants = ({ navigation }) => {
 			restaurantTags: itemData.item.restaurantTags,
 			phone: itemData.item.phone,
 			rating: itemData.item.restaurantRating,
+			url: itemData.item.url || "",
 		});
 	}
 

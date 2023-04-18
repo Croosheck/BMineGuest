@@ -3,13 +3,27 @@ import { Alert, Platform } from "react-native";
 import * as SystemCalendar from "expo-calendar";
 import { reminder } from "../util/permissions";
 
-export const addEvent = (eventDate, restaurantName) => {
+export const addEvent = (
+	{ eventDate, restaurantName, note, url } = {
+		eventDate: {
+			year: Number(),
+			month: Number(),
+			day: Number(),
+			hours: Number(),
+			minutes: Number(),
+		},
+		restaurantName: "",
+		note: "",
+		url: "",
+	}
+) => {
 	let permissionReminderStatus;
 
 	async function permissionsStatus() {
 		//only ios
 		permissionReminderStatus = await reminder();
 	}
+
 	if (Platform.OS === "ios") {
 		permissionsStatus();
 	}
@@ -74,7 +88,11 @@ export const addEvent = (eventDate, restaurantName) => {
 				//need to fix time zones issue
 				startDate: new Date(year, month, day, hours, minutes),
 				endDate: new Date(year, month, day, hours, minutes),
-				title: `Restaurant reservation in ${restaurantName}`,
+				title: `Restaurant reservation in ${restaurantName} at ${String(
+					hours
+				).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`,
+				notes: note,
+				url: url,
 				creationDate: new Date(Date.now()),
 				alarms: [
 					{
