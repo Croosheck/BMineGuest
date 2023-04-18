@@ -69,95 +69,102 @@ const RatingModal = ({
 		<Modal
 			visible={visible}
 			transparent={true}
-			animationType="slide"
+			animationType="fade"
 			onRequestClose={onCloseModal}
+			hardwareAccelerated
 		>
-			<View style={styles.modalContainer}>
-				<View style={styles.innerModalContainer}>
-					<Animated.Text
-						style={[styles.modalRatingTitle, reanimatedTitleStyle]}
-					>
-						{`How would you rate the service, regarding your reservation details, in ${restaurantName} ?`}
-					</Animated.Text>
-					<View style={styles.modalRatingStarsContainer}>
-						{!submitted ? (
-							<Animated.View style={[reanimatedStarsStyle]}>
-								<StarRating
-									rating={rating <= 1 ? 1 : rating}
-									onChange={(number) => onChangeRating(number)}
-									animationConfig={{
-										delay: 0,
-										duration: 700,
-										scale: 1.3,
+			<View style={{ flex: 1, backgroundColor: "#00000075" }}>
+				<View style={styles.modalContainer}>
+					<View style={styles.innerModalContainer}>
+						<Animated.Text
+							style={[styles.modalRatingTitle, reanimatedTitleStyle]}
+						>
+							{`How would you rate the service, regarding your reservation details, in ${restaurantName} ?`}
+						</Animated.Text>
+						<View style={styles.modalRatingStarsContainer}>
+							{!submitted ? (
+								<Animated.View style={[reanimatedStarsStyle]}>
+									<StarRating
+										rating={rating <= 1 ? 1 : rating}
+										onChange={(number) => onChangeRating(number)}
+										animationConfig={{
+											delay: 0,
+											duration: 700,
+											scale: 1.3,
+										}}
+										color="#3dbdff"
+									/>
+								</Animated.View>
+							) : (
+								<LottieIcon
+									source={require("../../assets/lottie/lottieSuccess1.json")}
+									height={"100%"}
+									autoPlay
+									loop={false}
+								/>
+							)}
+						</View>
+						<View style={styles.modalButtonsContainer}>
+							<Animated.View
+								style={[styles.buttonCancel, reanimatedCancelStyle]}
+							>
+								<ModalButton
+									title={!submitted ? "CANCEL" : "CLOSE"}
+									onPress={() => {
+										if (!animationFinished) return;
+
+										onCloseModal();
+										setTimeout(() => {
+											titleAnimatedScaleOpacity.value = 1;
+											starsAnimatedScaleOpacity.value = 1;
+											submitAnimatedTranslate.value = 0;
+											cancelAnimatedTranslate.value = modalSize.x * 0.08;
+											cancelAnimatedRotate.value = 0;
+										}, 800);
 									}}
-									color="#3dbdff"
+									buttonWidth={BUTTON_WIDTH}
 								/>
 							</Animated.View>
-						) : (
-							<LottieIcon
-								source={require("../../assets/lottie/lottieSuccess1.json")}
-								height={"100%"}
-								autoPlay
-								loop={false}
-							/>
-						)}
-					</View>
-					<View style={styles.modalButtonsContainer}>
-						<Animated.View style={[styles.buttonCancel, reanimatedCancelStyle]}>
-							<ModalButton
-								title={!submitted ? "CANCEL" : "CLOSE"}
-								onPress={() => {
-									if (!animationFinished) return;
+							<Animated.View
+								style={[styles.buttonSubmit, reanimatedSubmitStyle]}
+							>
+								<ModalButton
+									title="SUBMIT"
+									onPress={() => {
+										setAnimationFinished(false);
+										titleAnimatedScaleOpacity.value = withTiming(0, {
+											duration: 600,
+										});
+										starsAnimatedScaleOpacity.value = withTiming(
+											0,
+											{ duration: 600 },
+											() => {
+												cancelAnimatedRotate.value = withSpring(360, {
+													mass: 1,
+												});
+												//changes the "submitted" boolean state
+												runOnJS(onSubmit)();
 
-									onCloseModal();
-									setTimeout(() => {
-										titleAnimatedScaleOpacity.value = 1;
-										starsAnimatedScaleOpacity.value = 1;
-										submitAnimatedTranslate.value = 0;
-										cancelAnimatedTranslate.value = modalSize.x * 0.08;
-										cancelAnimatedRotate.value = 0;
-									}, 800);
-								}}
-								buttonWidth={BUTTON_WIDTH}
-							/>
-						</Animated.View>
-						<Animated.View style={[styles.buttonSubmit, reanimatedSubmitStyle]}>
-							<ModalButton
-								title="SUBMIT"
-								onPress={() => {
-									setAnimationFinished(false);
-									titleAnimatedScaleOpacity.value = withTiming(0, {
-										duration: 600,
-									});
-									starsAnimatedScaleOpacity.value = withTiming(
-										0,
-										{ duration: 600 },
-										() => {
-											cancelAnimatedRotate.value = withSpring(360, {
-												mass: 1,
-											});
-											//changes the "submitted" boolean state
-											runOnJS(onSubmit)();
-
-											//moving the submit button down
-											submitAnimatedTranslate.value = withTiming(
-												modalSize.y,
-												{ duration: 500 },
-												() => {
-													//centering the cancel button
-													cancelAnimatedTranslate.value = withSpring(
-														BUTTON_CENTERED,
-														{ mass: 0.8 },
-														() => runOnJS(setAnimationFinished)(true)
-													);
-												}
-											);
-										}
-									);
-								}}
-								buttonWidth={BUTTON_WIDTH}
-							/>
-						</Animated.View>
+												//moving the submit button down
+												submitAnimatedTranslate.value = withTiming(
+													modalSize.y,
+													{ duration: 500 },
+													() => {
+														//centering the cancel button
+														cancelAnimatedTranslate.value = withSpring(
+															BUTTON_CENTERED,
+															{ mass: 0.8 },
+															() => runOnJS(setAnimationFinished)(true)
+														);
+													}
+												);
+											}
+										);
+									}}
+									buttonWidth={BUTTON_WIDTH}
+								/>
+							</Animated.View>
+						</View>
 					</View>
 				</View>
 			</View>

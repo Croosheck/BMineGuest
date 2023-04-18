@@ -52,80 +52,83 @@ const RequestModal = ({
 		<Modal
 			visible={visible}
 			transparent={true}
-			animationType="slide"
+			animationType="fade"
 			onRequestClose={onCloseModal}
+			hardwareAccelerated
 		>
-			<View style={styles.modalContainer}>
-				<View style={styles.innerModalContainer}>
-					<Text style={styles.modalRatingTitle}>
-						{`Specify your request and type in some details, so we will be able to provide the best service for you!`}
-					</Text>
-					<View style={styles.modalDataContainer}>
-						<View style={styles.requestTypeContainer}>
-							<Picker
-								selectedValue={selectedRequest}
-								onValueChange={(itemValue) => setSelectedRequest(itemValue)}
-								prompt="Select your request:"
-								style={[
-									styles.requestPicker,
-									requestError && styles.requestPickerError,
-								]}
-								ref={pickerRef}
-							>
-								<Picker.Item
-									label="Choose request type..."
-									enabled={false}
-									color="#A3A3A3"
+			<View style={{ flex: 1, backgroundColor: "#00000075" }}>
+				<View style={styles.modalContainer}>
+					<View style={styles.innerModalContainer}>
+						<Text style={styles.modalRatingTitle}>
+							{`Specify your request and type in some details, so we will be able to provide the best service for you!`}
+						</Text>
+						<View style={styles.modalDataContainer}>
+							<View style={styles.requestTypeContainer}>
+								<Picker
+									selectedValue={selectedRequest}
+									onValueChange={(itemValue) => setSelectedRequest(itemValue)}
+									prompt="Select your request:"
+									style={[
+										styles.requestPicker,
+										requestError && styles.requestPickerError,
+									]}
+									ref={pickerRef}
+								>
+									<Picker.Item
+										label="Choose request type..."
+										enabled={false}
+										color="#A3A3A3"
+									/>
+									<Picker.Item label="Cancel Request" value="cancellation" />
+								</Picker>
+							</View>
+							<View style={styles.textInputContainer}>
+								<TextInput
+									style={styles.textInput}
+									placeholder="Message... (optional)"
+									maxLength={MESSAGE_MAX_LENGTH}
+									onChangeText={(value) => {
+										setMessage(value);
+										setCurrentMessageLength(value.length);
+									}}
+									value={message}
 								/>
-								<Picker.Item label="Cancel Request" value="cancellation" />
-							</Picker>
+								<Text
+									style={styles.textInputLimit}
+								>{`${currentMessageLength}/${MESSAGE_MAX_LENGTH}`}</Text>
+							</View>
 						</View>
-						<View style={styles.textInputContainer}>
-							<TextInput
-								style={styles.textInput}
-								placeholder="Message... (optional)"
-								maxLength={MESSAGE_MAX_LENGTH}
-								onChangeText={(value) => {
-									setMessage(value);
-									setCurrentMessageLength(value.length);
-								}}
-								value={message}
-							/>
-							<Text
-								style={styles.textInputLimit}
-							>{`${currentMessageLength}/${MESSAGE_MAX_LENGTH}`}</Text>
-						</View>
-					</View>
-					<View style={styles.modalButtonsContainer}>
-						<View style={styles.buttonCancel}>
-							<ModalButton
-								title="CANCEL"
-								onPress={() => {
-									onCloseModal();
+						<View style={styles.modalButtonsContainer}>
+							<View style={styles.buttonCancel}>
+								<ModalButton
+									title="CANCEL"
+									onPress={() => {
+										onCloseModal();
 
-									resetRequestData();
-								}}
-								buttonWidth={BUTTON_WIDTH}
-							/>
-						</View>
-						<View style={styles.buttonSubmit}>
-							<ModalButton
-								title="SUBMIT"
-								onPress={() => {
-									if (!selectedRequest) {
-										requestErrorHandler();
-										pickerRef.current.focus();
-										return;
-									}
-									onSubmit({
-										requestMessage: message,
-										request: selectedRequest,
-									});
+										resetRequestData();
+									}}
+									buttonWidth={BUTTON_WIDTH}
+								/>
+							</View>
+							<View style={styles.buttonSubmit}>
+								<ModalButton
+									title="SUBMIT"
+									onPress={() => {
+										if (!selectedRequest) {
+											requestErrorHandler();
+											pickerRef.current.focus();
+											return;
+										}
+										onSubmit({
+											requestMessage: message,
+											request: selectedRequest,
+										});
 
-									resetRequestData();
-								}}
-								buttonWidth={BUTTON_WIDTH}
-							/>
+										resetRequestData();
+									}}
+									buttonWidth={BUTTON_WIDTH}
+								/>
+							</View>
 						</View>
 					</View>
 				</View>
