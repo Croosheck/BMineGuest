@@ -17,11 +17,11 @@ import uploadData from "../../util/storage";
 
 import * as ImagePicker from "expo-image-picker";
 
-const Register = () => {
+const Register = ({ onRegister }) => {
 	const [credentials, setCredentials] = useState({
-		name: "",
-		email: "",
-		password: "",
+		name: "Wojtek",
+		email: "888@888.com",
+		password: "123123",
 	});
 	const [image, setImage] = useState(null);
 
@@ -94,13 +94,13 @@ const Register = () => {
 		createUserWithEmailAndPassword(auth, email, password)
 			.then(async (response) => {
 				// in setDoc ID must be specified
-				await setDoc(doc(db, "users", auth.currentUser.uid), {
-					name: name,
-					email: email,
-					registrationTimestamp: serverTimestamp(),
-				}).catch((error) => {
-					Alert.alert("Something went wrong!", `${error.message}`);
-				});
+				// await setDoc(doc(db, "users", auth.currentUser.uid), {
+				// 	name: name,
+				// 	email: email,
+				// 	registrationTimestamp: serverTimestamp(),
+				// }).catch((error) => {
+				// 	Alert.alert("Something went wrong!", `${error.message}`);
+				// });
 			})
 			.catch((error) => {
 				Alert.alert("Something went wrong!", `${error.message}`);
@@ -108,7 +108,8 @@ const Register = () => {
 
 		getAuth().onAuthStateChanged((user) => {
 			if (user) {
-				uploadData(image, "userProfile");
+				onRegister();
+				// uploadData(image, "userProfile");
 			}
 		});
 	}
@@ -122,6 +123,7 @@ const Register = () => {
 						style={styles.input}
 						placeholder="name"
 						onChangeText={inputHandler.bind(this, "name")}
+						value={credentials.name}
 					/>
 				</View>
 				<View style={styles.inputContainer}>
@@ -129,6 +131,7 @@ const Register = () => {
 						style={styles.input}
 						placeholder="email"
 						onChangeText={inputHandler.bind(this, "email")}
+						value={credentials.email}
 					/>
 				</View>
 				<View style={styles.inputContainer}>
@@ -136,6 +139,7 @@ const Register = () => {
 						style={styles.input}
 						placeholder="password"
 						onChangeText={inputHandler.bind(this, "password")}
+						value={credentials.password}
 					/>
 				</View>
 				<View>

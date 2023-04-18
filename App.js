@@ -31,8 +31,6 @@ function AppContainer() {
 	const { loaded, loggedIn } = isLoggedIn;
 	let isFreshStart = true;
 
-	function onLoginPressHandler() {}
-
 	function onLoginHandler(duration, isFreshStart) {
 		if (isFreshStart) {
 			setIsLoggedIn({ loaded: true, loggedIn: true });
@@ -42,6 +40,10 @@ function AppContainer() {
 		setTimeout(() => {
 			setIsLoggedIn({ loaded: true, loggedIn: true });
 		}, duration);
+	}
+
+	function onRegisterHandler() {
+		setIsLoggedIn({ loaded: true, loggedIn: true });
 	}
 
 	useEffect(() => {
@@ -87,12 +89,13 @@ function AppContainer() {
 					/>
 					<Stack.Screen
 						name="Register"
-						component={Register}
 						options={{
 							headerShown: false,
 							presentation: "modal",
 						}}
-					/>
+					>
+						{() => <Register onRegister={onRegisterHandler} />}
+					</Stack.Screen>
 					<Stack.Screen
 						name="Login"
 						options={{
@@ -104,7 +107,6 @@ function AppContainer() {
 							<Login
 								areCredentialsValid={areCredentialsValid}
 								onLogin={onLoginHandler}
-								onButtonPress={onLoginPressHandler}
 							/>
 						)}
 					</Stack.Screen>
