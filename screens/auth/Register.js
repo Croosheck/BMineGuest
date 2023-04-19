@@ -6,8 +6,10 @@ import {
 	TextInput,
 	View,
 	Alert,
+	Pressable,
+	Text,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { auth, db } from "../../firebase";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
@@ -15,19 +17,35 @@ import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 
 import uploadData from "../../util/storage";
 
-import * as ImagePicker from "expo-image-picker";
+import {
+	launchImageLibraryAsync,
+	MediaTypeOptions,
+	useMediaLibraryPermissions,
+} from "expo-image-picker";
+import SignLogInput from "../../components/inputs/SignLogInput";
+
+const CONTENT_WIDTH = 300;
+const SUCCESS_ANIM_DURATION = 1000;
 
 const Register = ({ onRegister }) => {
 	const [credentials, setCredentials] = useState({
-		name: "Wojtek",
+		name: "Josh",
 		email: "888@888.com",
 		password: "123123",
 	});
 	const [image, setImage] = useState(null);
+	const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+
+	const [status, requestPermission] = useMediaLibraryPermissions();
 
 	async function pickImageHandler() {
-		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+		if (!status.granted) {
+			const permissionStatus = await requestPermission();
+			if (!permissionStatus.granted) return;
+		}
+
+		let result = await launchImageLibraryAsync({
+			mediaTypes: MediaTypeOptions.Images,
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 1,
@@ -38,19 +56,6 @@ const Register = ({ onRegister }) => {
 		}
 	}
 
-	const pickedImage = !image ? (
-		<View style={styles.buttonContainer}>
-			<Button title="Pick Profile Image" onPress={pickImageHandler} />
-		</View>
-	) : (
-		<View style={[styles.outerCircleImageMasked, { opacity: 1 }]}>
-			<Image
-				source={{ uri: image }}
-				style={[styles.imageMasked, { opacity: 1 }]}
-			/>
-		</View>
-	);
-
 	function inputHandler(type, text) {
 		type === "name" &&
 			setCredentials((current) => ({ ...current, name: text }));
@@ -58,6 +63,10 @@ const Register = ({ onRegister }) => {
 			setCredentials((current) => ({ ...current, email: text }));
 		type === "password" &&
 			setCredentials((current) => ({ ...current, password: text }));
+	}
+
+	function showPasswordHandler() {
+		setIsPasswordHidden((prev) => !prev);
 	}
 
 	function signUpHandler() {
@@ -86,7 +95,7 @@ const Register = ({ onRegister }) => {
 		if (!image) {
 			Alert.alert(
 				"*Beep Boop!* No image detected!",
-				"Profile image detection failed. Over."
+				"Please pick your profile image. Over."
 			);
 			return;
 		}
@@ -108,7 +117,11 @@ const Register = ({ onRegister }) => {
 
 		getAuth().onAuthStateChanged((user) => {
 			if (user) {
-				onRegister();
+				setTimeout(() => {
+					//authorizes the user to get an access to the account
+					onRegister();
+				}, SUCCESS_ANIM_DURATION);
+
 				// uploadData(image, "userProfile");
 			}
 		});
@@ -117,32 +130,37 @@ const Register = ({ onRegister }) => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.innerContainer}>
-				{pickedImage}
-				<View style={styles.inputContainer}>
-					<TextInput
-						style={styles.input}
+				<Pressable onPress={pickImageHandler} style={[styles.imageContainer]}>
+					{image && (
+						<Image source={{ uri: image }} style={[styles.profileImage]} />
+					)}
+					{!image && <Text>Pick Profile Image</Text>}
+				</Pressable>
+
+				<View style={styles.inputsContainer}>
+					<SignLogInput
 						placeholder="name"
 						onChangeText={inputHandler.bind(this, "name")}
 						value={credentials.name}
 					/>
-				</View>
-				<View style={styles.inputContainer}>
-					<TextInput
-						style={styles.input}
+					<SignLogInput
 						placeholder="email"
 						onChangeText={inputHandler.bind(this, "email")}
 						value={credentials.email}
 					/>
-				</View>
-				<View style={styles.inputContainer}>
-					<TextInput
-						style={styles.input}
+					<SignLogInput
 						placeholder="password"
 						onChangeText={inputHandler.bind(this, "password")}
 						value={credentials.password}
+						textContentType="password"
+						isPasswordHidden={isPasswordHidden}
+						icon="ios-eye-outline"
+						iconColor="#000000"
+						iconSize={22}
+						onIconPress={showPasswordHandler}
 					/>
 				</View>
-				<View>
+				<View style={styles.signUpButton}>
 					<Button title="Sign Up" onPress={signUpHandler} />
 				</View>
 			</View>
@@ -158,67 +176,31 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	maskedViewContainer: {
-		flex: 1,
-	},
 	innerContainer: {
 		justifyContent: "center",
 		alignItems: "center",
+		width: CONTENT_WIDTH,
 	},
-	outerCircleImageMasked: {
+	///////////////////////////////
+	imageContainer: {
 		justifyContent: "center",
 		alignItems: "center",
-		width: Dimensions.get("window").width / 1.65, // A 1
-		height: Dimensions.get("window").width / 1.65, // A 2
-		borderRadius: Dimensions.get("window").width / 3,
-		borderWidth: 7,
-		marginBottom: 12,
+		borderColor: "#BDBDBD",
+		width: "80%",
+		height: CONTENT_WIDTH * 0.8,
+		borderWidth: 5,
+		borderRadius: 10,
+		overflow: "hidden",
+		marginBottom: 50,
 	},
-	imageMasked: {
-		width: Dimensions.get("window").width / 1.58, // B 1
-		height: Dimensions.get("window").width / 1.58, // B 2
-		borderRadius: Dimensions.get("window").width / 3.1, // B 3
-	},
-	// if WxH in imageMasked > WxH in imageBackgroundContainer, masked ring is inside image
-	imageBackgroundContainer: {
-		width: Dimensions.get("window").width / 1.65, // A 1
-		height: Dimensions.get("window").width / 1.65, // A 2
-		marginBottom: 12,
-	},
-	backgroundImageStyle: {
-		borderWidth: 8,
-		borderColor: "#220E0E",
-		borderRadius: Dimensions.get("window").width / 3,
-	},
-	innerView: {
-		//////// Applicable, if WxH in imageMasked > WxH in imageBackgroundContainer
-		// width: Dimensions.get("window").width / 1.85, // B 1
-		// height: Dimensions.get("window").width / 1.85, // B 2
-		// borderRadius: Dimensions.get("window").width / 3.7, // B 3
-	},
-	inputContainer: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		paddingHorizontal: 8,
-		marginVertical: 8,
-		height: 40,
-		width: "60%",
-		borderWidth: 1,
-		borderRadius: 14,
-		backgroundColor: "#DFDFDF",
-		borderWidth: 1,
-	},
-	input: {
+	profileImage: {
 		width: "100%",
-		fontWeight: "bold",
+		aspectRatio: 1,
 	},
-	buttonContainer: {
-		width: "50%",
-		marginBottom: 80, // top button
-		marginTop: 24, // bottom button
-	},
-	backgroundImage: {
+	///////////////////////////////
+	inputsContainer: {
 		width: "100%",
-		height: "100%",
 	},
+	///////////////////////////////
+	signUpButton: {},
 });
