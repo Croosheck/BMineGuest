@@ -1,5 +1,5 @@
 import { Button, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { auth, db } from "../../firebase";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
