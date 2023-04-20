@@ -1,15 +1,15 @@
 import {
 	Button,
-	Dimensions,
 	Image,
 	StyleSheet,
-	TextInput,
 	View,
 	Alert,
 	Pressable,
 	Text,
+	Dimensions,
+	KeyboardAvoidingView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { auth, db } from "../../firebase";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
@@ -23,8 +23,11 @@ import {
 	useMediaLibraryPermissions,
 } from "expo-image-picker";
 import SignLogInput from "../../components/inputs/SignLogInput";
+import IconButton from "../../components/IconButton";
+import { LinearGradient } from "expo-linear-gradient";
+import OutlinedButton from "../../components/OutlinedButton";
 
-const CONTENT_WIDTH = 300;
+const CONTENT_SIZE = Dimensions.get("window").width * 0.8;
 const SUCCESS_ANIM_DURATION = 1000;
 
 const Register = ({ onRegister }) => {
@@ -128,16 +131,46 @@ const Register = ({ onRegister }) => {
 	}
 
 	return (
-		<View style={styles.container}>
+		<LinearGradient
+			style={styles.container}
+			colors={["#00000018", "#ffffff", "#00000063"]}
+			start={{
+				x: 0.1,
+				y: 0.1,
+			}}
+			end={{
+				x: 1,
+				y: 1,
+			}}
+		>
 			<View style={styles.innerContainer}>
-				<Pressable onPress={pickImageHandler} style={[styles.imageContainer]}>
-					{image && (
-						<Image source={{ uri: image }} style={[styles.profileImage]} />
-					)}
-					{!image && <Text>Pick Profile Image</Text>}
-				</Pressable>
+				<View style={styles.imageContainer}>
+					<Pressable
+						onPress={pickImageHandler}
+						style={styles.imagePressableContainer}
+						android_ripple={{ color: "#CCCCCC69" }}
+					>
+						{image && (
+							<Image source={{ uri: image }} style={[styles.profileImage]} />
+						)}
+						{!image && (
+							<>
+								<Text style={styles.imageLabel}>Pick Profile Image</Text>
+								<IconButton
+									icon="folder-open-outline"
+									onPress={pickImageHandler}
+									size={32}
+									color="#888888"
+								/>
+							</>
+						)}
+					</Pressable>
+				</View>
 
-				<View style={styles.inputsContainer}>
+				<KeyboardAvoidingView
+					style={styles.inputsContainer}
+					behavior="position"
+				>
 					<SignLogInput
 						placeholder="name"
 						onChangeText={inputHandler.bind(this, "name")}
@@ -159,12 +192,18 @@ const Register = ({ onRegister }) => {
 						iconSize={22}
 						onIconPress={showPasswordHandler}
 					/>
-				</View>
-				<View style={styles.signUpButton}>
-					<Button title="Sign Up" onPress={signUpHandler} />
-				</View>
+				</KeyboardAvoidingView>
+
+				<OutlinedButton
+					title="Create Account"
+					onPress={signUpHandler}
+					innerStyle={styles.signUpButton}
+					titleStyle={{
+						fontSize: 18,
+					}}
+				/>
 			</View>
-		</View>
+		</LinearGradient>
 	);
 };
 
@@ -179,28 +218,42 @@ const styles = StyleSheet.create({
 	innerContainer: {
 		justifyContent: "center",
 		alignItems: "center",
-		width: CONTENT_WIDTH,
+		width: CONTENT_SIZE,
+		maxWidth: 300,
 	},
 	///////////////////////////////
 	imageContainer: {
+		width: CONTENT_SIZE * 0.8,
+		marginBottom: 50,
+		aspectRatio: 1,
+		borderWidth: 1,
+		borderColor: "#DEDEDE",
+		borderRadius: 5,
+		overflow: "hidden",
+		backgroundColor: "#ffffff",
+	},
+	imagePressableContainer: {
 		justifyContent: "center",
 		alignItems: "center",
-		borderColor: "#BDBDBD",
-		width: "80%",
-		height: CONTENT_WIDTH * 0.8,
-		borderWidth: 5,
-		borderRadius: 10,
-		overflow: "hidden",
-		marginBottom: 50,
+		height: "100%",
+		width: "100%",
 	},
 	profileImage: {
 		width: "100%",
 		aspectRatio: 1,
 	},
+	imageLabel: {
+		fontSize: 16,
+		color: "#888888",
+	},
 	///////////////////////////////
 	inputsContainer: {
 		width: "100%",
+		marginBottom: 20,
 	},
 	///////////////////////////////
-	signUpButton: {},
+	signUpButton: {
+		paddingVertical: 8,
+		paddingHorizontal: 15,
+	},
 });

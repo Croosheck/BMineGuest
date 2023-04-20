@@ -1,8 +1,5 @@
-import { Button, ImageBackground, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { ImageBackground, StyleSheet, Image, View } from "react-native";
 import OutlinedButton from "../../components/OutlinedButton";
-import { Image } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 
 const Landing = ({ navigation }) => {
 	function registerPageHandler() {
@@ -26,13 +23,15 @@ const Landing = ({ navigation }) => {
 				<OutlinedButton
 					title="Register"
 					onPress={registerPageHandler}
-					style={styles.button}
+					style={styles.buttonStyle}
+					innerStyle={styles.buttonInner}
 					titleStyle={{ fontSize: 18 }}
 				/>
 				<OutlinedButton
 					title="Login"
 					onPress={loginPageHandler}
-					style={styles.button}
+					style={styles.buttonStyle}
+					innerStyle={styles.buttonInner}
 					titleStyle={{ fontSize: 18 }}
 				/>
 			</View>
@@ -54,8 +53,6 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: 500,
 		transform: [{ translateY: 100 }],
-		// borderWidth: 2,
-		// borderColor: "#ffffff",
 	},
 	buttons: {
 		flexDirection: "row",
@@ -65,10 +62,15 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		bottom: 0,
 		height: "20%",
-		// borderWidth: 1,
 	},
-	button: {
-		maxWidth: "40%",
-		maxHeight: "30%",
+	buttonStyle: {
+		width: "35%",
+		minWidth: 150,
+		maxWidth: 200,
+	},
+	buttonInner: {
+		width: "100%",
+		paddingVertical: 10,
+		paddingHorizontal: 20,
 	},
 });
