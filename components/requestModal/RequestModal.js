@@ -1,5 +1,6 @@
 import {
 	Dimensions,
+	KeyboardAvoidingView,
 	Modal,
 	StyleSheet,
 	Text,
@@ -57,7 +58,7 @@ const RequestModal = ({
 			hardwareAccelerated
 		>
 			<View style={{ flex: 1, backgroundColor: "#00000075" }}>
-				<View style={styles.modalContainer}>
+				<KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
 					<View style={styles.innerModalContainer}>
 						<Text style={styles.modalRatingTitle}>
 							{`Specify your request and type in some details, so we will be able to provide the best service for you!`}
@@ -131,7 +132,7 @@ const RequestModal = ({
 							</View>
 						</View>
 					</View>
-				</View>
+				</KeyboardAvoidingView>
 			</View>
 		</Modal>
 	);

@@ -1,4 +1,10 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import {
+	Button,
+	KeyboardAvoidingView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { useState } from "react";
 
 import { auth, db } from "../../firebase";
@@ -7,7 +13,7 @@ import { updateDoc, doc, serverTimestamp } from "firebase/firestore";
 
 import { LinearGradient } from "expo-linear-gradient";
 import SignLogInput from "../../components/inputs/SignLogInput";
-import LottieAnimButton from "../../components/inputs/buttons/LottieAnimButton";
+import LottieAnimButton from "../../components/buttons/LottieAnimButton";
 
 const ANIM_DURATION = 1000;
 
@@ -122,24 +128,26 @@ const Login = ({ areCredentialsValid = Boolean(), onLogin = () => {} }) => {
 				</View>
 			)}
 
-			<SignLogInput
-				placeholder="email"
-				onChangeText={inputHandler.bind(this, "email")}
-				value={credentials.email}
-				textContentType="username"
-			/>
+			<KeyboardAvoidingView style={styles.inputs} behavior="position">
+				<SignLogInput
+					placeholder="email"
+					onChangeText={inputHandler.bind(this, "email")}
+					value={credentials.email}
+					textContentType="username"
+				/>
 
-			<SignLogInput
-				placeholder="password"
-				onChangeText={inputHandler.bind(this, "password")}
-				value={credentials.password}
-				textContentType="password"
-				isPasswordHidden={isPasswordHidden}
-				icon="ios-eye-outline"
-				iconColor="#000000"
-				iconSize={22}
-				onIconPress={showPasswordHandler}
-			/>
+				<SignLogInput
+					placeholder="password"
+					onChangeText={inputHandler.bind(this, "password")}
+					value={credentials.password}
+					textContentType="password"
+					isPasswordHidden={isPasswordHidden}
+					icon="ios-eye-outline"
+					iconColor="#000000"
+					iconSize={22}
+					onIconPress={showPasswordHandler}
+				/>
+			</KeyboardAvoidingView>
 			<Text>{error.errorMessage}</Text>
 
 			<LottieAnimButton
@@ -160,5 +168,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	inputs: {
+		width: "80%",
 	},
 });
