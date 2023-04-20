@@ -1,7 +1,13 @@
 import { Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const IconButton = ({ icon, size, color, onPress, style }) => {
+const IconButton = ({
+	icon = "",
+	size = 26,
+	color = "#000000",
+	onPress = () => {},
+	style = {},
+}) => {
 	return (
 		<Pressable
 			style={({ pressed }) => [
@@ -25,6 +31,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	pressed: {
-		opacity: 0.7,
+		opacity: 0.6,
 	},
 });

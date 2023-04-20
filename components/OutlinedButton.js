@@ -1,12 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-const OutlinedButton = ({ title, onPress, style, titleStyle }) => {
+const OutlinedButton = ({ title, onPress, innerStyle, style, titleStyle }) => {
 	return (
 		<View style={[styles.container, style]}>
 			<Pressable
 				style={({ pressed }) => [
 					styles.innerContainer,
 					pressed && styles.pressed,
+					innerStyle,
 				]}
 				android_ripple={{ color: "#7B7B7B56" }}
 				onPress={onPress}
@@ -21,18 +22,13 @@ export default OutlinedButton;
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
 		backgroundColor: "transparent",
 		borderWidth: 2,
 		borderColor: "#ffffff",
 		borderRadius: 10,
 		overflow: "hidden",
 	},
-	innerContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
+	innerContainer: {},
 	pressed: {
 		opacity: 0.7,
 	},
