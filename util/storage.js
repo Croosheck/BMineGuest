@@ -272,3 +272,29 @@ export async function cancellationRequest(
 
 	// console.log(reservationDateTimestamp - dateNow);
 }
+
+//swipable gallery inside the restaurant's profile
+export async function getRestaurantGalleryImages(
+	{ restaurantUid, profileGallery, setCallback } = {
+		restaurantUid: "",
+		profileGallery: [],
+		setCallback: () => {},
+	}
+) {
+	const listRef = ref(storage, `restaurants/${restaurantUid}/profileGallery`);
+	const response = await listAll(listRef);
+
+	//prevents from data overlapping
+	if (profileGallery.length >= response.items.length) return;
+
+	response.items.forEach(async (item) => {
+		const galleryImgRef = ref(
+			storage,
+			`restaurants/${restaurantUid}/profileGallery/${item.name}`
+		);
+
+		const galleryImgUri = await getDownloadURL(galleryImgRef);
+
+		setCallback((gallery) => [...gallery, galleryImgUri]);
+	});
+}
