@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 import LoadingScreen from "../../components/LoadingScreen";
 
-import Date from "./Date";
+import DateAndTime from "./DateAndTime";
 import Tables from "./Tables";
 import Extras from "./Extras";
 
@@ -41,7 +41,7 @@ const ReserveMain = ({ navigation, route }) => {
 					{
 						text: "Let's go!",
 						onPress: () => {
-							navigation.navigate("Date");
+							navigation.navigate("DateAndTime");
 						},
 					},
 				]
@@ -106,7 +106,7 @@ const ReserveMain = ({ navigation, route }) => {
 
 	return (
 		<TopTab.Navigator
-			initialRouteName="Date"
+			initialRouteName="DateAndTime"
 			screenOptions={{
 				tabBarShowLabel: false,
 				tabBarStyle: { backgroundColor: "#000A2B" },
@@ -122,8 +122,8 @@ const ReserveMain = ({ navigation, route }) => {
 			}}
 		>
 			<TopTab.Screen
-				name="Date"
-				component={Date}
+				name="DateAndTime"
+				component={DateAndTime}
 				initialParams={{
 					restaurantKey: restaurantKey,
 					reservationAdvance: reservationAdvance,
