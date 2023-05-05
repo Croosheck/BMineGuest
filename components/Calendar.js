@@ -1,22 +1,18 @@
-import { useEffect, useState } from "react";
-import { Alert, Button, View, Text, StyleSheet } from "react-native";
+import { useEffect } from "react";
+import { Alert, View, StyleSheet } from "react-native";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { useDispatch } from "react-redux";
 import { pickDate, pickDateParameters } from "../redux/slices/user";
-import { formatDate } from "../util/formatDate";
-import { calendar, reminder } from "../util/permissions";
-
-const MS_PER_HOUR = 3600000;
+import { calendar } from "../util/permissions";
 
 const Calendar = ({
-	reservationAdvance,
-	openDays,
-	closestReservationTimestamp,
-	buttonTitle,
+	openDays = [],
+	closestReservationTimestamp = Number(),
+	hideDatePicker = () => {},
+	isDatePickerVisible = false,
 }) => {
-	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 	const dispatch = useDispatch();
 
 	let permissionCalendarStatus;
@@ -24,22 +20,18 @@ const Calendar = ({
 	// Request permissios to use system calendar (read and write)
 	useEffect(() => {
 		async function permissionsStatus() {
-			permissionCalendarStatus = await calendar();
+			const permissionStatus = await calendar();
+			return permissionStatus;
 		}
-		permissionsStatus();
-	});
+		permissionCalendarStatus = permissionsStatus();
 
-	const showDatePicker = () => {
-		if (permissionCalendarStatus !== "granted") {
-			Alert.alert("Access denied!", "No permission to use Your calendar.");
-			return;
+		if (!permissionCalendarStatus) {
+			return Alert.alert(
+				"Access denied!",
+				"No permission to use Your calendar."
+			);
 		}
-		setDatePickerVisibility(true);
-	};
-
-	const hideDatePicker = () => {
-		setDatePickerVisibility(false);
-	};
+	}, []);
 
 	const alertButtons = [
 		{
@@ -48,7 +40,7 @@ const Calendar = ({
 		},
 	];
 
-	const handleConfirm = (date) => {
+	function handleConfirm(date) {
 		const timestamp = new Date(date).valueOf();
 
 		const pickedDayWeekDayNumber = new Date(timestamp).getDay();
@@ -64,7 +56,7 @@ const Calendar = ({
 
 		if (!pickedDay.isOpen) {
 			Alert.alert(
-				`We are closed every ${upperCaseDay}`,
+				`Reservations are unavailable every ${upperCaseDay}`,
 				"You can still try picking another day!",
 				alertButtons
 			);
@@ -131,23 +123,21 @@ const Calendar = ({
 			return;
 		}
 		hideDatePicker();
-	};
+	}
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.buttonContainer}>
-				<Button title={buttonTitle} onPress={showDatePicker} />
-			</View>
 			<DateTimePickerModal
 				isVisible={isDatePickerVisible}
 				mode="datetime"
 				onConfirm={handleConfirm}
 				onCancel={hideDatePicker}
 				hideDatePicker={hideDatePicker}
-				date={new Date()}
+				date={new Date(closestReservationTimestamp)}
 				minimumDate={new Date(closestReservationTimestamp)}
-				positiveButtonLabel="OK!"
 				minuteInterval={5}
+				is24Hour
+				positiveButton={{ label: "OK!", textColor: "#C9792E" }}
 			/>
 		</View>
 	);
@@ -157,10 +147,6 @@ export default Calendar;
 
 const styles = StyleSheet.create({
 	container: {},
-	buttonContainer: {
-		justifyContent: "center",
-		alignItems: "center",
-	},
 	closestDateInfo: {
 		color: "#ffffff",
 		marginBottom: 44,

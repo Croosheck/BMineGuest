@@ -1,14 +1,17 @@
-import * as Calendar from "expo-calendar";
+import {
+	requestCalendarPermissionsAsync,
+	requestRemindersPermissionsAsync,
+} from "expo-calendar";
 import { Platform } from "react-native";
 
 export async function calendar() {
-	const { status } = await Calendar.requestCalendarPermissionsAsync();
-	return status;
+	const { granted } = await requestCalendarPermissionsAsync();
+	return granted;
 }
 
 export async function reminder() {
 	if (Platform.OS === "ios") {
-		const { status } = await Calendar.requestRemindersPermissionsAsync();
+		const { status } = await requestRemindersPermissionsAsync();
 		return status;
-	} else return;
+	}
 }
