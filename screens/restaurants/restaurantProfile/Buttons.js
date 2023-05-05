@@ -1,5 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import OutlinedButton from "../../../components/OutlinedButton";
+import IconButton from "../../../components/IconButton";
 
 const Buttons = ({
 	screenWidth = 500,
@@ -7,28 +8,23 @@ const Buttons = ({
 	howMany = 0,
 	onReserveHandler = () => {},
 	visible = Boolean(),
+	sideButtonsSize = 30,
 }) => {
 	return (
 		<>
 			{visible && (
 				<View style={styles.buttonsContainer}>
-					<View
-						style={[
-							styles.setButtonContainer,
-							{ width: screenWidth * 0.1, height: screenWidth * 0.1 },
-						]}
-					>
-						<OutlinedButton
-							title="-"
-							onPress={howManyHandler.bind(this, "decrement")}
-							style={styles.setButton}
-							titleStyle={styles.setButtonTitle}
-						/>
-					</View>
+					<IconButton
+						icon="person-remove"
+						color="#ffffff"
+						onPress={howManyHandler.bind(this, "decrement")}
+						size={sideButtonsSize}
+					/>
+
 					<View
 						style={[
 							styles.submitButtonContainer,
-							{ minWidth: screenWidth * 0.4, height: screenWidth * 0.1 },
+							{ minWidth: screenWidth * 0.45, height: screenWidth * 0.1 },
 						]}
 					>
 						<OutlinedButton
@@ -38,19 +34,13 @@ const Buttons = ({
 							innerStyle={styles.submitButton}
 						/>
 					</View>
-					<View
-						style={[
-							styles.setButtonContainer,
-							{ width: screenWidth * 0.1, height: screenWidth * 0.1 },
-						]}
-					>
-						<OutlinedButton
-							title="+"
-							onPress={howManyHandler.bind(this, "increment")}
-							style={styles.setButton}
-							titleStyle={styles.setButtonTitle}
-						/>
-					</View>
+
+					<IconButton
+						icon="person-add"
+						color="#ffffff"
+						onPress={howManyHandler.bind(this, "increment")}
+						size={sideButtonsSize}
+					/>
 				</View>
 			)}
 		</>
@@ -74,10 +64,6 @@ const styles = StyleSheet.create({
 	submitButton: {
 		height: "100%",
 		justifyContent: "center",
-	},
-	setButtonContainer: {},
-	setButton: {
-		borderWidth: 1,
 	},
 	setButtonTitle: {
 		fontSize: 28,
