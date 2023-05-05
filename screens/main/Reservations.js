@@ -8,7 +8,7 @@ import {
 	Text,
 } from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import ReservationListItem from "../reservations/ReservationListItem";
+import ReservationListItem from "./reservations/ReservationListItem";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
 import { auth, db, storage } from "../../firebase";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,18 +17,20 @@ import { SlideInRight, SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import ReservationsFilters from "../../components/ReservationsFilters";
 import OutlinedButton from "../../components/OutlinedButton";
-import { drawerOptionsType } from "../../util/drawerOptionsType";
+import { drawerOptionsType } from "./reservations/drawer/drawerOptionsType";
 import { addEvent } from "../../components/AddEvent";
 import { mapsRedirect } from "../../util/mapsRedirect";
 import { callingRedirect } from "../../util/callingRedirect";
 import {
 	cancellationRequest,
 	deleteUserReservation,
+	getExtras,
 	updateRestaurantRating,
 	updateUsersRatingStatus,
 } from "../../util/storage";
-import RatingModal from "../../components/ratingModal/RatingModal";
-import RequestModal from "../../components/requestModal/RequestModal";
+import RatingModal from "./reservations/ratingModal/RatingModal";
+import RequestModal from "./reservations/requestModal/RequestModal";
+import { getReservationStatus } from "./reservations/utils/getReservationStatus";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
@@ -111,34 +113,6 @@ const Reservations = ({ navigation }) => {
 		};
 	}, []);
 
-	// Extras fetch function - data and images
-	async function getExtrasHandler() {
-		const listRef = ref(storage, "extras");
-
-		// List all images under the /extras/ path
-		const response = await listAll(listRef);
-
-		// Return, if the number of images inside state object === number of all images under extras/ path
-		// - prevents from overloading
-		if (extraImages.length === response.items.length) return;
-
-		// For each extra item (image) from Storage - get a url and connect with extras
-		response.items.forEach(async (item) => {
-			const extraImgRef = ref(storage, `extras/${item.name}`);
-			const extraImgUri = await getDownloadURL(extraImgRef);
-
-			setExtraImages((prev) => {
-				// Cut the image extension
-				const itemName = item.name.match(/^.*(?=(\.))/g).join("");
-
-				return {
-					...prev,
-					[itemName]: extraImgUri,
-				};
-			});
-		});
-	}
-
 	useEffect(() => {
 		if (auth.currentUser) {
 			// Check if user is signed in before using currentUser.uid
@@ -158,43 +132,27 @@ const Reservations = ({ navigation }) => {
 				}
 			});
 
-			getExtrasHandler();
+			getExtras({
+				stateCallback: setExtraImages,
+				state: extraImages,
+			});
 		}
 	}, []);
 
-	function getReservationStatusHandler(itemData) {
-		if (
-			!itemData.item.confirmed &&
-			!itemData.item.cancelled &&
-			!itemData.item.callRequest
-		)
-			return {
-				status: "Pending",
-				bgColor: "#79B4FDA6",
-				type: "pending",
-			};
-		if (
-			!itemData.item.confirmed &&
-			!itemData.item.cancelled &&
-			itemData.item.callRequest
-		)
-			return {
-				status: "Call Us!",
-				bgColor: "#FFFFFFA6",
-				type: "call",
-			};
-		if (itemData.item.confirmed)
-			return {
-				status: "Confirmed",
-				bgColor: "#FFFA66A6",
-				type: "confirmed",
-			};
-		if (itemData.item.cancelled)
-			return {
-				status: "Cancelled",
-				bgColor: "#FF5858A6",
-				type: "cancelled",
-			};
+	function filterButtonHandler(type) {
+		//Anim-reservations only for the 1st render
+		setIsFirstLoad(false);
+
+		setFilterType(type);
+		if (type === "upcoming" || type === "expired")
+			setEmptyListMessage(`No ${type} reservations yet.`);
+	}
+
+	let listCounter;
+	let drawerType;
+
+	function ratingModalButtonHandler(itemData) {
+		setRatingModalOpened({ isOpened: true, reservationData: itemData.item });
 	}
 
 	function noReservationsOutlinedButtonHandler() {
@@ -229,28 +187,13 @@ const Reservations = ({ navigation }) => {
 					</Text>
 					<OutlinedButton
 						title="Let's go!"
-						style={styles.noReservationsOutlinedButton}
+						style={styles.emptyListButton}
+						innerStyle={styles.emptyListButtonInner}
 						onPress={noReservationsOutlinedButtonHandler}
 					/>
 				</LinearGradient>
 			</LinearGradient>
 		);
-	}
-
-	function filterButtonHandler(type) {
-		//Anim-reservations only for the 1st render
-		setIsFirstLoad(false);
-
-		setFilterType(type);
-		if (type === "upcoming" || type === "expired")
-			setEmptyListMessage(`No ${type} reservations yet.`);
-	}
-
-	let listCounter;
-	let reservationDateCategory;
-
-	function ratingModalButtonHandler(itemData) {
-		setRatingModalOpened({ isOpened: true, reservationData: itemData.item });
 	}
 
 	return (
@@ -345,20 +288,20 @@ const Reservations = ({ navigation }) => {
 							listCounter = 0;
 						}
 
-						const reservationStatus = getReservationStatusHandler(itemData);
-						const currentTimestamp = new Date().valueOf();
+						const reservationStatus = getReservationStatus(itemData);
+						const currentTimestamp = Date.now();
 
-						//check if the list is empty, upon filtering
 						if (
+							//check if the list is empty, upon filtering
 							((filterType === "upcoming" &&
 								!(itemData.item.reservationDateTimestamp > currentTimestamp)) ||
 								(filterType === "expired" &&
 									!(
 										itemData.item.reservationDateTimestamp < currentTimestamp
 									))) &&
-							//check if that's the last item
+							//also check if that's the last item
 							itemData.index === reservationsData.length - 1 &&
-							//check if there weren't any items after filtering
+							//also check if there weren't any items after filtering
 							listCounter === 0
 						)
 							return (
@@ -368,16 +311,32 @@ const Reservations = ({ navigation }) => {
 									start={{ x: 0, y: 0.5 }}
 									end={{ x: 0.8, y: 1 }}
 								>
-									<Text style={styles.filteredListEmptyText}>
-										{emptyListMessage}
-									</Text>
+									{filterType !== "upcoming" && (
+										<Text style={styles.filteredListEmptyText}>
+											{emptyListMessage}
+										</Text>
+									)}
+									{filterType === "upcoming" && (
+										<>
+											<Text style={styles.filteredListEmptyText}>
+												{`No ${filterType} reservations yet.\nDo you wish to look for something?\n`}
+											</Text>
+											<OutlinedButton
+												title="Let's go!"
+												style={styles.emptyListButton}
+												innerStyle={styles.emptyListButtonInner}
+												onPress={noReservationsOutlinedButtonHandler}
+											/>
+										</>
+									)}
 								</LinearGradient>
 							);
 
 						if (itemData.item.reservationDateTimestamp > currentTimestamp)
-							reservationDateCategory = "upcoming";
+							drawerType = "upcoming";
+
 						if (itemData.item.reservationDateTimestamp < currentTimestamp)
-							reservationDateCategory = "expired";
+							drawerType = "expired";
 
 						if (
 							(filterType === "upcoming" &&
@@ -391,7 +350,7 @@ const Reservations = ({ navigation }) => {
 						listCounter += 1;
 
 						const drawerOptionsButtons = drawerOptionsType({
-							reservationDateCategory: reservationDateCategory,
+							reservationDateCategory: drawerType,
 							status: reservationStatus.type,
 
 							//general: for all kinds
@@ -411,9 +370,7 @@ const Reservations = ({ navigation }) => {
 										if (itemData.item.ratingData?.isRated) return;
 
 										ratingModalButtonHandler(itemData);
-										//forward the data, to
-										//change state on user's database,
-										//if not submitted
+										//forward the data, to change state on user's database, if not submitted
 									},
 									title: itemData.item.ratingData?.isRated
 										? `Your rating:\n${itemData.item.ratingData.rating} / 5`
@@ -431,16 +388,16 @@ const Reservations = ({ navigation }) => {
 								//cancellation request: only upcoming (either pending, call or confirmed statuses)
 								cancel: {
 									onPress: () => {
-										////temporary disabled for development
-										// if (itemData.item.requestData) {
-										// 	Alert.alert(
-										// 		`Your ${itemData.item.requestData.requestType} request has been submitted.`,
-										// 		"Please call us for any further information!",
-										// 		[{ text: "Thanks!", style: "cancel" }]
-										// 	);
+										//temporary disabled for development
+										if (itemData.item.requestData) {
+											Alert.alert(
+												`Your ${itemData.item.requestData.requestType} request has been submitted.`,
+												"Please call us if you have any further questions!",
+												[{ text: "Thanks!", style: "cancel" }]
+											);
 
-										// 	return;
-										// }
+											return;
+										}
 
 										setRequestModalOpened({
 											isOpened: true,
@@ -457,6 +414,7 @@ const Reservations = ({ navigation }) => {
 						return (
 							<ReservationListItem
 								restaurantName={itemData.item.restaurantName}
+								madeOnTimestamp={itemData.item.madeOnTimestamp}
 								reservationDateTimestamp={
 									itemData.item.reservationDateTimestamp
 								}
@@ -467,7 +425,9 @@ const Reservations = ({ navigation }) => {
 								madeOnDate={itemData.item.madeOnTimestamp}
 								extras={itemData.item.extras}
 								extraImages={extraImages}
+								extrasPrice={itemData.item.extrasTotalPrice}
 								table={itemData.item.table}
+								howMany={itemData.item.howMany}
 								restaurantUid={itemData.item.restaurantUid}
 								drawerOptionsButtons={drawerOptionsButtons}
 								slideMenu
@@ -528,8 +488,14 @@ const styles = StyleSheet.create({
 		textShadowColor: "#ffffff",
 		textShadowRadius: 5,
 	},
-	noReservationsOutlinedButton: {
-		maxHeight: 50,
-		minWidth: 100,
+	emptyListButton: {
+		width: "30%",
+		minWidth: 120,
+		maxWidth: 150,
+	},
+	emptyListButtonInner: {
+		width: "100%",
+		paddingVertical: 10,
+		paddingHorizontal: 20,
 	},
 });
