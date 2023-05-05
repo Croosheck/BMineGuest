@@ -124,6 +124,34 @@ export default async function uploadData(image, type, data) {
 	return { imagesRef, formatedDate };
 }
 
+// Extras fetch function - data and images
+export async function getExtras({ stateCallback = () => ({}), state = [] }) {
+	const listRef = ref(storage, "extras");
+
+	// List all images under the /extras/ path
+	const response = await listAll(listRef);
+
+	// Return, if the number of images inside state object === number of all images under extras/ path
+	// - prevents from overloading
+	if (state.length === response.items.length) return;
+
+	// For each extra item (image) from Storage - get a url and connect with extras
+	response.items.forEach(async (item) => {
+		const extraImgRef = ref(storage, `extras/${item.name}`);
+		const extraImgUri = await getDownloadURL(extraImgRef);
+
+		stateCallback((prev) => {
+			// Cut the image extension
+			const itemName = item.name.match(/^.*(?=(\.))/g).join("");
+
+			return {
+				...prev,
+				[itemName]: extraImgUri,
+			};
+		});
+	});
+}
+
 // Reservations list fetching function
 export async function getReservations() {
 	const reservationsQuery = query(

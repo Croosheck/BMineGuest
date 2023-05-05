@@ -1,4 +1,4 @@
-export function formatDate(date, part = String(), params) {
+export function formatDate(date, part = "", params) {
 	if (params) {
 		//params - object with individual date parameters (as the solution for time zones)
 		//mainly for scheduling the date on the phone's calendar app
@@ -12,6 +12,8 @@ export function formatDate(date, part = String(), params) {
 			weekdayNumber,
 		} = params;
 
+		let isData = true;
+
 		const weekDays = [
 			"Sunday",
 			"Monday",
@@ -22,11 +24,10 @@ export function formatDate(date, part = String(), params) {
 			"Saturday",
 		];
 
-		let isData = true;
-
 		if ([yr, mo, dd, hr, min, weekdayNumber].some((i) => i === undefined))
 			return (isData = false);
 
+		//formats the date with given params and returns data being ready to display
 		const yrDisp = yr?.toString();
 		const moDisp = (mo + 1)?.toString().padStart(2, 0);
 		const ddDisp = dd?.toString().padStart(2, 0);
@@ -50,8 +51,6 @@ export function formatDate(date, part = String(), params) {
 	const minutes = newDate.getMinutes().toString();
 	const time = `${hours.padStart(2, 0)}:${minutes.padStart(2, 0)}`;
 
-	const formatedDate = `${day}-${month}-${year} ${time}`;
-
 	if (part) {
 		if (part === "onlyDate") {
 			const onlyDate = `${day}-${month.padStart(2, 0)}-${year}`;
@@ -62,6 +61,8 @@ export function formatDate(date, part = String(), params) {
 			return onlyTime;
 		}
 	}
+
+	const formatedDate = `${day}-${month}-${year} ${time}`;
 
 	return formatedDate;
 }

@@ -54,8 +54,8 @@ const RequestModal = ({
 			visible={visible}
 			transparent={true}
 			animationType="fade"
-			onRequestClose={onCloseModal}
 			hardwareAccelerated
+			onRequestClose={onCloseModal}
 		>
 			<View style={{ flex: 1, backgroundColor: "#00000075" }}>
 				<KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>

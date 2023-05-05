@@ -16,7 +16,7 @@ import Gallery from "./restaurantProfile/Gallery";
 import Buttons from "./restaurantProfile/Buttons";
 
 const MARGIN_LEFT = 20;
-const MARGIN_RIGHT = 20;
+const DESCRIPTION_MARGIN_RIGHT = 20;
 const TITLE_CONTAINER_HEIGHT = 50;
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -123,7 +123,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 				<Description
 					description={description}
 					marginLeft={MARGIN_LEFT}
-					marginRight={MARGIN_RIGHT}
+					marginRight={DESCRIPTION_MARGIN_RIGHT}
 				/>
 
 				<Gallery
@@ -138,6 +138,7 @@ const RestaurantProfile = ({ navigation, route }) => {
 					howMany={howMany}
 					onReserveHandler={onReserveHandler}
 					visible={reservationsEnabled && isAnyOpen}
+					sideButtonsSize={26}
 				/>
 			</View>
 		</LinearGradient>

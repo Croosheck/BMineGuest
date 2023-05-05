@@ -2,7 +2,7 @@ import "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { StatusBar, StyleSheet, Text, View } from "react-native";
 
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { store } from "./redux/store";
 
 import Landing from "./screens/auth/Landing";
@@ -177,9 +177,7 @@ export default function App() {
 	return (
 		<Provider store={store}>
 			<StatusBar translucent={false} style="light" />
-			{/* <View style={{ flex: 1, backgroundColor: "#000000" }}> */}
 			<AppContainer />
-			{/* </View> */}
 		</Provider>
 	);
 }

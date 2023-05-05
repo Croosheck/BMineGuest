@@ -1,6 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-const OutlinedButton = ({ title, onPress, innerStyle, style, titleStyle }) => {
+const OutlinedButton = ({
+	title = "",
+	onPress = () => {},
+	style = {},
+	innerStyle = {},
+	titleStyle = {},
+}) => {
 	return (
 		<View style={[styles.container, style]}>
 			<Pressable

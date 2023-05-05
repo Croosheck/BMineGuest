@@ -4,6 +4,7 @@ import {
 	Dimensions,
 	FlatList,
 	ImageBackground,
+	Pressable,
 	StyleSheet,
 	Text,
 	View,
@@ -11,9 +12,9 @@ import {
 
 import { useEffect, useState } from "react";
 
-import { formatDate } from "../../util/formatDate";
-import ExtraItem from "./ExtraItem";
-import { getRestaurantProfileImage } from "../../util/storage";
+import { formatDate } from "../../../util/formatDate";
+import ExtraItem from "./extras/ExtraItem";
+import { getRestaurantProfileImage } from "../../../util/storage";
 
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -24,20 +25,25 @@ import Animated, {
 	withSpring,
 } from "react-native-reanimated";
 import { PanGestureHandler } from "react-native-gesture-handler";
-import DrawerOptions from "./DrawerOptions";
+import DrawerOptions from "./drawer/DrawerOptions";
+
+import DetailsModal from "./detailsModal/DetailsModal";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const BORDER_RADIUS = 14;
 
 const ReservationListItem = ({
 	restaurantName = String(),
+	madeOnTimestamp = Number(),
 	reservationDateTimestamp = Number(),
 	reservationDate = String(),
 	reservationDateParameters = Object(),
 	madeOnDate = Number(),
-	table = Array(),
+	table = Object(),
+	howMany = Number(),
 	extras = Array(),
 	extraImages = new Object(),
+	extrasPrice = String(),
 	restaurantUid = String(),
 	reservationEntering,
 	extraEntering,
@@ -52,13 +58,16 @@ const ReservationListItem = ({
 	const [displayedExtraName, setDisplayedExtraName] = useState();
 	const [reservationBackgroundUri, setReservationBackgroundUri] = useState();
 	const [animationFinished, setAnimationFinished] = useState(true);
+	const [detailsModal, setDetailsModal] = useState({
+		isOpened: false,
+	});
 
 	const [fontsLoaded] = useFonts({
-		"PTS-Reg": require("../../assets/fonts/PTSans-Regular.ttf"),
-		"PTS-Bold": require("../../assets/fonts/PTSans-Bold.ttf"),
-		"TiltNeon-Reg": require("../../assets/fonts/TiltNeon-Regular.ttf"),
-		"Anton-Reg": require("../../assets/fonts/Anton-Regular.ttf"),
-		"SourceCodePro-SB": require("../../assets/fonts/SourceCodePro-SemiBold.ttf"),
+		"PTS-Reg": require("../../../assets/fonts/PTSans-Regular.ttf"),
+		"PTS-Bold": require("../../../assets/fonts/PTSans-Bold.ttf"),
+		"TiltNeon-Reg": require("../../../assets/fonts/TiltNeon-Regular.ttf"),
+		"Anton-Reg": require("../../../assets/fonts/Anton-Regular.ttf"),
+		"SourceCodePro-SB": require("../../../assets/fonts/SourceCodePro-SemiBold.ttf"),
 	});
 
 	const formatedReservationDate = formatDate(
@@ -111,16 +120,14 @@ const ReservationListItem = ({
 
 	// Extras title with animation
 	function displayExtraName(itemData) {
-		const { width: WIDTH } = Dimensions.get("window");
-
 		if (displayedExtraName) {
 			if (!animationFinished) return;
 			setAnimationFinished(false);
-			animatedTranslateX.value = withSpring(WIDTH * 2, { mass: 0.6 });
+			animatedTranslateX.value = withSpring(WIDTH, { mass: 0.6 });
 
 			//time period between names changing
 			backToDefaultTimeout = setTimeout(() => {
-				animatedTranslateX.value = -WIDTH * 2;
+				animatedTranslateX.value = -WIDTH;
 				setDisplayedExtraName(
 					`${itemData.item.xName} (${itemData.item.xPrice}$)`
 				);
@@ -179,166 +186,205 @@ const ReservationListItem = ({
 		getRestaurantDataHandler();
 	}, []);
 
+	function openDetailsModalHandler() {
+		setDetailsModal({
+			isOpened: true,
+		});
+	}
+
 	return (
 		<>
-			{reservationBackgroundUri && extraImages && (
-				<Animated.View
-					entering={firstLoad && reservationEntering}
-					style={styles.mainContainer}
-				>
-					{slideMenu && (
-						<DrawerOptions
-							buttonsData={drawerOptionsButtons}
-							width={gestureTranslateXOpened + BORDER_RADIUS}
-							textCenteringMargin={BORDER_RADIUS}
-							buttonCornerRadius={BORDER_RADIUS}
-							animatedScale={reanimatedDrawerGestureButtonScale}
-						/>
-					)}
+			<DetailsModal
+				modalState={detailsModal}
+				closeModal={() => {
+					setDetailsModal({ isOpened: false });
+				}}
+				restaurantName={restaurantName}
+				restaurantImageUri={reservationBackgroundUri}
+				howMany={howMany}
+				madeOnTimestamp={madeOnDate}
+				reservationDateTimestamp={reservationDateTimestamp}
+				reservationDate={reservationDate}
+				table={table}
+				extras={extras}
+				extraImages={extraImages}
+				extrasPrice={extrasPrice}
+			/>
+			<Pressable
+				onPress={() => {
+					openDetailsModalHandler();
+				}}
+			>
+				{reservationBackgroundUri && extraImages && (
 					<Animated.View
-						style={[styles.drawerContainer, reanimatedDrawerGesture]}
+						entering={firstLoad && reservationEntering}
+						style={styles.mainContainer}
 					>
-						<LinearGradient
-							colors={["#212121", "#FFFFFF", "#303030"]}
-							style={styles.gradientBackgroundContainer}
-							start={{ x: 0, y: 0.4 }}
-							end={{ x: 0.3, y: 1 }}
+						{slideMenu && (
+							<DrawerOptions
+								buttonsData={drawerOptionsButtons}
+								width={gestureTranslateXOpened + BORDER_RADIUS}
+								textCenteringMargin={BORDER_RADIUS}
+								buttonCornerRadius={BORDER_RADIUS}
+								animatedScale={reanimatedDrawerGestureButtonScale}
+							/>
+						)}
+						<Animated.View
+							style={[
+								styles.drawerContainer,
+								slideMenu && reanimatedDrawerGesture,
+							]}
 						>
-							<ImageBackground
-								source={{ uri: reservationBackgroundUri }}
-								style={styles.innerBackgroundContainer}
-								imageStyle={styles.imageBackground}
-								resizeMode="stretch"
-								blurRadius={3}
+							<LinearGradient
+								colors={["#212121", "#FFFFFF", "#303030"]}
+								style={styles.gradientBackgroundContainer}
+								start={{ x: 0, y: 0.4 }}
+								end={{ x: 0.3, y: 1 }}
 							>
-								<PanGestureHandler
-									onGestureEvent={slideMenu && drawerGestureHandler}
-									activeOffsetX={[-25, 25]}
+								<ImageBackground
+									source={{ uri: reservationBackgroundUri }}
+									style={styles.innerBackgroundContainer}
+									imageStyle={styles.imageBackground}
+									resizeMode="stretch"
+									blurRadius={3}
 								>
-									<Animated.View style={styles.dataContainer}>
-										<View style={styles.dataInnerContainer}>
-											<Text
-												style={[styles.restaurantName, styles.textShadow]}
-												numberOfLines={1}
-											>
-												{restaurantName}
-											</Text>
-											<View style={styles.datesDataContainer}>
-												<View style={styles.reservedOnContainer}>
-													<Text
-														style={[
-															styles.reservationDetailText,
-															styles.textShadow,
-														]}
-													>
-														{formatedMadeOnDate}
-													</Text>
-													<Text style={[styles.dateLabel, styles.textShadow]}>
-														Reserved on
-													</Text>
-													<Text
-														style={[
-															styles.dateLabel,
-															styles.textShadow,
-															styles.dateLabelTextBelow,
-														]}
-													>
-														(Current Location Time)
-													</Text>
-												</View>
+									<PanGestureHandler
+										onGestureEvent={slideMenu && drawerGestureHandler}
+										activeOffsetX={[-25, 25]}
+									>
+										<Animated.View style={styles.dataContainer}>
+											<View style={styles.dataInnerContainer}>
+												<Text
+													style={[styles.restaurantName, styles.textShadow]}
+													numberOfLines={1}
+												>
+													{restaurantName}
+												</Text>
+												<View style={styles.datesDataContainer}>
+													<View style={styles.reservedOnContainer}>
+														<Text
+															style={[
+																styles.reservationDetailText,
+																styles.textShadow,
+															]}
+														>
+															{formatedMadeOnDate}
+														</Text>
+														<Text style={[styles.dateLabel, styles.textShadow]}>
+															Reserved on
+														</Text>
+														<Text
+															style={[
+																styles.dateLabel,
+																styles.textShadow,
+																styles.dateLabelTextBelow,
+															]}
+														>
+															(Current Location Time)
+														</Text>
+													</View>
 
-												<View style={styles.reservationDateContainer}>
-													<Text
-														style={[
-															styles.reservationDetailText,
-															styles.textShadow,
-														]}
-													>
-														{formatedReservationDate.isData
-															? formatedReservationDate.dateResult
-															: reservationDate}
-													</Text>
-													<Text style={[styles.dateLabel, styles.textShadow]}>
-														Reservation date
-													</Text>
-													<Text
-														style={[
-															styles.dateLabel,
-															styles.textShadow,
-															styles.dateLabelTextBelow,
-														]}
-													>
-														(Restaurant's Local Time)
-													</Text>
+													<View style={styles.reservationDateContainer}>
+														<Text
+															style={[
+																styles.reservationDetailText,
+																styles.textShadow,
+															]}
+														>
+															{formatedReservationDate.isData
+																? formatedReservationDate.dateResult
+																: reservationDate}
+														</Text>
+														<Text style={[styles.dateLabel, styles.textShadow]}>
+															Reservation date
+														</Text>
+														<Text
+															style={[
+																styles.dateLabel,
+																styles.textShadow,
+																styles.dateLabelTextBelow,
+															]}
+														>
+															(Restaurant's Local Time)
+														</Text>
+													</View>
 												</View>
+												<Text
+													style={[styles.tablePlacement, styles.textShadow]}
+													numberOfLines={1}
+												>
+													Table placement: {table.tPlacement}
+												</Text>
 											</View>
-											<Text
-												style={[styles.tablePlacement, styles.textShadow]}
-												numberOfLines={1}
-											>
-												Table placement: {table.tPlacement}
-											</Text>
-										</View>
-									</Animated.View>
-								</PanGestureHandler>
+										</Animated.View>
+									</PanGestureHandler>
 
-								<View style={styles.extrasContainer}>
-									<FlatList
-										data={extras}
-										keyExtractor={(item, index) => index}
-										horizontal={true}
-										style={styles.extrasFlatList}
-										contentContainerStyle={styles.extrasFlatListContent}
-										renderItem={(itemData) => {
-											return (
-												<ExtraItem
-													onPress={displayExtraName.bind(this, itemData)}
-													imgUri={
-														extraImages &&
-														extraImages[itemData.item.xShortFileName]
-													}
-													extraEntering={firstLoad && extraEntering}
-												/>
-											);
-										}}
-									/>
-									<Animated.View
-										style={[
-											styles.displayedExtraNameContainer,
-											reanimatedExtraName,
-										]}
-									>
-										<Text
-											style={[styles.displayedExtraName, styles.textShadow]}
+									<View style={styles.extrasContainer}>
+										<View
+											style={{ flex: 0.75 }}
+											onStartShouldSetResponder={(event) => true}
+											onTouchEnd={(e) => {
+												e.stopPropagation();
+											}}
 										>
-											{displayedExtraName}
-										</Text>
-									</Animated.View>
-								</View>
-								<View
-									style={[
-										styles.reservationStatus,
-										{ backgroundColor: statusColor },
-									]}
-								>
-									<Animated.Text
-										entering={firstLoad && statusEntering}
+											<FlatList
+												data={extras}
+												keyExtractor={(item, index) => index}
+												horizontal={true}
+												style={styles.extrasFlatList}
+												contentContainerStyle={styles.extrasFlatListContent}
+												renderItem={(itemData) => {
+													return (
+														<ExtraItem
+															onPress={displayExtraName.bind(this, itemData)}
+															imgUri={
+																extraImages &&
+																extraImages[itemData.item.xShortFileName]
+															}
+															extraEntering={firstLoad && extraEntering}
+														/>
+													);
+												}}
+											/>
+										</View>
+										<Animated.View
+											style={[
+												styles.displayedExtraNameContainer,
+												reanimatedExtraName,
+											]}
+										>
+											<Text
+												style={[styles.displayedExtraName, styles.textShadow]}
+											>
+												{displayedExtraName}
+											</Text>
+										</Animated.View>
+									</View>
+									<View
 										style={[
-											styles.reservationStatusTitle,
-											styles.textShadow,
-											{
-												color: statusTextColor,
-											},
+											styles.reservationStatus,
+											{ backgroundColor: statusColor },
 										]}
 									>
-										{statusText}
-									</Animated.Text>
-								</View>
-							</ImageBackground>
-						</LinearGradient>
+										<Animated.Text
+											entering={firstLoad && statusEntering}
+											style={[
+												styles.reservationStatusTitle,
+												styles.textShadow,
+												{
+													color: statusTextColor,
+												},
+											]}
+										>
+											{statusText}
+										</Animated.Text>
+									</View>
+								</ImageBackground>
+							</LinearGradient>
+						</Animated.View>
 					</Animated.View>
-				</Animated.View>
-			)}
+				)}
+			</Pressable>
 		</>
 	);
 };
@@ -351,7 +397,7 @@ const styles = StyleSheet.create({
 		textShadowOffset: { height: 3, width: 0 },
 		textShadowRadius: 5,
 	},
-
+	////////////////////////////////////////
 	mainContainer: {
 		height: WIDTH * 0.65,
 		margin: HEIGHT * 0.015,
@@ -440,14 +486,14 @@ const styles = StyleSheet.create({
 		borderColor: "#FFFFFFB3",
 	},
 	extrasFlatList: {
-		borderBottomWidth: 1.5,
+		borderBottomWidth: 0.5,
 		borderColor: "#FFFFFF",
 	},
 	extrasFlatListContent: {
 		alignItems: "center",
 	},
 	displayedExtraNameContainer: {
-		flex: 1.5,
+		flex: 0.25,
 		justifyContent: "center",
 		alignItems: "center",
 	},

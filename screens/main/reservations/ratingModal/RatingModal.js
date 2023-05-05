@@ -1,7 +1,7 @@
 import { Dimensions, Modal, StyleSheet, View } from "react-native";
 import ModalButton from "./ModalButton";
 import StarRating from "react-native-star-rating-widget";
-import LottieIcon from "../LottieIcon";
+import LottieIcon from "../../../../components/LottieIcon";
 import Animated, {
 	runOnJS,
 	useAnimatedStyle,
@@ -97,7 +97,7 @@ const RatingModal = ({
 								</Animated.View>
 							) : (
 								<LottieIcon
-									source={require("../../assets/lottie/lottieSuccess1.json")}
+									source={require("../../../../assets/lottie/lottieSuccess1.json")}
 									height={"100%"}
 									autoPlay
 									loop={false}

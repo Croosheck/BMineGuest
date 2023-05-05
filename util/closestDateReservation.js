@@ -6,7 +6,7 @@ export const closestDateReservation = ({
 	const anyOpenDay = openDays.some((dayData) => dayData.isOpen);
 
 	if (!anyOpenDay || !reservationsEnabled) {
-		return false;
+		return null;
 	}
 
 	const MS_PER_MINUTE = 60000;

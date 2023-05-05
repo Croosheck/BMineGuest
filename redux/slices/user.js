@@ -29,9 +29,20 @@ export const getRestaurants = createAsyncThunk(
 	}
 );
 
+const name = "user";
+const initialState = createInitialState();
+const reducers = createReducers();
+const extraReducers = createExtraReducers(getUser, getRestaurants);
+
 export const userSlice = createSlice({
-	name: "user",
-	initialState: {
+	name,
+	initialState,
+	reducers,
+	extraReducers,
+});
+
+function createInitialState() {
+	return {
 		currentUser: "",
 		reservationData: {
 			extras: [],
@@ -48,8 +59,11 @@ export const userSlice = createSlice({
 		},
 		availableRestaurants: [],
 		reservationsList: [],
-	},
-	reducers: {
+	};
+}
+
+function createReducers() {
+	return {
 		realTimeRestaurants: (state, { payload }) => {
 			state.availableRestaurants = [...payload];
 		},
@@ -98,6 +112,7 @@ export const userSlice = createSlice({
 		},
 		clearDate: (state) => {
 			state.reservationDate = "";
+			state.reservationDateParameters = "";
 		},
 		logoutUser: (state) => {
 			state.currentUser = "";
@@ -105,16 +120,39 @@ export const userSlice = createSlice({
 		addFetchedReservations: (state, { payload }) => {
 			state.reservationsList = payload;
 		},
-	},
-	extraReducers: {
+	};
+}
+
+// function createExtraReducers(userThunk, restaurantsThunk) {
+// 	return (builder) => {
+// 		const { fulfilledUser, pendingUser } = userThunk;
+// 		const { fulfilledRestaurants, pendingRestaurants } = restaurantsThunk;
+
+// 		builder.addCase(fulfilledUser, (state, { payload }) => {
+// 			state.currentUser = payload;
+// 		});
+// 		builder.addCase(pendingUser, (state) => {
+// 			state.currentUser = null;
+// 		});
+
+// 		builder.addCase(fulfilledRestaurants, (state, { payload }) => {
+// 			state.availableRestaurants = [...payload];
+// 		});
+// 		builder.addCase(pendingRestaurants, (state) => {
+// 			state.availableRestaurants = [];
+// 		});
+// 	};
+// }
+function createExtraReducers() {
+	return {
 		[getUser.fulfilled]: (state, { payload }) => {
 			state.currentUser = payload;
 		},
 		[getRestaurants.fulfilled]: (state, { payload }) => {
 			state.availableRestaurants = [...payload];
 		},
-	},
-});
+	};
+}
 
 export const {
 	realTimeRestaurants,

@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import ReservationDrawerButton from "../../components/ReservationDrawerButton";
+import ReservationDrawerButton from "../../../../components/ReservationDrawerButton";
 
 const DrawerOptions = ({
 	width,
@@ -13,6 +13,7 @@ const DrawerOptions = ({
 	const emptyArr = [];
 
 	if (!buttonsData) {
+		//default blank buttons
 		function newArray(arr) {
 			for (let i = 0; i < buttonsQuantity; i++) {
 				arr.push({

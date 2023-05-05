@@ -113,9 +113,6 @@ const Restaurants = ({ navigation }) => {
 	}, []);
 
 	function pressHandler(itemData) {
-		//temporary
-		if (itemData.item.uid !== "XigLnIKHcWUXdHtHlcXnDLehMa83") return;
-
 		navigation.navigate("RestaurantProfile", {
 			name: itemData.item.name,
 			description: itemData.item.description

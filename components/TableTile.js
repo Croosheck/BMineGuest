@@ -10,7 +10,7 @@ import {
 import Icon from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import defaultImg from "../assets/imagePlaceholders/default.jpg";
+import imgPlaceholder from "../assets/imagePlaceholders/default.jpg";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -83,11 +83,7 @@ const TableTile = ({
 							styles.imageBackgroundContainer,
 							picked && styles.imageBackgroundContainerPicked,
 						]}
-						source={
-							imgUri
-								? { uri: imgUri }
-								: require("../assets/imagePlaceholders/default.jpg")
-						}
+						source={imgUri ? { uri: imgUri } : imgPlaceholder}
 						onLoadEnd={() => getImageSizeHandler()}
 						imageStyle={[
 							styles.imageBackground,

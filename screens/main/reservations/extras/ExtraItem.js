@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
 		height: Dimensions.get("window").width * 0.14,
 		width: Dimensions.get("window").width * 0.14,
 		marginHorizontal: 4,
+		// backgroundColor: "#cccccc",
 	},
 	extraBackgroundImg: {},
 });
