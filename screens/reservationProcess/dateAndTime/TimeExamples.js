@@ -2,6 +2,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Example from "./timeExamples/Example";
 import { getExampleClosestHours } from "./utils";
+import { memo } from "react";
 
 const TimeExamples = ({
 	initialTimestamp = Number(),
@@ -38,7 +39,7 @@ const TimeExamples = ({
 	);
 };
 
-export default TimeExamples;
+export default memo(TimeExamples);
 
 const styles = StyleSheet.create({
 	container: {

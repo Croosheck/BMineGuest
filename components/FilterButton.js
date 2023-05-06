@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 const FilterButton = ({ title, onPress, style, titleStyle, disPressAnim }) => {
@@ -15,7 +16,7 @@ const FilterButton = ({ title, onPress, style, titleStyle, disPressAnim }) => {
 	);
 };
 
-export default FilterButton;
+export default memo(FilterButton);
 
 const styles = StyleSheet.create({
 	container: {

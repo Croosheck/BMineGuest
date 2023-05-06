@@ -5,8 +5,8 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { formatDate } from "../../../util/formatDate";
-import { closestDateReservation } from "../../../util/closestDateReservation";
+import { formatDate } from "../../../../util/formatDate";
+import { closestDateReservation } from "../../../../util/closestDateReservation";
 
 const { width: WIDTH } = Dimensions.get("window");
 
@@ -37,7 +37,7 @@ const NearestDate = ({
 		<ImageBackground
 			style={styles.closestDateContainer}
 			imageStyle={styles.closestDatePlateImage}
-			source={require("../../../assets/restaurantProfile/plate1.png")}
+			source={require("../../../../assets/restaurantProfile/plate1.png")}
 		>
 			<View style={styles.closestDateInnerContainer}>
 				<Text style={styles.closestDate}>{`Nearest\navail. date:`}</Text>
@@ -50,7 +50,7 @@ const NearestDate = ({
 		<ImageBackground
 			style={styles.closestDateContainer}
 			imageStyle={styles.closestDatePlateImage}
-			source={require("../../../assets/restaurantProfile/plate1.png")}
+			source={require("../../../../assets/restaurantProfile/plate1.png")}
 		>
 			<View style={styles.closestDateInnerContainer}>
 				<Text

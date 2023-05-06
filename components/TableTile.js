@@ -16,6 +16,7 @@ import Animated, {
 	withTiming,
 } from "react-native-reanimated";
 import { useEffect } from "react";
+import { memo } from "react";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -128,7 +129,7 @@ const TableTile = ({
 	);
 };
 
-export default TableTile;
+export default memo(TableTile);
 
 const styles = StyleSheet.create({
 	container: {

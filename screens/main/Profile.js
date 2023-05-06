@@ -20,6 +20,7 @@ import { getDownloadURL, listAll, ref } from "firebase/storage";
 import LottieIcon from "../../components/LottieIcon";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../../components/Icon";
+import { memo } from "react";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const BACKGROUND_COLOR = "#1F1616";
@@ -239,7 +240,7 @@ const Profile = ({ navigation }) => {
 	);
 };
 
-export default Profile;
+export default memo(Profile);
 
 const styles = StyleSheet.create({
 	container: {

@@ -7,7 +7,7 @@ import {
 	ImageBackground,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { getRestaurantProfileImage } from "../../util/storage";
+import { getRestaurantProfileImage } from "../../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated from "react-native-reanimated";
 import { useFonts } from "expo-font";
@@ -35,11 +35,11 @@ const RestaurantListItem = ({
 }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
 	const [fontsLoaded] = useFonts({
-		"PTS-Reg": require("../../assets/fonts/PTSans-Regular.ttf"),
-		"PTS-Bold": require("../../assets/fonts/PTSans-Bold.ttf"),
-		"TiltNeon-Reg": require("../../assets/fonts/TiltNeon-Regular.ttf"),
-		"Anton-Reg": require("../../assets/fonts/Anton-Regular.ttf"),
-		"SourceCodePro-SB": require("../../assets/fonts/SourceCodePro-SemiBold.ttf"),
+		"PTS-Reg": require("../../../assets/fonts/PTSans-Regular.ttf"),
+		"PTS-Bold": require("../../../assets/fonts/PTSans-Bold.ttf"),
+		"TiltNeon-Reg": require("../../../assets/fonts/TiltNeon-Regular.ttf"),
+		"Anton-Reg": require("../../../assets/fonts/Anton-Regular.ttf"),
+		"SourceCodePro-SB": require("../../../assets/fonts/SourceCodePro-SemiBold.ttf"),
 	});
 
 	useEffect(() => {

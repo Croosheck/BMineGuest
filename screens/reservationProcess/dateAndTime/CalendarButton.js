@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
 	useAnimatedStyle,
@@ -52,7 +52,7 @@ const CalendarButton = ({
 	);
 };
 
-export default CalendarButton;
+export default memo(CalendarButton);
 
 const styles = StyleSheet.create({
 	calendarContainer: {

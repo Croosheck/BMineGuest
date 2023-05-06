@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { StyleSheet, Text } from "react-native";
 
 const PickedDate = ({
@@ -17,7 +18,7 @@ const PickedDate = ({
 	);
 };
 
-export default PickedDate;
+export default memo(PickedDate);
 
 const styles = StyleSheet.create({
 	pickedDate: {

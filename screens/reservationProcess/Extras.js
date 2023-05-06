@@ -7,6 +7,7 @@ import ItemTile from "../../components/ItemTile";
 import { storage } from "../../firebase";
 import { addExtra, removeExtra } from "../../redux/slices/user";
 import { LinearGradient } from "expo-linear-gradient";
+import { memo } from "react";
 
 const Extras = ({ route }) => {
 	const [extraItems, setExtraItems] = useState();
@@ -137,7 +138,7 @@ const Extras = ({ route }) => {
 	);
 };
 
-export default Extras;
+export default memo(Extras);
 
 const styles = StyleSheet.create({
 	container: {

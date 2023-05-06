@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Dimensions, Image, StyleSheet, View } from "react-native";
 
 import { useDispatch } from "react-redux";
-import { getUser } from "../../redux/slices/user";
+import { getUser } from "../../../redux/slices/user";
 import {
 	getRestaurantGalleryImages,
 	getRestaurantProfileImage,
-} from "../../util/storage";
+} from "../../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 import NearestDate from "./restaurantProfile/NearestDate";
 import TitleBar from "./restaurantProfile/TitleBar";

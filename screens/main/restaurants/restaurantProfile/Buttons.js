@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
-import OutlinedButton from "../../../components/OutlinedButton";
-import IconButton from "../../../components/IconButton";
+import OutlinedButton from "../../../../components/OutlinedButton";
+import IconButton from "../../../../components/IconButton";
 
 const Buttons = ({
 	screenWidth = 500,

@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { getOneWeek } from "./utils";
 import WeekDay from "./weekPicks/WeekDay";
+import { memo } from "react";
 
 const WeekPicks = ({
 	openDaysData = [],
@@ -25,7 +26,7 @@ const WeekPicks = ({
 	);
 };
 
-export default WeekPicks;
+export default memo(WeekPicks);
 
 const styles = StyleSheet.create({
 	container: {

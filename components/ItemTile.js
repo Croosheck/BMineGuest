@@ -7,6 +7,7 @@ import {
 	ImageBackground,
 } from "react-native";
 import Icon from "./Icon";
+import { memo } from "react";
 
 const BORDER_RADIUS = 32;
 
@@ -58,7 +59,7 @@ const ItemTile = ({
 	);
 };
 
-export default ItemTile;
+export default memo(ItemTile);
 
 const styles = StyleSheet.create({
 	container: {

@@ -1,5 +1,5 @@
 import { Animated, Easing, FlatList, StyleSheet } from "react-native";
-import RestaurantListItem from "../restaurants/RestaurantListItem";
+import RestaurantListItem from "./restaurants/RestaurantListItem";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getRestaurants } from "../../redux/slices/user";

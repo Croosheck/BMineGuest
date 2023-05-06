@@ -10,7 +10,7 @@ import Register from "./screens/auth/Register";
 import Login from "./screens/auth/Login";
 import Main from "./screens/Main";
 
-import RestaurantProfile from "./screens/restaurants/RestaurantProfile";
+import RestaurantProfile from "./screens/main/restaurants/RestaurantProfile";
 import ReserveMain from "./screens/reservationProcess/ReserveMain";
 import Summary from "./screens/reservationProcess/Summary";
 
