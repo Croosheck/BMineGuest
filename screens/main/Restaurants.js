@@ -8,8 +8,11 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import LottieIcon from "../../components/LottieIcon";
 import {
+	FadeInLeft,
+	FadeInRight,
 	SlideInRight,
 	SlideInUp,
+	StretchInY,
 	ZoomInEasyDown,
 } from "react-native-reanimated";
 
@@ -164,11 +167,17 @@ const Restaurants = ({ navigation }) => {
 		>
 			<FlatList
 				data={availableRestaurants}
+				keyExtractor={(item, idx) => item.uid}
 				renderItem={(itemData) => {
 					const rating = (
 						ratings[itemData.item.uid]?.ratingsSum /
 						ratings[itemData.item.uid]?.ratingsTotal
 					).toFixed(1);
+
+					const fadeInDirection =
+						itemData.index % 2 === 0
+							? FadeInLeft.delay(500).duration(1000).springify().mass(0.6)
+							: FadeInRight.delay(500).duration(1000).springify().mass(0.6);
 
 					return (
 						<RestaurantListItem
@@ -179,12 +188,9 @@ const Restaurants = ({ navigation }) => {
 							name={itemData.item.name}
 							onPress={() => pressHandler(itemData)}
 							restaurantUid={itemData.item.uid}
-							restaurantEntering={ZoomInEasyDown.delay(500)
-								.duration(1000)
-								.springify()
-								.mass(0.6)}
-							titleEntering={SlideInUp.delay(1500).springify().mass(0.5)}
-							restaurantNameEntering={SlideInRight.delay(2000)
+							restaurantEntering={fadeInDirection}
+							titleEntering={StretchInY.delay(1000).springify().mass(0.5)}
+							restaurantNameEntering={SlideInRight.delay(1300)
 								.springify()
 								.mass(0.7)}
 							ratingStyle={ratingBgColorHandler(rating)}
@@ -199,5 +205,7 @@ const Restaurants = ({ navigation }) => {
 export default Restaurants;
 
 const styles = StyleSheet.create({
-	container: {},
+	container: {
+		minHeight: "100%",
+	},
 });
