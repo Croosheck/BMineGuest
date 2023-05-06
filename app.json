@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "BMineGuest",
-		"slug": "BMineGuest",
+		"name": "BMineGuest_presentVersion",
+		"slug": "BMineGuest_presentVersion",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"userInterfaceStyle": "automatic",

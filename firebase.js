@@ -10,12 +10,18 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-	apiKey: Constants.manifest.extra.apiKey,
-	authDomain: Constants.manifest.extra.authDomain,
-	projectId: Constants.manifest.extra.projectId,
-	storageBucket: Constants.manifest.extra.storageBucket,
-	messagingSenderId: Constants.manifest.extra.messagingSenderId,
-	appId: Constants.manifest.extra.appId,
+	apiKey: Constants.expoConfig.extra.apiKey,
+	authDomain: Constants.expoConfig.extra.authDomain,
+	projectId: Constants.expoConfig.extra.projectId,
+	storageBucket: Constants.expoConfig.extra.storageBucket,
+	messagingSenderId: Constants.expoConfig.extra.messagingSenderId,
+	appId: Constants.expoConfig.extra.appId,
+	// apiKey: "AIzaSyBiahlKIrbCBvdLpObk2LTADtvxCDL3-Kw",
+	// authDomain: "bmineguest.firebaseapp.com",
+	// projectId: "bmineguest",
+	// storageBucket: "bmineguest.appspot.com",
+	// messagingSenderId: "1078589199636",
+	// appId: "1:1078589199636:web:e08e61fa957bd9b1149e01",
 };
 
 let app;
