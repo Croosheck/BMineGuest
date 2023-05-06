@@ -4,13 +4,18 @@ import {
 	StyleSheet,
 	Text,
 	View,
-	ImageBackground,
 	Image,
 } from "react-native";
 import Icon from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import imgPlaceholder from "../assets/imagePlaceholders/default.jpg";
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
+} from "react-native-reanimated";
+import { useEffect } from "react";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -29,6 +34,29 @@ const TableTile = ({
 		height: 0,
 	});
 
+	const imgRatio = imageSize.width / imageSize.height;
+	const imageScale = imgRatio > 1.55 ? imgRatio : 1.45;
+
+	const animatedImageScale = useSharedValue(imageScale);
+
+	const reanimatedImageStyle = useAnimatedStyle(() => ({
+		transform: [
+			{ scale: animatedImageScale.value },
+			{ rotate: "-25deg" },
+			{ translateX: -WIDTH * 0.02 },
+			{ translateY: -WIDTH * 0.05 },
+		],
+	}));
+
+	useEffect(() => {
+		if (picked) {
+			animatedImageScale.value = withTiming(imageScale + 0.2);
+		}
+		if (!picked) {
+			animatedImageScale.value = withTiming(imageScale);
+		}
+	}, [picked]);
+
 	function getImageSizeHandler() {
 		Image.getSize(
 			imgUri,
@@ -40,9 +68,6 @@ const TableTile = ({
 			(error) => console.log(error)
 		);
 	}
-
-	const imgRatio = imageSize.width / imageSize.height;
-	const imageScale = imgRatio > 1.55 ? imgRatio : 1.45;
 
 	return (
 		<View style={[styles.container, picked && styles.containerPicked]}>
@@ -78,35 +103,25 @@ const TableTile = ({
 							{tPlacement}
 						</Text>
 					</View>
-					<ImageBackground
+					<View
 						style={[
 							styles.imageBackgroundContainer,
 							picked && styles.imageBackgroundContainerPicked,
 						]}
-						source={imgUri ? { uri: imgUri } : imgPlaceholder}
-						onLoadEnd={() => getImageSizeHandler()}
-						imageStyle={[
-							styles.imageBackground,
-							{
-								transform: [
-									{ rotate: "-25deg" },
-									{ scale: imageScale },
-									{ translateX: -WIDTH * 0.02 },
-									{ translateY: -WIDTH * 0.05 },
-								],
-							},
-							picked && {
-								opacity: 1,
-								transform: [
-									{ rotate: "-25deg" },
-									{ scale: imageScale + 0.2 },
-									{ translateX: -WIDTH * 0.04 },
-									{ translateY: -WIDTH * 0.05 },
-								],
-							},
-						]}
-						resizeMode="center"
-					></ImageBackground>
+					>
+						<Animated.Image
+							style={[
+								styles.imageBackground,
+								picked && {
+									opacity: 1,
+								},
+								reanimatedImageStyle,
+							]}
+							source={imgUri ? { uri: imgUri } : imgPlaceholder}
+							onLoadStart={() => getImageSizeHandler()}
+							resizeMode="center"
+						/>
+					</View>
 				</Pressable>
 			</LinearGradient>
 		</View>
