@@ -5,12 +5,14 @@ import {
 	Dimensions,
 	Pressable,
 	ImageBackground,
+	Image,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { getRestaurantProfileImage } from "../../../util/storage";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated from "react-native-reanimated";
 import { useFonts } from "expo-font";
+import { normalizeFontSize } from "../../../util/normalizeFontSize";
 
 const BORDER_RADIUS = 8;
 
@@ -33,6 +35,7 @@ const RestaurantListItem = ({
 		textShadow: String(),
 	},
 }) => {
+	const [isImageLoaded, setIsImageLoaded] = useState(false);
 	const [profileImgUri, setProfileImgUri] = useState();
 	const [fontsLoaded] = useFonts({
 		"PTS-Reg": require("../../../assets/fonts/PTSans-Regular.ttf"),
@@ -41,6 +44,8 @@ const RestaurantListItem = ({
 		"Anton-Reg": require("../../../assets/fonts/Anton-Regular.ttf"),
 		"SourceCodePro-SB": require("../../../assets/fonts/SourceCodePro-SemiBold.ttf"),
 	});
+
+	const placeholderImg = require("../../../assets/imagePlaceholders/restaurantBackground.webp");
 
 	useEffect(() => {
 		async function getRestaurantDataHandler() {
@@ -66,19 +71,33 @@ const RestaurantListItem = ({
 						<ImageBackground
 							style={styles.container}
 							source={{ uri: profileImgUri }}
+							onLoadEnd={() => setIsImageLoaded(true)}
 						>
 							<Pressable
 								style={styles.pressableContainer}
 								android_ripple={{ color: "#B1B1B135" }}
 								onPress={onPress}
 							>
+								<Image
+									source={placeholderImg}
+									style={[
+										{
+											width: "100%",
+											height: "100%",
+											position: "absolute",
+											backgroundColor: "#000000",
+											opacity: 0.8,
+										},
+										isImageLoaded && { display: "none" },
+									]}
+								/>
 								<Animated.View
 									style={styles.nameContainer}
 									entering={titleEntering}
 								>
 									<Animated.Text
 										entering={restaurantNameEntering}
-										style={styles.name}
+										style={[styles.name, { fontSize: normalizeFontSize(24) }]}
 									>
 										{name}
 									</Animated.Text>
@@ -95,6 +114,7 @@ const RestaurantListItem = ({
 											{
 												color: ratingStyle.text,
 												textShadowColor: ratingStyle.textShadow,
+												fontSize: normalizeFontSize(16),
 											},
 										]}
 									>{`${
@@ -139,6 +159,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		height: Dimensions.get("window").width * 0.65,
 		borderRadius: BORDER_RADIUS - 2,
+		zIndex: 4,
 	},
 	nameContainer: {
 		backgroundColor: "#CCCCCC6E",
@@ -150,7 +171,6 @@ const styles = StyleSheet.create({
 	},
 	name: {
 		color: "#000000",
-		fontSize: 24,
 		fontWeight: "bold",
 	},
 	ratingContainer: {
@@ -167,6 +187,5 @@ const styles = StyleSheet.create({
 	ratingText: {
 		textShadowRadius: 6,
 		fontFamily: "PTS-Bold",
-		fontSize: 16,
 	},
 });
