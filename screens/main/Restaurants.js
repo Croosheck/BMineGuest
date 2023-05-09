@@ -1,5 +1,6 @@
 import { Animated, Easing, FlatList, StyleSheet } from "react-native";
 import RestaurantListItem from "./restaurants/RestaurantListItem";
+import { ratingBgColorHandler } from "./restaurants/utils/ratingBgColorHandler";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getRestaurants } from "../../redux/slices/user";
@@ -10,10 +11,9 @@ import LottieIcon from "../../components/LottieIcon";
 import {
 	FadeInLeft,
 	FadeInRight,
+	SlideInLeft,
 	SlideInRight,
-	SlideInUp,
 	StretchInY,
-	ZoomInEasyDown,
 } from "react-native-reanimated";
 
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -132,6 +132,8 @@ const Restaurants = ({ navigation }) => {
 			phone: itemData.item.phone,
 			rating: itemData.item.restaurantRating,
 			url: itemData.item.url || "",
+			tables: itemData.item.tables || [],
+			tablesFiltering: itemData.item.tablesFiltering,
 		});
 	}
 
@@ -143,22 +145,10 @@ const Restaurants = ({ navigation }) => {
 			ratingsSnapshot.forEach((doc) => {
 				setRatings((prev) => ({ ...prev, [doc.id]: doc.data() }));
 			});
-			// console.log(ratings["XigLnIKHcWUXdHtHlcXnDLehMa83"].ratings);
 		});
+
+		return () => unsubscribeRatings();
 	}, []);
-
-	function ratingBgColorHandler(rating = Number()) {
-		if (0 < rating && rating <= 2)
-			return { bg: "#FF4444CF", text: "#ffffff", textShadow: "#000000" };
-		if (2 < rating && rating < 4)
-			return { bg: "#FFAB44CF", text: "#ffffff", textShadow: "#000000" };
-		if (rating >= 4)
-			return { bg: "#ABFF3ECF", text: "#000000", textShadow: "#FFFFFF" };
-		if (isNaN(rating))
-			return { bg: "#30B7FFCF", text: "#ffffff", textShadow: "#000000" };
-
-		return { bg: "#30B7FFCF", text: "#ffffff", textShadow: "#000000" };
-	}
 
 	return (
 		<LinearGradient
@@ -179,6 +169,11 @@ const Restaurants = ({ navigation }) => {
 							? FadeInLeft.delay(500).duration(1000).springify().mass(0.6)
 							: FadeInRight.delay(500).duration(1000).springify().mass(0.6);
 
+					const slideInDirection =
+						itemData.index % 2 === 0
+							? SlideInRight.delay(1200).springify().mass(0.6)
+							: SlideInLeft.delay(1200).springify().mass(0.6);
+
 					return (
 						<RestaurantListItem
 							rating={{
@@ -190,9 +185,7 @@ const Restaurants = ({ navigation }) => {
 							restaurantUid={itemData.item.uid}
 							restaurantEntering={fadeInDirection}
 							titleEntering={StretchInY.delay(1000).springify().mass(0.5)}
-							restaurantNameEntering={SlideInRight.delay(1300)
-								.springify()
-								.mass(0.7)}
+							restaurantNameEntering={slideInDirection}
 							ratingStyle={ratingBgColorHandler(rating)}
 						/>
 					);
