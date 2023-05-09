@@ -1,11 +1,13 @@
 import { StyleSheet, View, Modal } from "react-native";
 import CloseButton from "../../../../components/IconButton";
 import SectionDivider from "../../../../components/SectionDivider";
-import SectionField from "./SectionField";
-import TimelineBarSection from "./TimelineBarSection";
-import TableSection from "./TableSection";
-import ExtrasSection from "./ExtrasSection";
-import TopContainer from "./TopContainer";
+import SectionField from "./detailsModal/SectionField";
+import TimelineBarSection from "./detailsModal/TimelineBarSection";
+import TableSection from "./detailsModal/TableSection";
+import ExtrasSection from "./detailsModal/ExtrasSection";
+import TopContainer from "./detailsModal/TopContainer";
+import { useState } from "react";
+import NoteModal from "./detailsModal/NoteModal";
 
 const MARGIN_LEFT = 20;
 const DIVIDER_MARGIN = 20;
@@ -26,7 +28,26 @@ const DetailsModal = ({
 	extras = [],
 	extraImages = {},
 	extrasPrice = "",
+	note = "",
 }) => {
+	const [noteModal, setNoteModal] = useState({
+		isVisible: false,
+		content: "",
+	});
+
+	function openNoteModalHandler() {
+		setNoteModal({
+			isVisible: true,
+			content: note,
+		});
+	}
+	function closeNoteModalHandler() {
+		setNoteModal({
+			isVisible: false,
+			content: "",
+		});
+	}
+
 	return (
 		<Modal
 			visible={modalState.isOpened}
@@ -34,7 +55,14 @@ const DetailsModal = ({
 			transparent={true}
 			hardwareAccelerated
 			onRequestClose={closeModal}
+			statusBarTranslucent={true}
 		>
+			<NoteModal
+				isVisible={noteModal.isVisible}
+				content={noteModal.content}
+				onRequestClose={closeNoteModalHandler}
+			/>
+
 			<View style={styles.modalBackdrop}>
 				<View style={styles.modal}>
 					<CloseButton
@@ -49,6 +77,8 @@ const DetailsModal = ({
 						restaurantName={restaurantName}
 						restaurantImageUri={restaurantImageUri}
 						paddingLeft={MARGIN_LEFT}
+						isMessage={!!note}
+						onMessagePress={openNoteModalHandler}
 					/>
 
 					<View style={styles.modalDetails}>
@@ -56,7 +86,7 @@ const DetailsModal = ({
 							style={[styles.modalDetailsSection, styles.modalDetailsFirst]}
 						>
 							<SectionField
-								label="Reservation Number"
+								label="Reservation No."
 								content={reservationNumber}
 							/>
 							<SectionField label="For" content={howMany} />

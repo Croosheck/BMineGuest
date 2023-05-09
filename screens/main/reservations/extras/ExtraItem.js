@@ -13,7 +13,7 @@ import Animated, {
 	useAnimatedStyle,
 } from "react-native-reanimated";
 
-const ExtraItem = ({ onPress, imgUri, extraEntering }) => {
+const ExtraItem = ({ onPress = () => {}, imgUri = "" }) => {
 	const [touched, setTouched] = useState();
 
 	const animatedScale = useSharedValue(0.9);
@@ -42,7 +42,7 @@ const ExtraItem = ({ onPress, imgUri, extraEntering }) => {
 	return (
 		<>
 			{imgUri && (
-				<Animated.View style={[reanimatedScale]} entering={extraEntering}>
+				<Animated.View style={[reanimatedScale]}>
 					<Pressable
 						onPress={() => {
 							scaleHandler();

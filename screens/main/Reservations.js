@@ -9,11 +9,10 @@ import {
 } from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReservationListItem from "./reservations/ReservationListItem";
-import { getDownloadURL, ref, listAll } from "firebase/storage";
-import { auth, db, storage } from "../../firebase";
+import { auth, db } from "../../firebase";
 import { LinearGradient } from "expo-linear-gradient";
 import LottieIcon from "../../components/LottieIcon";
-import { SlideInRight, SlideInUp, ZoomInEasyUp } from "react-native-reanimated";
+import { FadeIn, FadeInRight, FadeInUp } from "react-native-reanimated";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import ReservationsFilters from "../../components/ReservationsFilters";
 import OutlinedButton from "../../components/OutlinedButton";
@@ -393,7 +392,7 @@ const Reservations = ({ navigation }) => {
 											Alert.alert(
 												`Your ${itemData.item.requestData.requestType} request has been submitted.`,
 												"Please call us if you have any further questions!",
-												[{ text: "Thanks!", style: "cancel" }]
+												[{ text: "Close", style: "cancel" }]
 											);
 
 											return;
@@ -413,42 +412,28 @@ const Reservations = ({ navigation }) => {
 
 						return (
 							<ReservationListItem
-								restaurantName={itemData.item.restaurantName}
-								madeOnTimestamp={itemData.item.madeOnTimestamp}
-								reservationDateTimestamp={
-									itemData.item.reservationDateTimestamp
-								}
-								reservationDate={itemData.item.reservationDate}
-								reservationDateParameters={
-									itemData.item.reservationDateParameters
-								}
-								madeOnDate={itemData.item.madeOnTimestamp}
-								extras={itemData.item.extras}
+								data={itemData.item}
 								extraImages={extraImages}
-								extrasPrice={itemData.item.extrasTotalPrice}
-								table={itemData.item.table}
-								howMany={itemData.item.howMany}
-								restaurantUid={itemData.item.restaurantUid}
 								drawerOptionsButtons={drawerOptionsButtons}
 								slideMenu
-								// animation only for the 1st render
-								firstLoad={isFirstLoad}
-								// firstLoad={true}
-								reservationEntering={ZoomInEasyUp.delay(500)
-									.duration(1000)
+								//// animation only for the 1st render ////
+								// firstLoad={isFirstLoad}
+								firstLoad={true}
+								reservationEntering={FadeInUp.delay(300)
+									.duration(isFirstLoad && 1000)
 									.springify()
 									.mass(0.6)}
-								extraEntering={SlideInUp.delay(800)
-									.duration(1000)
-									.springify()
-									.mass(0.6)}
+								extrasEntering={
+									isFirstLoad &&
+									FadeInRight.delay(1000).duration(1000).springify().mass(0.6)
+								}
 								statusColor={reservationStatus.bgColor}
 								statusText={reservationStatus.status}
 								statusTextColor="#ffffff"
-								statusEntering={SlideInRight.delay(1600)
-									.duration(500)
-									.springify()
-									.mass(0.65)}
+								statusEntering={
+									isFirstLoad &&
+									FadeIn.delay(1500).duration(500).springify().mass(0.65)
+								}
 							/>
 						);
 					}}

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
-import { formatDate } from "../../../../util/formatDate";
+import { formatDate } from "../../../../../util/formatDate";
+import { normalizeFontSize } from "../../../../../util/normalizeFontSize";
 
 const WIDTH = "90%";
 const MS_PER_DAY = 86400000;
@@ -56,17 +57,32 @@ const TimelineBarSection = ({
 		<View style={styles.container}>
 			<View style={styles.labelsBox}>
 				<View style={styles.labelBox}>
-					<Text style={styles.label}>Made On</Text>
-					<Text style={styles.date}>{formattedStart}</Text>
+					<Text style={[styles.label, { fontSize: normalizeFontSize(12) }]}>
+						Made On
+					</Text>
+					<Text style={[styles.date, { fontSize: normalizeFontSize(13) }]}>
+						{formattedStart}
+					</Text>
 				</View>
 				<View style={styles.labelBox}>
-					<Text style={styles.label}>For (local)</Text>
-					<Text style={styles.date}>{reservationDate}</Text>
+					<Text style={[styles.label, { fontSize: normalizeFontSize(12) }]}>
+						For (local)
+					</Text>
+					<Text style={[styles.date, { fontSize: normalizeFontSize(13) }]}>
+						{reservationDate}
+					</Text>
 				</View>
 			</View>
 			<View style={styles.progressBar}>
 				{timeDelta > 0 && (
-					<Text style={styles.progressTimeLeft}>{timeLeft}</Text>
+					<Text
+						style={[
+							styles.progressTimeLeft,
+							{ fontSize: normalizeFontSize(13) },
+						]}
+					>
+						{timeLeft}
+					</Text>
 				)}
 				<View
 					style={[styles.progress, { width: `${progressPercentage}%` }]}
@@ -98,11 +114,9 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 		color: "#656565",
 		letterSpacing: 0.7,
-		fontSize: 12,
 	},
 	date: {
 		fontWeight: "500",
-		fontSize: 13,
 	},
 	//////////////////////
 	progressBar: {
@@ -124,6 +138,5 @@ const styles = StyleSheet.create({
 		zIndex: 3,
 		width: "100%",
 		textAlign: "center",
-		fontSize: 13,
 	},
 });

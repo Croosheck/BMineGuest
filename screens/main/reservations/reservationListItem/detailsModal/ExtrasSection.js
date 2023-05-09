@@ -1,11 +1,20 @@
 import { StyleSheet, Text, View } from "react-native";
+import { normalizeFontSize } from "../../../../../util/normalizeFontSize";
 
 const ExtrasSection = ({ extrasPrice = Number(), extras = [] }) => {
 	let content = "";
 
 	function getBoldText(content) {
 		return (
-			<Text style={[styles.content, styles.contentHighlighted]}>{content}</Text>
+			<Text
+				style={[
+					styles.content,
+					{ fontSize: normalizeFontSize(14) },
+					styles.contentHighlighted,
+				]}
+			>
+				{content}
+			</Text>
 		);
 	}
 
@@ -13,7 +22,7 @@ const ExtrasSection = ({ extrasPrice = Number(), extras = [] }) => {
 		content = (
 			<>
 				<Text
-					style={styles.content}
+					style={[styles.content, { fontSize: normalizeFontSize(14) }]}
 				>{`The total price for your extra services (${extras.length}) is:`}</Text>
 				{getBoldText(`${extrasPrice}$`)}
 				<Text style={styles.annotation}>
@@ -26,7 +35,7 @@ const ExtrasSection = ({ extrasPrice = Number(), extras = [] }) => {
 		content = (
 			<>
 				<Text
-					style={styles.content}
+					style={[styles.content, { fontSize: normalizeFontSize(14) }]}
 				>{`The extra services (${extras.length}) you picked are FREE!`}</Text>
 			</>
 		);
@@ -34,7 +43,7 @@ const ExtrasSection = ({ extrasPrice = Number(), extras = [] }) => {
 	if (extrasPrice === 0 && extras.length === 0) {
 		content = (
 			<Text
-				style={styles.content}
+				style={[styles.content, { fontSize: normalizeFontSize(14) }]}
 			>{`You didn't pick any extra services.`}</Text>
 		);
 	}

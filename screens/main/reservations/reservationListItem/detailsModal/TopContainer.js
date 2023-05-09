@@ -1,9 +1,13 @@
 import { Image, StyleSheet, Text, View } from "react-native";
+import { normalizeFontSize } from "../../../../../util/normalizeFontSize";
+import IconButton from "../../../../../components/IconButton";
 
 const TopContainer = ({
 	restaurantName = "",
 	restaurantImageUri = "",
 	paddingLeft = Number(),
+	onMessagePress = () => {},
+	isMessage = Boolean(),
 }) => {
 	const restaurantTitleDynamicFontSize = restaurantName.length < 22 ? 22 : 18;
 
@@ -18,12 +22,20 @@ const TopContainer = ({
 				<Text
 					style={[
 						styles.restaurantName,
-						{ fontSize: restaurantTitleDynamicFontSize },
+						{ fontSize: normalizeFontSize(restaurantTitleDynamicFontSize) },
 					]}
 					numberOfLines={1}
 				>
 					{restaurantName}
 				</Text>
+				{isMessage && (
+					<IconButton
+						icon="chatbox"
+						onPress={onMessagePress}
+						color="#A1BFEB"
+						style={styles.iconButton}
+					/>
+				)}
 			</View>
 		</View>
 	);
@@ -40,13 +52,19 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	restaurantNameBox: {
-		justifyContent: "center",
-		paddingVertical: 6,
+		justifyContent: "space-between",
+		paddingVertical: 5,
 		borderBottomWidth: 0.5,
 		borderColor: "#949494",
+		flexDirection: "row",
 	},
 	restaurantName: {
 		fontWeight: "600",
 		letterSpacing: 0.3,
+	},
+	iconButton: {
+		margin: 0,
+		padding: 0,
+		marginRight: 10,
 	},
 });
