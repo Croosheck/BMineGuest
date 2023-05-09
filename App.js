@@ -176,7 +176,12 @@ function AppContainer() {
 export default function App() {
 	return (
 		<Provider store={store}>
-			<StatusBar translucent={false} style="light" />
+			<StatusBar
+				translucent={false}
+				barStyle="light-content"
+				backgroundColor="#000000"
+				hidden
+			/>
 			<AppContainer />
 		</Provider>
 	);
