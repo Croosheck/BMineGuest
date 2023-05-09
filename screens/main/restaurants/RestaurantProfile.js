@@ -39,6 +39,8 @@ const RestaurantProfile = ({ navigation, route }) => {
 		restaurantTags,
 		phone,
 		url,
+		tables,
+		tablesFiltering,
 	} = route.params;
 
 	function howManyHandler(type) {
@@ -84,6 +86,8 @@ const RestaurantProfile = ({ navigation, route }) => {
 			reservationsEnabled: reservationsEnabled,
 			phone: phone,
 			url: url,
+			tables: tables,
+			tablesFiltering: tablesFiltering,
 		});
 	}
 

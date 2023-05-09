@@ -26,6 +26,8 @@ const ReserveMain = ({ navigation, route }) => {
 		reservationsEnabled,
 		phone,
 		url,
+		tables,
+		tablesFiltering,
 	} = route.params;
 
 	const { reservationDate } = useSelector((state) => state.userReducer);
@@ -144,6 +146,9 @@ const ReserveMain = ({ navigation, route }) => {
 				initialParams={{
 					restaurantKey: restaurantKey,
 					howMany: howMany,
+					tables: tables,
+					tablesFiltering: tablesFiltering,
+					restaurantUid: restaurantUid,
 				}}
 				options={{
 					tabBarIcon: () => {
