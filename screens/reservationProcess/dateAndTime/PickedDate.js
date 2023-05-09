@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { StyleSheet, Text } from "react-native";
+import { normalizeFontSize } from "../../../util/normalizeFontSize";
 
 const PickedDate = ({
 	label = "",
@@ -10,7 +11,14 @@ const PickedDate = ({
 }) => {
 	return (
 		<>
-			<Text style={styles.pickedDate}>
+			<Text
+				style={[
+					styles.pickedDate,
+					{
+						fontSize: normalizeFontSize(20),
+					},
+				]}
+			>
 				{data.date && `${data.date} (${data.weekDay})`}
 			</Text>
 			<Text style={styles.label}>{data.date && label}</Text>
@@ -23,7 +31,6 @@ export default memo(PickedDate);
 const styles = StyleSheet.create({
 	pickedDate: {
 		color: "#ffffff",
-		fontSize: 20,
 		textAlign: "center",
 	},
 	label: {

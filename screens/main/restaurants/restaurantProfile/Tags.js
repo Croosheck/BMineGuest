@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { normalizeFontSize } from "../../../../util/normalizeFontSize";
 
 const Tags = ({ restaurantTags = [{ tagName: "" }], marginLeft = 0 }) => {
 	return (
@@ -8,7 +9,10 @@ const Tags = ({ restaurantTags = [{ tagName: "" }], marginLeft = 0 }) => {
 				horizontal
 			>
 				{restaurantTags.map((tag, i) => (
-					<Text style={styles.tag} key={i}>
+					<Text
+						style={[styles.tag, { fontSize: normalizeFontSize(14) }]}
+						key={i}
+					>
 						{tag.tagName}
 					</Text>
 				))}

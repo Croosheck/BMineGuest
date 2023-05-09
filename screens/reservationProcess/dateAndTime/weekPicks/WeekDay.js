@@ -1,4 +1,5 @@
 import { StyleSheet, Text, Pressable } from "react-native";
+import { normalizeFontSize } from "../../../../util/normalizeFontSize";
 
 const WeekDay = ({
 	day = {
@@ -22,8 +23,24 @@ const WeekDay = ({
 				!day.dayData.isOpen && styles.dayUnavailable,
 			]}
 		>
-			<Text style={styles.dayNameLabel}>{day.dayShort}</Text>
-			<Text style={styles.dayDateLabel}>
+			<Text
+				style={[
+					styles.dayNameLabel,
+					{
+						fontSize: normalizeFontSize(16),
+					},
+				]}
+			>
+				{day.dayShort}
+			</Text>
+			<Text
+				style={[
+					styles.dayDateLabel,
+					{
+						fontSize: normalizeFontSize(12),
+					},
+				]}
+			>
 				{day.dayNum}.{day.monthNum}
 			</Text>
 		</Pressable>
@@ -53,7 +70,6 @@ const styles = StyleSheet.create({
 		textTransform: "capitalize",
 		width: "100%",
 		textAlign: "center",
-		fontSize: 16,
 		fontWeight: "500",
 	},
 	dayDateLabel: {
@@ -61,7 +77,6 @@ const styles = StyleSheet.create({
 		textTransform: "capitalize",
 		width: "100%",
 		textAlign: "center",
-		fontSize: 12,
 		fontWeight: "200",
 	},
 });

@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { formatDate } from "../../../../util/formatDate";
 import { closestDateReservation } from "../../../../util/closestDateReservation";
+import { normalizeFontSize } from "../../../../util/normalizeFontSize";
 
 const { width: WIDTH } = Dimensions.get("window");
 
@@ -41,7 +42,13 @@ const NearestDate = ({
 		>
 			<View style={styles.closestDateInnerContainer}>
 				<Text style={styles.closestDate}>{`Nearest\navail. date:`}</Text>
-				<Text style={[styles.closestDate, styles.dateStyle]}>
+				<Text
+					style={[
+						styles.closestDate,
+						styles.dateStyle,
+						{ fontSize: normalizeFontSize(17) },
+					]}
+				>
 					{formatDate(closestReservationTimestamp, "onlyDate")}
 				</Text>
 			</View>
@@ -60,7 +67,7 @@ const NearestDate = ({
 						styles.dateStyle,
 						{
 							top: "9%",
-							fontSize: WIDTH * 0.04,
+							fontSize: normalizeFontSize(WIDTH * 0.04),
 							textShadowRadius: 3,
 						},
 					]}
@@ -100,7 +107,6 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		color: "#ffffff",
 		fontWeight: "500",
-		fontSize: WIDTH * 0.04,
 		textShadowColor: "white",
 		textShadowRadius: 6,
 	},
@@ -110,6 +116,5 @@ const styles = StyleSheet.create({
 		// color: "#57851A",
 		marginTop: 5,
 		top: -5,
-		fontSize: 17,
 	},
 });

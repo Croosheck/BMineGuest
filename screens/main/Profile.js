@@ -21,6 +21,7 @@ import LottieIcon from "../../components/LottieIcon";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "../../components/Icon";
 import { memo } from "react";
+import { normalizeFontSize } from "../../util/normalizeFontSize";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const BACKGROUND_COLOR = "#1F1616";
@@ -209,20 +210,28 @@ const Profile = ({ navigation }) => {
 							imageStyle={styles.profileImage}
 							resizeMode="cover"
 						/>
-						<Text style={styles.userNameText}>{currentUser.name}</Text>
+						<Text
+							style={[styles.userNameText, { fontSize: normalizeFontSize(22) }]}
+						>
+							{currentUser.name}
+						</Text>
 						<View style={styles.statsContainer}>
 							{/* <View style={styles.statContainer}>
 								<Text style={styles.stat}>{reservationsCounter.active ?? 0}</Text>
 								<Text style={styles.statLabel}>Active Reservations</Text>
 							</View> */}
 							<View style={styles.statContainer}>
-								<Text style={styles.stat}>
+								<Text
+									style={[styles.stat, { fontSize: normalizeFontSize(20) }]}
+								>
 									{reservationsCounter.upcoming ?? 0}
 								</Text>
 								<Text style={styles.statLabel}>Upcoming Reservations</Text>
 							</View>
 							<View style={styles.statContainer}>
-								<Text style={styles.stat}>
+								<Text
+									style={[styles.stat, { fontSize: normalizeFontSize(20) }]}
+								>
 									{reservationsCounter.total ?? 0}
 								</Text>
 								<Text style={styles.statLabel} numberOfLines={1}>
@@ -289,7 +298,6 @@ const styles = StyleSheet.create({
 	userNameText: {
 		width: WIDTH,
 		color: "#FFFFFF",
-		fontSize: 22,
 		fontWeight: "bold",
 		textShadowColor: "#000000",
 		textShadowOffset: { height: 2, width: 2 },
@@ -313,7 +321,6 @@ const styles = StyleSheet.create({
 	},
 	stat: {
 		color: "#ffffff",
-		fontSize: 20,
 	},
 	statLabel: {
 		color: "#FFFFFF79",

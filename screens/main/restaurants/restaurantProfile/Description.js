@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { normalizeFontSize } from "../../../../util/normalizeFontSize";
 
 const Description = ({ description = "", marginLeft = 0, marginRight = 0 }) => {
 	return (
@@ -9,7 +10,9 @@ const Description = ({ description = "", marginLeft = 0, marginRight = 0 }) => {
 			]}
 		>
 			<ScrollView style={styles.descriptionInnerContainer}>
-				<Text style={styles.description}>{description}</Text>
+				<Text style={[styles.description, { fontSize: normalizeFontSize(15) }]}>
+					{description}
+				</Text>
 			</ScrollView>
 		</View>
 	);
@@ -30,7 +33,6 @@ const styles = StyleSheet.create({
 	description: {
 		color: "#ffffff",
 		fontStyle: "italic",
-		fontSize: 15,
 		letterSpacing: 0.4,
 		textShadowColor: "#FFFFFFCD",
 		textShadowRadius: 3,

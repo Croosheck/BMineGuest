@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { normalizeFontSize } from "../../../../util/normalizeFontSize";
 
 const TitleBar = ({ name = "", marginLeft = 0, height = 14 }) => {
 	const restaurantTitleDynamicFontSize = name.length < 22 ? 24 : 20;
@@ -10,7 +11,7 @@ const TitleBar = ({ name = "", marginLeft = 0, height = 14 }) => {
 					style={[
 						styles.title,
 						{
-							fontSize: restaurantTitleDynamicFontSize,
+							fontSize: normalizeFontSize(restaurantTitleDynamicFontSize),
 							marginLeft: marginLeft,
 						},
 					]}

@@ -17,6 +17,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useEffect } from "react";
 import { memo } from "react";
+import { normalizeFontSize } from "../util/normalizeFontSize";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -86,6 +87,9 @@ const TableTile = ({
 							<Text
 								style={[
 									styles.seatsQuantity,
+									{
+										fontSize: normalizeFontSize(18),
+									},
 									styles.textShadow,
 									picked && { color: "#FFFFFF" },
 								]}
@@ -97,6 +101,9 @@ const TableTile = ({
 						<Text
 							style={[
 								styles.textBelow,
+								{
+									fontSize: normalizeFontSize(16),
+								},
 								styles.textShadow,
 								picked && { color: "#FFFFFF" },
 							]}
@@ -209,14 +216,12 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	seatsQuantity: {
-		fontSize: 18,
 		fontWeight: "500",
 		color: "#ffffff",
 		textAlign: "center",
 		minWidth: "10%",
 	},
 	textBelow: {
-		fontSize: 16,
 		fontWeight: "300",
 		color: "#ffffff",
 		textAlign: "center",
