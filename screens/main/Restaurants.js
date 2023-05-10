@@ -157,7 +157,7 @@ const Restaurants = ({ navigation }) => {
 		>
 			<FlatList
 				data={availableRestaurants}
-				keyExtractor={(item, idx) => item.uid}
+				keyExtractor={(item) => item.uid}
 				renderItem={(itemData) => {
 					const rating = (
 						ratings[itemData.item.uid]?.ratingsSum /

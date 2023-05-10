@@ -239,6 +239,7 @@ const Tables = ({ route }) => {
 					data={tables}
 					style={styles.tablesListContainer}
 					numColumns={1}
+					keyExtractor={(item) => item.tId}
 					renderItem={(itemData) => {
 						return (
 							<TableTile

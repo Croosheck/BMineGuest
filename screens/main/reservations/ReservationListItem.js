@@ -391,7 +391,7 @@ const ReservationListItem = ({
 											>
 												<FlatList
 													data={extras}
-													keyExtractor={(item, index) => index}
+													keyExtractor={(item) => item.xName}
 													horizontal={true}
 													style={styles.extrasFlatList}
 													contentContainerStyle={styles.extrasFlatListContent}
