@@ -14,6 +14,12 @@ import Tags from "./restaurantProfile/Tags";
 import Description from "./restaurantProfile/Description";
 import Gallery from "./restaurantProfile/Gallery";
 import Buttons from "./restaurantProfile/Buttons";
+import AddFavorite from "./restaurantProfile/AddFavorite";
+import {
+	getFavorite,
+	removeFavorite,
+	setAsFavorite,
+} from "./utils/favoriteHandler";
 
 const MARGIN_LEFT = 20;
 const DESCRIPTION_MARGIN_RIGHT = 20;
@@ -24,6 +30,10 @@ const RestaurantProfile = ({ navigation, route }) => {
 	const [profileImgUri, setProfileImgUri] = useState();
 	const [howMany, setHowMany] = useState(1);
 	const [profileGallery, setProfileGallery] = useState([]);
+	const [isRestaurantFavorite, setIsRestaurantFavorite] = useState({
+		isFav: false,
+		isLoaded: false,
+	});
 
 	const dispatch = useDispatch();
 
@@ -58,10 +68,40 @@ const RestaurantProfile = ({ navigation, route }) => {
 		}
 	}
 
+	async function onFavPressHandler() {
+		if (isRestaurantFavorite.isFav) {
+			removeFavorite(restaurantUid);
+			setIsRestaurantFavorite((prev) => ({
+				...prev,
+				isFav: false,
+			}));
+			return;
+		}
+
+		setAsFavorite({
+			restaurantUid: restaurantUid,
+			restaurantName: name,
+		});
+
+		setIsRestaurantFavorite((prev) => ({
+			...prev,
+			isFav: true,
+		}));
+	}
+
 	useEffect(() => {
 		async function getRestaurantDataHandler() {
 			const profileImage = await getRestaurantProfileImage(restaurantUid);
 			setProfileImgUri(profileImage);
+
+			const wasFavedBefore = await getFavorite({
+				restaurantUid: restaurantUid,
+			});
+
+			setIsRestaurantFavorite({
+				isLoaded: true,
+				isFav: wasFavedBefore,
+			});
 		}
 
 		getRestaurantGalleryImages({
@@ -107,6 +147,13 @@ const RestaurantProfile = ({ navigation, route }) => {
 		>
 			<View style={styles.imageContainer}>
 				<Image source={{ uri: profileImgUri }} style={styles.image} />
+
+				{isRestaurantFavorite.isLoaded && (
+					<AddFavorite
+						onFavPress={onFavPressHandler}
+						isFavorite={isRestaurantFavorite.isFav}
+					/>
+				)}
 			</View>
 
 			<View style={styles.detailsContainer}>
