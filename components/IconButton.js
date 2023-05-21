@@ -10,13 +10,14 @@ const IconButton = ({
 	label = "",
 	labelColor = "#A2A2A2",
 	labelSize = 11,
+	pressable = true,
 }) => {
 	return (
 		<Pressable
 			style={({ pressed }) => [
 				styles.button,
 				{ ...style },
-				pressed && styles.pressed,
+				pressed && pressable && styles.pressed,
 			]}
 			onPress={onPress}
 		>
