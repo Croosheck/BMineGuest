@@ -2,12 +2,11 @@ import {
 	Animated,
 	Dimensions,
 	Easing,
-	ImageBackground,
-	Pressable,
 	StyleSheet,
-	Text,
 	View,
+	Button,
 } from "react-native";
+import { useEffect, useLayoutEffect, useRef, useState, memo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logoutUser } from "../../redux/slices/user";
@@ -15,13 +14,14 @@ import { getUser, logoutUser } from "../../redux/slices/user";
 import { signOut } from "firebase/auth";
 import { auth, db, storage } from "../../firebase";
 import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
+
 import LottieIcon from "../../components/LottieIcon";
-import { LinearGradient } from "expo-linear-gradient";
-import Icon from "../../components/Icon";
-import { memo } from "react";
-import { normalizeFontSize } from "../../util/normalizeFontSize";
+import LogoutButton from "./profile/LogoutButton";
+import ProfileImage from "./profile/ProfileImage";
+import UserName from "./profile/UserName";
+import Stats from "./profile/stats/Stats";
+import BackgroundImageWrapper from "./profile/BackgroundImageWrapper";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const BACKGROUND_COLOR = "#1F1616";
@@ -166,6 +166,8 @@ const Profile = ({ navigation }) => {
 		});
 	}
 
+	function testHandler() {}
+
 	useEffect(() => {
 		getUserData();
 
@@ -175,76 +177,27 @@ const Profile = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			{profileImage && (
-				<ImageBackground
-					style={styles.profileBackgroundContainer}
-					imageStyle={styles.profileBackground}
-					source={{ uri: profileImage }}
-					blurRadius={5}
-					resizeMode="cover"
-					resizeMethod="scale"
+				<BackgroundImageWrapper
+					WIDTH={WIDTH}
+					bgColor={BACKGROUND_COLOR}
+					uri={profileImage}
 				>
-					<LinearGradient
-						colors={["#8E21496D", BACKGROUND_COLOR]}
-						style={styles.backdropGradient}
-						start={{
-							x: 0,
-							y: 0.5,
-						}}
-						end={{
-							x: 0,
-							y: 1,
-						}}
-					>
-						<Pressable
-							onPress={logoutHandler}
-							style={({ pressed }) => [
-								styles.logoutButton,
-								pressed && { opacity: 0.5 },
-							]}
-						>
-							<Icon name="logout-variant" color="#ffffff" size={36} />
-						</Pressable>
-						<ImageBackground
-							source={{ uri: profileImage }}
-							style={styles.profileImageContainer}
-							imageStyle={styles.profileImage}
-							resizeMode="cover"
-						/>
-						<Text
-							style={[styles.userNameText, { fontSize: normalizeFontSize(22) }]}
-						>
-							{currentUser.name}
-						</Text>
-						<View style={styles.statsContainer}>
-							{/* <View style={styles.statContainer}>
-								<Text style={styles.stat}>{reservationsCounter.active ?? 0}</Text>
-								<Text style={styles.statLabel}>Active Reservations</Text>
-							</View> */}
-							<View style={styles.statContainer}>
-								<Text
-									style={[styles.stat, { fontSize: normalizeFontSize(20) }]}
-								>
-									{reservationsCounter.upcoming ?? 0}
-								</Text>
-								<Text style={styles.statLabel}>Upcoming Reservations</Text>
-							</View>
-							<View style={styles.statContainer}>
-								<Text
-									style={[styles.stat, { fontSize: normalizeFontSize(20) }]}
-								>
-									{reservationsCounter.total ?? 0}
-								</Text>
-								<Text style={styles.statLabel} numberOfLines={1}>
-									Ever Submitted
-								</Text>
-							</View>
-						</View>
-					</LinearGradient>
-				</ImageBackground>
+					<LogoutButton onPress={logoutHandler} />
+
+					<ProfileImage uri={profileImage} WIDTH={WIDTH} />
+
+					<UserName name={currentUser.name} WIDTH={WIDTH} />
+
+					<Stats
+						WIDTH={WIDTH}
+						upcoming={reservationsCounter.upcoming}
+						total={reservationsCounter.total}
+					/>
+				</BackgroundImageWrapper>
 			)}
-			<View style={styles.menuContainer}>
-				{/* <Button title="test" onPress={testHandler} /> */}
-			</View>
+			{/* <View style={styles.menuContainer}>
+				<Button title="test" onPress={testHandler} />
+			</View> */}
 		</View>
 	);
 };
@@ -256,76 +209,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: BACKGROUND_COLOR,
 	},
-	/////////// Upper Half
-	profileBackgroundContainer: {
-		flex: 0.5,
-		width: WIDTH,
-		zIndex: 1,
-		elevation: 20,
 
-		shadowColor: "#000000",
-		shadowOffset: { width: 0, height: 5 },
-		shadowOpacity: 1,
-		shadowRadius: 15,
-		overflow: "hidden",
-	},
-	profileBackground: {
-		opacity: 0.8,
-	},
-	backdropGradient: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#00000021",
-	},
-	logoutButton: {
-		position: "absolute",
-		top: 0,
-		right: 0,
-		marginRight: 20,
-		marginTop: 15,
-	},
-	profileImageContainer: {
-		width: WIDTH * 0.4,
-		aspectRatio: 1,
-		borderRadius: WIDTH * 0.2,
-		transform: [{ translateY: -25 }],
-		overflow: "hidden",
-	},
-	profileImage: {
-		transform: [{ scale: 1.2 }, { translateY: 10 }],
-	},
-	userNameText: {
-		width: WIDTH,
-		color: "#FFFFFF",
-		fontWeight: "bold",
-		textShadowColor: "#000000",
-		textShadowOffset: { height: 2, width: 2 },
-		textShadowRadius: 8,
-		textAlign: "center",
-	},
-	statsContainer: {
-		width: WIDTH,
-		flexDirection: "row",
-		transform: [{ translateY: 20 }],
-		paddingVertical: 10,
-		flexWrap: "wrap",
-	},
-	statContainer: {
-		justifyContent: "center",
-		alignItems: "center",
-		minWidth: "33%",
-		flexBasis: "auto",
-		flexGrow: 1,
-		flexShrink: 0,
-	},
-	stat: {
-		color: "#ffffff",
-	},
-	statLabel: {
-		color: "#FFFFFF79",
-		fontSize: 12,
-	},
 	/////////// Bottom Half
 	menuContainer: {
 		flex: 0.5,
