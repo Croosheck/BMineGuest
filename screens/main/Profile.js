@@ -1,11 +1,4 @@
-import {
-	Animated,
-	Dimensions,
-	Easing,
-	StyleSheet,
-	View,
-	Button,
-} from "react-native";
+import { Animated, Dimensions, Easing, StyleSheet, View } from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState, memo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +6,13 @@ import { getUser, logoutUser } from "../../redux/slices/user";
 
 import { signOut } from "firebase/auth";
 import { auth, db, storage } from "../../firebase";
-import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
+import {
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	onSnapshot,
+} from "firebase/firestore";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 
 import LottieIcon from "../../components/LottieIcon";
@@ -22,18 +21,22 @@ import ProfileImage from "./profile/ProfileImage";
 import UserName from "./profile/UserName";
 import Stats from "./profile/stats/Stats";
 import BackgroundImageWrapper from "./profile/BackgroundImageWrapper";
+import Favs from "./profile/favs/Favs";
+import { getFavs, getRestaurantData } from "./profile/utils/getFavs";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const BACKGROUND_COLOR = "#1F1616";
 
 const Profile = ({ navigation }) => {
-	const userProfileRef = doc(db, "users", auth.currentUser.uid);
+	const userProfileRef = doc(db, "users", auth.currentUser?.uid);
 	const userReservationRef = collection(
 		db,
 		"users",
-		auth.currentUser.uid,
+		auth.currentUser?.uid,
 		"reservations"
 	);
+
+	let logoutInProgress = false;
 
 	const [profileImage, setProfileImage] = useState();
 	const [reservationsCounter, setReservationsCounter] = useState({
@@ -41,6 +44,7 @@ const Profile = ({ navigation }) => {
 		upcoming: 0,
 		total: 0,
 	});
+	const [favRestaurants, setFavRestaurants] = useState([]);
 	const { currentUser } = useSelector((state) => state.userReducer);
 
 	const dispatch = useDispatch();
@@ -80,6 +84,8 @@ const Profile = ({ navigation }) => {
 				},
 			});
 
+			getFavRestaurants();
+
 			Animated.timing(animationProgress.current, {
 				toValue: 1,
 				duration: 700,
@@ -103,6 +109,8 @@ const Profile = ({ navigation }) => {
 				},
 			});
 
+			// setFavRestaurants([]);
+
 			Animated.timing(animationProgress.current, {
 				toValue: 0,
 				duration: 500,
@@ -118,9 +126,19 @@ const Profile = ({ navigation }) => {
 		};
 	}, []);
 
-	function logoutHandler() {
-		dispatch(logoutUser());
-		signOut(auth);
+	async function logoutHandler() {
+		if (logoutInProgress) return;
+
+		logoutInProgress = true;
+
+		try {
+			signOut(auth);
+			dispatch(logoutUser());
+		} catch (error) {
+			console.log(error);
+		} finally {
+			logoutInProgress = false;
+		}
 	}
 
 	async function getUserData() {
@@ -128,7 +146,7 @@ const Profile = ({ navigation }) => {
 
 		const imageFolderRef = ref(
 			storage,
-			`users/${auth.currentUser.uid}/profilePic`
+			`users/${auth.currentUser?.uid}/profilePic`
 		);
 
 		const list = await listAll(imageFolderRef);
@@ -138,7 +156,7 @@ const Profile = ({ navigation }) => {
 		dispatch(getUser());
 		const profileImageRef = ref(
 			storage,
-			`users/${auth.currentUser.uid}/profilePic/${imageItemName}`
+			`users/${auth.currentUser?.uid}/profilePic/${imageItemName}`
 		);
 
 		const profileImgUri = await getDownloadURL(profileImageRef);
@@ -156,48 +174,76 @@ const Profile = ({ navigation }) => {
 		});
 
 		const unsub = onSnapshot(userProfileRef, (doc) => {
-			// console.log("Current data: ", doc.data());
-
 			setReservationsCounter({
-				// active: querySnapshot.docs.length,
 				upcoming: upcomingReservations,
 				total: doc.data().totalReservations,
 			});
 		});
 	}
 
-	function testHandler() {}
+	function getFavRestaurants() {
+		getFavs({
+			stateCallback: setFavRestaurants,
+		});
+	}
+
+	async function onFavPressHandler(data) {
+		const restaurantData = await getRestaurantData(data.id);
+
+		// console.log(restaurantData);
+
+		navigation.navigate("RestaurantProfile", {
+			name: restaurantData.name,
+			description: restaurantData.description
+				? restaurantData.description
+				: "No description.",
+			imageUri: restaurantData.imageUri,
+			restaurantKey: restaurantData.key,
+			restaurantUid: restaurantData.uid,
+			reservationAdvance: restaurantData.reservationAdvance,
+			openDays: restaurantData.openDays,
+			reservationLimit: restaurantData.reservationLimit,
+			reservationsEnabled: restaurantData.reservationsEnabled,
+			restaurantTags: restaurantData.restaurantTags,
+			phone: restaurantData.phone,
+			rating: restaurantData.restaurantRating,
+			url: restaurantData.url || "",
+			tables: restaurantData.tables || [],
+			tablesFiltering: restaurantData.tablesFiltering,
+		});
+	}
 
 	useEffect(() => {
 		getUserData();
-
-		// console.log(currentUser);
 	}, []);
 
 	return (
 		<View style={styles.container}>
-			{profileImage && (
-				<BackgroundImageWrapper
+			<BackgroundImageWrapper
+				WIDTH={WIDTH}
+				bgColor={BACKGROUND_COLOR}
+				uri={profileImage || "#"}
+			>
+				<LogoutButton onPress={logoutHandler} />
+
+				<ProfileImage uri={profileImage || "#"} WIDTH={WIDTH} />
+
+				<UserName name={currentUser.name} WIDTH={WIDTH} />
+
+				<Stats
 					WIDTH={WIDTH}
-					bgColor={BACKGROUND_COLOR}
-					uri={profileImage}
-				>
-					<LogoutButton onPress={logoutHandler} />
-
-					<ProfileImage uri={profileImage} WIDTH={WIDTH} />
-
-					<UserName name={currentUser.name} WIDTH={WIDTH} />
-
-					<Stats
-						WIDTH={WIDTH}
-						upcoming={reservationsCounter.upcoming}
-						total={reservationsCounter.total}
-					/>
-				</BackgroundImageWrapper>
-			)}
-			{/* <View style={styles.menuContainer}>
-				<Button title="test" onPress={testHandler} />
-			</View> */}
+					upcoming={reservationsCounter.upcoming}
+					total={reservationsCounter.total}
+				/>
+			</BackgroundImageWrapper>
+			<View style={styles.menuContainer}>
+				<Favs
+					WIDTH={WIDTH}
+					favRestaurants={favRestaurants}
+					onFavPress={(data) => onFavPressHandler(data)}
+					label="Favorites:"
+				/>
+			</View>
 		</View>
 	);
 };
@@ -215,7 +261,7 @@ const styles = StyleSheet.create({
 		flex: 0.5,
 		backgroundColor: BACKGROUND_COLOR,
 		width: WIDTH,
-		justifyContent: "center",
+		// justifyContent: "center",
 		alignItems: "center",
 	},
 });
