@@ -9,6 +9,14 @@ const LogoutButton = ({ onPress = () => {} }) => {
 			icon="md-exit-outline"
 			color="#ffffff"
 			size={36}
+			label="Logout"
+			labelSize={10}
+			labelColor="#ffffff"
+			labelStyle={{
+				transform: [{ translateX: -3 }, { translateY: -4 }],
+				textTransform: "uppercase",
+				fontWeight: "300",
+			}}
 		/>
 	);
 };
