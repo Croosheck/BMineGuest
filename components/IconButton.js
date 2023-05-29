@@ -10,6 +10,7 @@ const IconButton = ({
 	label = "",
 	labelColor = "#A2A2A2",
 	labelSize = 11,
+	labelStyle = {},
 	pressable = true,
 }) => {
 	return (
@@ -24,7 +25,11 @@ const IconButton = ({
 			<Ionicons name={icon} size={size} color={color} />
 			{!!label && (
 				<Text
-					style={{ fontWeight: "200", color: labelColor, fontSize: labelSize }}
+					style={[
+						styles.label,
+						{ color: labelColor, fontSize: labelSize },
+						labelStyle,
+					]}
 				>
 					{label}
 				</Text>
@@ -43,5 +48,8 @@ const styles = StyleSheet.create({
 	},
 	pressed: {
 		opacity: 0.6,
+	},
+	label: {
+		fontWeight: "200",
 	},
 });
