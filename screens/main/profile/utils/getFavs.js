@@ -1,4 +1,12 @@
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import {
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	limit,
+	orderBy,
+	query,
+} from "firebase/firestore";
 import { auth, db, storage } from "../../../../firebase";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 
@@ -12,14 +20,34 @@ export async function getRestaurantData(id = "") {
 	}
 }
 
-export async function getFavs({ stateCallback = () => {} }) {
-	stateCallback([]);
+export async function getFavs({ listLimit = 2 }) {
+	const favsData = [];
+	let favsQuery;
 
 	const favsRef = collection(db, "users", auth.currentUser.uid, "favorites");
-	const favsSnapshot = await getDocs(favsRef);
+
+	if (listLimit !== 0) {
+		favsQuery = query(
+			favsRef,
+			orderBy("addedTimestamp", "desc"),
+			limit(listLimit + 1)
+		);
+	} else {
+		favsQuery = query(favsRef, orderBy("addedTimestamp", "desc"));
+	}
+
+	const favsSnapshot = await getDocs(favsQuery);
 
 	//iterates through the 'favorites' collection
-	for (const fav of favsSnapshot.docs) {
+	for (const [index, fav] of favsSnapshot.docs.entries()) {
+		if (listLimit !== 0) {
+			if (
+				index === favsSnapshot.docs.length - 1 &&
+				listLimit < favsSnapshot.docs.length
+			)
+				return { isMoreThanLimit: true, favsData: favsData };
+		}
+
 		const profileImageRef = ref(
 			storage,
 			`restaurants/${fav.id}/restaurantPicture`
@@ -32,14 +60,13 @@ export async function getFavs({ stateCallback = () => {} }) {
 			const restaurantImgRef = ref(storage, item.fullPath);
 			const profileImgUri = await getDownloadURL(restaurantImgRef);
 
-			stateCallback((prev) => [
-				...prev,
-				{
-					name: data.name,
-					url: profileImgUri,
-					id: fav.id,
-				},
-			]);
+			favsData.push({
+				name: data.name,
+				url: profileImgUri,
+				id: fav.id,
+			});
 		}
 	}
+
+	return { isMoreThanLimit: false, favsData: favsData };
 }
