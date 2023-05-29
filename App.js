@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import { useEffect, useState } from "react";
-import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { StatusBar } from "react-native";
 
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
@@ -18,6 +18,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import { getAuth } from "firebase/auth";
+import LoadingSplashScreen from "./screens/LoadingSplashScreen";
 
 function AppContainer() {
 	const Stack = createStackNavigator();
@@ -29,6 +30,8 @@ function AppContainer() {
 	const [areCredentialsValid, setAreCredentialsValid] = useState(false);
 
 	const { loaded, loggedIn } = isLoggedIn;
+
+	//used when user is already logged in and turns the app back on
 	let isFreshStart = true;
 
 	function onLoginHandler(duration, isFreshStart) {
@@ -64,11 +67,7 @@ function AppContainer() {
 	}, []);
 
 	if (!loaded) {
-		return (
-			<View style={styles.container}>
-				<Text>Loading...</Text>
-			</View>
-		);
+		return <LoadingSplashScreen theme="dark" label="Loading app..." />;
 	}
 
 	if (!loggedIn) {
@@ -186,11 +185,3 @@ export default function App() {
 		</Provider>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-});
