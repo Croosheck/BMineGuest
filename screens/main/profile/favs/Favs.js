@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import { StyleSheet, ScrollView, View, Text, Pressable } from "react-native";
 import { memo } from "react";
 import { FadeInRight } from "react-native-reanimated";
 import { normalizeFontSize } from "../../../../util/normalizeFontSize";
@@ -10,7 +10,13 @@ const Favs = ({
 	favRestaurants = [],
 	onFavPress = () => {},
 	label = "",
+	isMoreData = Boolean(),
+	onShowAllFavsPress = () => {},
 }) => {
+	function displayAllFavsHandler() {
+		onShowAllFavsPress();
+	}
+
 	return (
 		<View style={[styles.container]}>
 			<Text style={[styles.label, { fontSize: normalizeFontSize(18) }]}>
@@ -21,7 +27,6 @@ const Favs = ({
 				horizontal
 				style={styles.scroll}
 				contentContainerStyle={styles.scrollContent}
-				persistentScrollbar={false}
 			>
 				{favRestaurants.map((fav, idx) => {
 					const img = !fav.url
@@ -36,10 +41,28 @@ const Favs = ({
 							WIDTH={WIDTH}
 							data={fav}
 							onFavPress={(data) => onFavPress(data)}
-							entering={FadeInRight.delay(500).duration(600)}
+							entering={FadeInRight.duration(400)}
 						/>
 					);
 				})}
+				{isMoreData && (
+					<Pressable
+						style={({ pressed }) => [
+							styles.allButton,
+							pressed && { opacity: 0.7 },
+						]}
+						onPress={displayAllFavsHandler}
+					>
+						<Text
+							style={[
+								styles.allButtonLabel,
+								{ fontSize: normalizeFontSize(16) },
+							]}
+						>
+							Show All
+						</Text>
+					</Pressable>
+				)}
 			</ScrollView>
 		</View>
 	);
@@ -49,8 +72,6 @@ export default memo(Favs);
 
 const styles = StyleSheet.create({
 	container: {
-		// borderWidth: 2,
-		// borderColor: "#ffffff",
 		flex: 0.45,
 		paddingLeft: 20,
 		marginRight: 10,
@@ -61,15 +82,28 @@ const styles = StyleSheet.create({
 		fontWeight: "500",
 		letterSpacing: 1,
 	},
-	scroll: {
-		// borderWidth: 2,
-		// borderColor: "#62FF00",
-	},
+	scroll: {},
 	scrollContent: {
 		alignItems: "center",
 		paddingVertical: 2,
+		paddingRight: 10,
 		gap: 15,
 		minWidth: "100%",
-		// backgroundColor: "#FF0000",
+	},
+	///////////////
+	allButton: {
+		flex: 1,
+		height: "40%",
+		width: 110,
+
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		backgroundColor: "#FFFFFF17",
+	},
+	allButtonLabel: {
+		color: "#ffffff",
+		textShadowColor: "#FFFFFFA4",
+		textShadowRadius: 5,
 	},
 });
