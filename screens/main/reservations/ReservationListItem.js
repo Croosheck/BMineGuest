@@ -45,6 +45,7 @@ const ReservationListItem = ({
 	firstLoad = Boolean(),
 	drawerOptionsButtons = Array(),
 	slideMenu = Boolean(),
+	onLoadEnd = () => {},
 
 	data = {
 		restaurantName: "",
@@ -273,6 +274,7 @@ const ReservationListItem = ({
 									imageStyle={styles.imageBackground}
 									resizeMode="stretch"
 									blurRadius={3}
+									onLoadEnd={onLoadEnd}
 								>
 									<PanGestureHandler
 										onGestureEvent={slideMenu && drawerGestureHandler}
