@@ -7,13 +7,20 @@ import { normalizeFontSize } from "../../../../util/normalizeFontSize";
 const Fav = ({
 	img,
 	WIDTH = Number(),
+	HEIGHT,
 	data = {},
 	onFavPress = () => {},
 	entering,
+	style = {},
 }) => {
 	return (
 		<Animated.View
-			style={[styles.container, { width: WIDTH * 0.5 }]}
+			style={[
+				styles.container,
+				{ width: WIDTH * 0.5 },
+				HEIGHT && { height: HEIGHT },
+				style,
+			]}
 			entering={entering}
 		>
 			<Pressable style={{ flex: 1 }} onPress={onFavPress.bind(this, data)}>
