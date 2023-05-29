@@ -54,7 +54,7 @@ const AllFavsModal = ({
 										WIDTH={WIDTH * 0.8}
 										HEIGHT="15%"
 										data={fav}
-										style={styles.favModal}
+										style={styles.favItem}
 										onFavPress={onFavPress}
 										entering={FadeInUp.delay(100 * idx).duration(350)}
 									/>
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
 		height: "85%",
 		maxWidth: 400,
 		maxHeight: 700,
-		backgroundColor: "#ffffff",
+		backgroundColor: "#D4E7F0",
 		borderRadius: 10,
 		overflow: "hidden",
 	},
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
 		right: 0,
 		top: 0,
 		zIndex: 2,
-		backgroundColor: "#FFFFFF",
+		backgroundColor: "#FFFFFFBB",
 		padding: 15,
 		borderBottomLeftRadius: 99,
 		borderLeftWidth: 15,
@@ -117,8 +117,10 @@ const styles = StyleSheet.create({
 		padding: 5,
 		paddingVertical: 10,
 	},
-	favModal: {
+	favItem: {
 		flexGrow: 1,
 		minHeight: 100,
+		borderWidth: 1,
+		borderColor: "#B4B4B4",
 	},
 });

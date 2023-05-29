@@ -71,13 +71,13 @@ export default BackgroundImageWrapper;
 const styles = StyleSheet.create({
 	container: {
 		flex: 0.5,
-		zIndex: 1,
-		elevation: 20,
-		shadowColor: "#000000",
-		shadowOffset: { width: 0, height: 5 },
-		shadowOpacity: 1,
-		shadowRadius: 15,
-		overflow: "hidden",
+		// zIndex: 1,
+		// elevation: 20,
+		// shadowColor: "#000000",
+		// shadowOffset: { width: 0, height: 5 },
+		// shadowOpacity: 1,
+		// shadowRadius: 15,
+		// overflow: "hidden",
 	},
 	profileBackground: {
 		opacity: 0.8,
