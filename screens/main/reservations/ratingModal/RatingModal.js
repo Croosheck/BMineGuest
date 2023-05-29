@@ -72,6 +72,7 @@ const RatingModal = ({
 			animationType="fade"
 			onRequestClose={onCloseModal}
 			hardwareAccelerated
+			statusBarTranslucent
 		>
 			<View style={{ flex: 1, backgroundColor: "#00000075" }}>
 				<View style={styles.modalContainer}>

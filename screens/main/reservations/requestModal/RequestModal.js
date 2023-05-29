@@ -56,6 +56,7 @@ const RequestModal = ({
 			animationType="fade"
 			hardwareAccelerated
 			onRequestClose={onCloseModal}
+			statusBarTranslucent
 		>
 			<View style={{ flex: 1, backgroundColor: "#00000075" }}>
 				<KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
