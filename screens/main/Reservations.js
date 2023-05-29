@@ -31,6 +31,7 @@ import RatingModal from "./reservations/ratingModal/RatingModal";
 import RequestModal from "./reservations/requestModal/RequestModal";
 import { getReservationStatus } from "./reservations/utils/getReservationStatus";
 import { ActivityIndicator } from "react-native";
+import LoadingSplashScreen from "../LoadingSplashScreen";
 
 const { height: HEIGHT, width: WIDTH } = Dimensions.get("window");
 
@@ -168,12 +169,11 @@ const Reservations = ({ navigation }) => {
 
 	if (!loaded) {
 		return (
-			<LinearGradient
-				style={[styles.container, styles.emptyListInnerContainer]}
-				colors={["#3B1616", "#010C1C", "#370B0B"]}
-			>
-				<ActivityIndicator size="large" color="#FFFFFF" />
-			</LinearGradient>
+			<LoadingSplashScreen
+				theme="dark"
+				label="Looking for your reservations..."
+				style={styles.emptyListInnerContainer}
+			/>
 		);
 	}
 
