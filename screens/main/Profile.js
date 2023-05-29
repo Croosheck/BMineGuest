@@ -1,4 +1,11 @@
-import { Animated, Dimensions, Easing, StyleSheet, View } from "react-native";
+import {
+	ActivityIndicator,
+	Animated,
+	Dimensions,
+	Easing,
+	StyleSheet,
+	View,
+} from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState, memo } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -6,13 +13,7 @@ import { getUser, logoutUser } from "../../redux/slices/user";
 
 import { signOut } from "firebase/auth";
 import { auth, db, storage } from "../../firebase";
-import {
-	collection,
-	doc,
-	getDoc,
-	getDocs,
-	onSnapshot,
-} from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
 
 import LottieIcon from "../../components/LottieIcon";
@@ -23,6 +24,7 @@ import Stats from "./profile/stats/Stats";
 import BackgroundImageWrapper from "./profile/BackgroundImageWrapper";
 import Favs from "./profile/favs/Favs";
 import { getFavs, getRestaurantData } from "./profile/utils/getFavs";
+import AllFavsModal from "./profile/AllFavsModal";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const BACKGROUND_COLOR = "#1F1616";
@@ -45,6 +47,13 @@ const Profile = ({ navigation }) => {
 		total: 0,
 	});
 	const [favRestaurants, setFavRestaurants] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isMoreFavsToDisplay, setIsMoreFavsToDisplay] = useState(false);
+	const [allFavsModal, setAllFavsModal] = useState({
+		isOpen: false,
+		data: [],
+		isLoading: false,
+	});
 	const { currentUser } = useSelector((state) => state.userReducer);
 
 	const dispatch = useDispatch();
@@ -109,14 +118,14 @@ const Profile = ({ navigation }) => {
 				},
 			});
 
-			// setFavRestaurants([]);
-
 			Animated.timing(animationProgress.current, {
 				toValue: 0,
 				duration: 500,
 				easing: Easing.linear,
 				useNativeDriver: false,
 			}).start();
+
+			// setIsMoreFavsToDisplay(false);
 		});
 
 		return () => {
@@ -163,7 +172,6 @@ const Profile = ({ navigation }) => {
 
 		setProfileImage(profileImgUri);
 
-		// const snapshot = await getCountFromServer(userReservationRef);
 		const querySnapshot = await getDocs(userReservationRef);
 
 		const currentTimestamp = new Date().valueOf();
@@ -181,16 +189,58 @@ const Profile = ({ navigation }) => {
 		});
 	}
 
-	function getFavRestaurants() {
-		getFavs({
-			stateCallback: setFavRestaurants,
-		});
+	async function getFavRestaurants(listLimit = 2) {
+		setIsLoading(true);
+
+		try {
+			const { isMoreThanLimit, favsData } = await getFavs({
+				listLimit: listLimit,
+			});
+			setFavRestaurants(favsData);
+			setIsMoreFavsToDisplay(isMoreThanLimit);
+		} catch (error) {
+			console.log("Something went wrong while fetching favs: ", error);
+		} finally {
+			setIsLoading(false);
+		}
 	}
 
-	async function onFavPressHandler(data) {
+	async function showAllFavsHandler() {
+		setAllFavsModal({
+			isOpen: true,
+			data: [],
+			isLoading: true,
+		});
+
+		try {
+			const { favsData } = await getFavs({
+				// "0" means no limit
+				listLimit: 0,
+			});
+			setAllFavsModal((prev) => ({
+				...prev,
+				data: favsData,
+			}));
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setAllFavsModal((prev) => ({
+				...prev,
+				isLoading: false,
+			}));
+		}
+	}
+
+	async function onFavPressHandler(data = {}, type = "") {
 		const restaurantData = await getRestaurantData(data.id);
 
-		// console.log(restaurantData);
+		if (type === "modal") {
+			setAllFavsModal({
+				isOpen: false,
+				data: [],
+				isLoading: false,
+			});
+		}
 
 		navigation.navigate("RestaurantProfile", {
 			name: restaurantData.name,
@@ -213,12 +263,28 @@ const Profile = ({ navigation }) => {
 		});
 	}
 
+	function allFavsModalCloseHandler() {
+		setAllFavsModal((prev) => ({
+			...prev,
+			isOpen: false,
+		}));
+	}
+
 	useEffect(() => {
 		getUserData();
 	}, []);
 
 	return (
 		<View style={styles.container}>
+			<AllFavsModal
+				data={allFavsModal.data}
+				WIDTH={WIDTH}
+				isVisible={allFavsModal.isOpen}
+				isLoading={allFavsModal.isLoading}
+				onClose={allFavsModalCloseHandler}
+				onFavPress={(data) => onFavPressHandler(data, "modal")}
+			/>
+
 			<BackgroundImageWrapper
 				WIDTH={WIDTH}
 				bgColor={BACKGROUND_COLOR}
@@ -237,12 +303,18 @@ const Profile = ({ navigation }) => {
 				/>
 			</BackgroundImageWrapper>
 			<View style={styles.menuContainer}>
-				<Favs
-					WIDTH={WIDTH}
-					favRestaurants={favRestaurants}
-					onFavPress={(data) => onFavPressHandler(data)}
-					label="Favorites:"
-				/>
+				{isLoading ? (
+					<ActivityIndicator size="large" color="#FFFFFF" />
+				) : (
+					<Favs
+						WIDTH={WIDTH}
+						favRestaurants={favRestaurants}
+						onFavPress={onFavPressHandler}
+						label="Favorites:"
+						isMoreData={isMoreFavsToDisplay}
+						onShowAllFavsPress={showAllFavsHandler}
+					/>
+				)}
 			</View>
 		</View>
 	);
@@ -261,7 +333,7 @@ const styles = StyleSheet.create({
 		flex: 0.5,
 		backgroundColor: BACKGROUND_COLOR,
 		width: WIDTH,
-		// justifyContent: "center",
 		alignItems: "center",
 	},
+	/////////////////////////
 });
