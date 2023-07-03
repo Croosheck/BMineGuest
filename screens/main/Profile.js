@@ -290,7 +290,7 @@ const Profile = ({ navigation }) => {
 				bgColor={BACKGROUND_COLOR}
 				uri={profileImage || "#"}
 			>
-				<LogoutButton onPress={logoutHandler} />
+				<LogoutButton onPress={logoutHandler} isReady={!isLoading} />
 
 				<ProfileImage uri={profileImage || "#"} WIDTH={WIDTH} />
 
