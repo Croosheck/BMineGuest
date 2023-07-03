@@ -20,6 +20,7 @@ import {
 	removeFavorite,
 	setAsFavorite,
 } from "./utils/favoriteHandler";
+import BackButton from "./restaurantProfile/BackButton";
 
 const MARGIN_LEFT = 20;
 const DESCRIPTION_MARGIN_RIGHT = 20;
@@ -154,6 +155,8 @@ const RestaurantProfile = ({ navigation, route }) => {
 						isFavorite={isRestaurantFavorite.isFav}
 					/>
 				)}
+
+				<BackButton onPress={() => navigation.goBack()} />
 			</View>
 
 			<View style={styles.detailsContainer}>
