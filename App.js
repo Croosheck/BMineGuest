@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import { useEffect, useState } from "react";
-import { StatusBar } from "react-native";
+import { Platform, StatusBar } from "react-native";
 
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
@@ -173,13 +173,15 @@ function AppContainer() {
 }
 
 export default function App() {
+	const statusBarHidden = Platform.select({ ios: false, android: false });
+
 	return (
 		<Provider store={store}>
 			<StatusBar
 				translucent={false}
 				barStyle="light-content"
 				backgroundColor="#000000"
-				hidden
+				hidden={statusBarHidden}
 			/>
 			<AppContainer />
 		</Provider>
