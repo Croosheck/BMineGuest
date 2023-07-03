@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Image, View } from "react-native";
+import { ImageBackground, StyleSheet, Image, View, Button } from "react-native";
 import OutlinedButton from "../../components/OutlinedButton";
 
 const Landing = ({ navigation }) => {
@@ -15,10 +15,11 @@ const Landing = ({ navigation }) => {
 			imageStyle={styles.backgroundImage}
 			source={require("../../assets/background/Landing/background.jpg")}
 		>
-			<Image
+			{/* <Image
 				style={styles.image}
 				source={require("../../assets/background/Landing/1.png")}
-			/>
+				resizeMode="contain"
+			/> */}
 			<View style={styles.buttons}>
 				<OutlinedButton
 					title="Register"
@@ -50,9 +51,11 @@ const styles = StyleSheet.create({
 		opacity: 0.7,
 	},
 	image: {
-		width: "100%",
-		height: 500,
-		transform: [{ translateY: 100 }],
+		maxWidth: "100%",
+		maxHeight: "100%",
+		opacity: 0.9,
+		// borderWidth: 2,
+		// borderColor: "#ffffff",
 	},
 	buttons: {
 		flexDirection: "row",
